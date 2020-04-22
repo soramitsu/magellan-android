@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/dashboard"
+        android:title="Dashboard"
+        android:icon="@drawable/ic_dashboard_24"
+        />
+
+    <item
+        android:id="@+id/map_two_tabs"
+        android:title="Map (2 tabs)"
+        android:icon="@drawable/ic_map_24"
+        />
+
+    <item
+        android:id="@+id/map_single_tab"
+        android:title="Map (1 tab)"
+        android:icon="@drawable/ic_map_24"
+        />
+
+</menu>

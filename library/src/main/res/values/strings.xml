@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="sm_close">Close dialog</string>
+
+    <string name="sm_category_bank">Bank</string>
+    <string name="sm_category_services">Services</string>
+    <string name="sm_category_food">Food</string>
+    <string name="sm_category_supermarkets">Supermarkets</string>
+    <string name="sm_category_pharmacy">Pharmacy</string>
+    <string name="sm_category_entertainment">Entertainment</string>
+    <string name="sm_category_education">Education</string>
+    <string name="sm_category_other">Other</string>
+
+    <plurals name="sm_review">
+        <item quantity="one">(%d review)</item>
+        <item quantity="other">(%d reviews)</item>
+    </plurals>
+
+    <string name="sm_open_till">Open till %1$s</string>
+    <string name="sm_closed_till">Closed till %1$s</string>
+    <string name="sm_open_now">Open now</string>
+    <string name="sm_closed_now">Closed now</string>
+    <string name="sm_information">Information</string>
+    <string name="sm_mobile_phone">Mobile phone</string>
+    <string name="sm_website">Website</string>
+    <string name="sm_facebook">Facebook</string>
+    <string name="sm_address">Address</string>
+    <string name="sm_open_hours">Open hours</string>
+    <string name="sm_daily_interval">Daily %1$s – %2$s</string>
+    <string name="sm_category">Category</string>
+    <string name="sm_list_of_places">List of places</string>
+    <string name="sm_search_by_name">Search by name</string>
+    <string name="sm_search_by_name_hint">Search by name…</string>
+    <string name="sm_content_description_clear_search_field">clear search field</string>
+    <string name="sm_nearby_places">Nearby places</string>
+    <string name="sm_zoom_in_button_caption">+</string>
+    <string name="sm_zoom_out_button_caption">–</string>
+
+    <string name="sm_undefined_schedule">Undefined schedule</string>
+</resources>

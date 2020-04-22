@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="text_color_activated">#00A167</color>
+    <color name="text_color_deactivated">#D0021B</color>
+    <color name="text_color_clickable">#027AD0</color>
+    <color name="rating_bar">#FFC516</color>
+</resources>

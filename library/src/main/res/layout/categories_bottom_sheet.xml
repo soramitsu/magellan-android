@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/categoriesBottomSheet"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="?soramitsuMapCategoriesBottomSheetBackground"
+    app:behavior_peekHeight="?soramitsuMapCategoriesBottomSheetPeekHeight"
+    app:layout_behavior="com.google.android.material.bottomsheet.ViewPagerBottomSheetBehavior">
+
+    <View
+        android:layout_width="?soramitsuMapCategoriesBottomSheetTopperWidth"
+        android:layout_height="?soramitsuMapCategoriesBottomSheetTopperHeight"
+        android:layout_marginTop="8dp"
+        android:background="?soramitsuMapCategoriesBottomSheetTopperDrawable"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/searchTextInputLayout"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:paddingStart="16dp"
+        android:paddingTop="12dp"
+        android:paddingEnd="16dp"
+        android:paddingBottom="12dp"
+        app:boxStrokeColor="?soramitsuMapCategoriesBottomSheetSearchBoxStrokeColor"
+        app:hintEnabled="false"
+        app:layout_constraintEnd_toStartOf="@id/clearSearchViewButton"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/searchTextInputEditText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@null"
+            android:drawableStart="?soramitsuMapCategoriesBottomSheetSearchIcon"
+            android:drawableLeft="?soramitsuMapCategoriesBottomSheetSearchIcon"
+            android:drawablePadding="16dp"
+            android:textAppearance="?soramitsuMapCategoriesBottomSheetSearchTextAppearance"
+            android:hint="@string/sm_search_by_name_hint"
+            android:maxLines="1"
+            android:textColorHint="?soramitsuMapCategoriesBottomSheetSearchTextHintColor"
+            />
+
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <ImageButton
+        android:id="@+id/clearSearchViewButton"
+        style="@style/Widget.AppCompat.ActionButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:layout_marginRight="8dp"
+        android:contentDescription="@string/sm_content_description_clear_search_field"
+        android:src="?soramitsuMapCloseIcon"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@id/searchTextInputLayout" />
+
+    <androidx.constraintlayout.widget.Barrier
+        android:id="@+id/searchPanelBarrier"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:constraint_referenced_ids="clearSearchViewButton,searchTextInputLayout"
+        app:barrierDirection="bottom"
+        />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="8dp"
+        android:background="?soramitsuMapCategoriesBottomSheetSeparatorColor"
+        app:layout_constraintTop_toBottomOf="@id/searchPanelBarrier"
+        />
+
+    <androidx.viewpager.widget.ViewPager
+        android:id="@+id/categoriesViewPager"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginTop="8dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/searchPanelBarrier">
+
+        <com.google.android.material.tabs.TabLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="top"
+            app:tabTextAppearance="?soramitsuMapCategoriesBottomSheetTabTextAppearance" />
+
+    </androidx.viewpager.widget.ViewPager>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
