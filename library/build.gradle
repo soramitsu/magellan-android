@@ -6,7 +6,7 @@ android {
     compileSdkVersion 29
 
     defaultConfig {
-        minSdkVersion 17
+        minSdkVersion 21
         targetSdkVersion 29
         versionCode 1
         versionName "0.1"
@@ -28,4 +28,16 @@ dependencies {
 
     implementation "com.google.android.gms:play-services-maps:17.0.0"
     implementation 'com.google.maps.android:android-maps-utils:1.0.0'
+}
+
+apply from: '../maven-publish-helper.gradle'
+
+publishing {
+    publications {
+        release(MavenPublication)
+    }
+}
+
+tasks.withType(Javadoc).all {
+    enabled = false
 }
