@@ -1,9 +1,9 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="jp.co.soramitsu.feature_map_impl">
+    package="jp.co.soramitsu.map">
 
     <application>
         <activity
-            android:name="jp.co.soramitsu.feature.maps.impl.presentation.GoogleMapActivity"
+            android:name="jp.co.soramitsu.map.presentation.GoogleMapActivity"
             android:screenOrientation="portrait"
             android:theme="@style/Soramistu.Map.BaseTheme"
             />

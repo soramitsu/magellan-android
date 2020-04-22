@@ -4,7 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.Fragment
-import jp.co.soramitsu.feature.maps.impl.presentation.GoogleMapActivity
+import jp.co.soramitsu.map.presentation.GoogleMapActivity
 import kotlinx.android.synthetic.main.fragment_dashboard.*
 
 class DashboardFragment : Fragment(R.layout.fragment_dashboard) {

@@ -4,7 +4,7 @@
     android:id="@+id/map"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:name="jp.co.soramitsu.feature.maps.impl.presentation.SoramitsuMapFragment"
-    tools:context="jp.co.soramitsu.feature.maps.impl.presentation.GoogleMapActivity"
+    android:name="jp.co.soramitsu.map.presentation.SoramitsuMapFragment"
+    tools:context="jp.co.soramitsu.map.presentation.GoogleMapActivity"
     />
 

@@ -3,8 +3,8 @@ package jp.soramitsu.map
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
-import jp.co.soramitsu.feature.maps.impl.presentation.SoramitsuMapFragment
-import jp.co.soramitsu.feature.maps.impl.presentation.SoramitsuMapFragment.Companion.EXTRA_SINGLE_TAB
+import jp.co.soramitsu.map.presentation.SoramitsuMapFragment
+import jp.co.soramitsu.map.presentation.SoramitsuMapFragment.Companion.EXTRA_SINGLE_TAB
 import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity() {
