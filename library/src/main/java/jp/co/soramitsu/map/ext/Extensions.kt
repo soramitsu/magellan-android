@@ -10,21 +10,21 @@ import jp.co.soramitsu.map.model.Category
 import jp.co.soramitsu.map.model.Time
 import java.util.*
 
-fun Time.toMinutesOfDay() = hour * 60 + minute
+internal fun Time.toMinutesOfDay() = hour * 60 + minute
 
-fun Calendar.withTime(time: Time) {
+internal fun Calendar.withTime(time: Time) {
     this[Calendar.HOUR_OF_DAY] = time.hour
     this[Calendar.MINUTE] = time.minute
 }
 
-fun Calendar.asTime(): Time {
+internal fun Calendar.asTime(): Time {
     val hour = this[Calendar.HOUR_OF_DAY]
     val minute = this[Calendar.MINUTE]
     return Time(hour = hour, minute = minute)
 }
 
 @StringRes
-fun Category.asLocalizedString() = when (this) {
+internal fun Category.asLocalizedString() = when (this) {
     Category.BANK -> R.string.sm_category_bank
     Category.FOOD -> R.string.sm_category_food
     Category.EDUCATION -> R.string.sm_category_education
@@ -35,13 +35,13 @@ fun Category.asLocalizedString() = when (this) {
     Category.OTHER -> R.string.sm_category_other
 }
 
-fun View.selectableItemBackground() {
+internal fun View.selectableItemBackground() {
     val outValue = TypedValue()
     context.theme.resolveAttribute(android.R.attr.selectableItemBackground, outValue, true)
     setBackgroundResource(outValue.resourceId)
 }
 
-fun Context.getResourceIdForAttr(@AttrRes attribute: Int): Int {
+internal fun Context.getResourceIdForAttr(@AttrRes attribute: Int): Int {
     val typedValue = TypedValue()
     theme.resolveAttribute(attribute, typedValue, true)
     return typedValue.resourceId

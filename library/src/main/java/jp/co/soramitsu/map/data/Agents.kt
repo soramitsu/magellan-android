@@ -8,7 +8,7 @@ import jp.co.soramitsu.map.model.Position
  * All agents on the map. Agent is an authorized person who can help user with
  * withdraw and top up his account
  */
-val Places.agents
+internal val Places.agents
     get() = listOf(
         Place(
             name = "Nguon Sitha",

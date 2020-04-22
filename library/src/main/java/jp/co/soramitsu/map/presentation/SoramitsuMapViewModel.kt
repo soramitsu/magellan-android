@@ -10,7 +10,7 @@ import jp.co.soramitsu.map.model.Place
 import jp.co.soramitsu.map.presentation.lifycycle.SingleLiveEvent
 import java.util.*
 
-class SoramitsuMapViewModel(
+internal class SoramitsuMapViewModel(
     private val placesRepository: PlacesRepository = DemoPlacesRepository()
 ) : ViewModel() {
 
@@ -74,7 +74,7 @@ class SoramitsuMapViewModel(
     }
 }
 
-data class SoramitsuMapViewState(
+internal data class SoramitsuMapViewState(
     val showLoadingIndicator: Boolean = false,
     val places: List<Place> = emptyList(),
     val query: String = "",

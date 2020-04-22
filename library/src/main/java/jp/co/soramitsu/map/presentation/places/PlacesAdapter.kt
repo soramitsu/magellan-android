@@ -5,7 +5,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import jp.co.soramitsu.map.model.Place
 
-class PlacesAdapter(
+internal class PlacesAdapter(
     private val onPlaceSelected: (Place) -> Unit = {}
 ) : RecyclerView.Adapter<PlaceViewHolder>() {
 
@@ -39,9 +39,9 @@ class PlacesAdapter(
     }
 }
 
-class PlaceViewHolder(val placeView: PlaceView) : RecyclerView.ViewHolder(placeView)
+internal class PlaceViewHolder(val placeView: PlaceView) : RecyclerView.ViewHolder(placeView)
 
-class DiffUtilCallback(
+internal class DiffUtilCallback(
     private val beforeList: List<Place>,
     private val afterList: List<Place>
 ) : DiffUtil.Callback() {

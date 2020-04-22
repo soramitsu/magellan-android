@@ -12,7 +12,7 @@ import jp.co.soramitsu.map.ext.asLocalizedString
 import jp.co.soramitsu.map.ext.getResourceIdForAttr
 import jp.co.soramitsu.map.model.Category
 
-class CategoriesAdapter : RecyclerView.Adapter<CategoryViewHolder>() {
+internal class CategoriesAdapter : RecyclerView.Adapter<CategoryViewHolder>() {
 
     private val items = mutableListOf<CategoryListItem>()
 
@@ -42,7 +42,7 @@ class CategoriesAdapter : RecyclerView.Adapter<CategoryViewHolder>() {
     }
 }
 
-class CategoryDiffUtilCallback(
+internal class CategoryDiffUtilCallback(
     private val beforeList: List<CategoryListItem>,
     private val afterList: List<CategoryListItem>
 ) : DiffUtil.Callback() {
@@ -59,7 +59,7 @@ class CategoryDiffUtilCallback(
     }
 }
 
-class CategoryViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+internal class CategoryViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
     private val categoryTextView =
         itemView.findViewById<AppCompatTextView>(R.id.categoryNameTextView)

@@ -12,7 +12,7 @@ import jp.co.soramitsu.map.model.Category
 import jp.co.soramitsu.map.model.Place
 import jp.co.soramitsu.map.presentation.places.PlaceView
 
-class CategoriesWithPlacesAdapter(
+internal class CategoriesWithPlacesAdapter(
     private val onCategorySelected: (Category) -> Unit,
     private val onPlaceSelected: (Place) -> Unit
 ) : RecyclerView.Adapter<BaseViewHolder<ListItem>>() {
@@ -64,7 +64,7 @@ class CategoriesWithPlacesAdapter(
         holder.bind(items[position])
 }
 
-class DiffUtilCallback(
+internal class DiffUtilCallback(
     private val listBefore: List<ListItem>,
     private val listAfter: List<ListItem>
 ) : DiffUtil.Callback() {
@@ -82,31 +82,31 @@ class DiffUtilCallback(
 }
 
 // region list items
-interface ListItem {
+internal interface ListItem {
     val viewType: Int
 }
 
-data class Categories(val selectedCategory: Category? = null) : ListItem {
+internal data class Categories(val selectedCategory: Category? = null) : ListItem {
     override val viewType = 1
 }
 
-data class PlaceListItem(
+internal data class PlaceListItem(
     val place: Place,
     override val viewType: Int = 2
 ) : ListItem
 // endregion
 
 // region viewHolders
-abstract class BaseViewHolder<in T>(itemView: View) : RecyclerView.ViewHolder(itemView) {
+internal abstract class BaseViewHolder<in T>(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
     abstract fun bind(payload: T)
 }
 
-class PlaceViewHolder(private val placeView: PlaceView) : BaseViewHolder<PlaceListItem>(placeView) {
+internal class PlaceViewHolder(private val placeView: PlaceView) : BaseViewHolder<PlaceListItem>(placeView) {
     override fun bind(payload: PlaceListItem) = placeView.bind(payload.place)
 }
 
-class CategoriesViewHolder(
+internal class CategoriesViewHolder(
     itemView: View,
     private val onCategorySelected: (Category) -> Unit = {}
 ) : BaseViewHolder<Categories>(itemView) {

@@ -1,6 +1,6 @@
 package jp.co.soramitsu.map.model
 
-data class Time(
+internal data class Time(
     val hour: Int,
     val minute: Int
 )

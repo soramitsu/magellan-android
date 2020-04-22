@@ -16,7 +16,7 @@ import kotlinx.android.synthetic.main.place_view.view.*
 import java.text.SimpleDateFormat
 import java.util.*
 
-class PlaceView @JvmOverloads constructor(
+internal class PlaceView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0

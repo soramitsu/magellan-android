@@ -1,6 +1,6 @@
 package jp.co.soramitsu.map.model
 
-enum class Category {
+internal enum class Category {
     BANK,
     SERVICES,
     FOOD,

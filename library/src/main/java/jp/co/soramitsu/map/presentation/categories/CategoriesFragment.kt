@@ -12,7 +12,7 @@ import jp.co.soramitsu.map.presentation.SoramitsuMapFragment
 import jp.co.soramitsu.map.presentation.SoramitsuMapViewModel
 import kotlinx.android.synthetic.main.categories_fragment.*
 
-class CategoriesFragment : Fragment(R.layout.categories_fragment) {
+internal class CategoriesFragment : Fragment(R.layout.categories_fragment) {
 
     private lateinit var viewModel: SoramitsuMapViewModel
 

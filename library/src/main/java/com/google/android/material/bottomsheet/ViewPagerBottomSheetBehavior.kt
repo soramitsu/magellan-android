@@ -27,7 +27,7 @@ import java.lang.ref.WeakReference
  * we have 2 recycler views in a single [VIEW_TYPE] (in our case [VIEW_TYPE] is a
  * ConstraintLayout). In our case only the first one view will be always found
  */
-class ViewPagerBottomSheetBehavior<VIEW_TYPE : View> : BottomSheetBehavior<VIEW_TYPE> {
+internal class ViewPagerBottomSheetBehavior<VIEW_TYPE : View> : BottomSheetBehavior<VIEW_TYPE> {
 
     constructor() : super()
 

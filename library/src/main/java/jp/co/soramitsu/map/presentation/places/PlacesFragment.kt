@@ -12,7 +12,7 @@ import jp.co.soramitsu.map.presentation.SoramitsuMapFragment
 import jp.co.soramitsu.map.presentation.SoramitsuMapViewModel
 import kotlinx.android.synthetic.main.places_fragment.*
 
-class PlacesFragment : Fragment(R.layout.places_fragment) {
+internal class PlacesFragment : Fragment(R.layout.places_fragment) {
 
     private lateinit var placesAdapter: PlacesAdapter
 

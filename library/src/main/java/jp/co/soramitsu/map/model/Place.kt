@@ -2,7 +2,7 @@ package jp.co.soramitsu.map.model
 
 import java.util.*
 
-data class Place(
+internal data class Place(
     val name: String,
     val category: Category,
     val position: Position,

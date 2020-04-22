@@ -6,7 +6,7 @@ import androidx.fragment.app.FragmentStatePagerAdapter
 import jp.co.soramitsu.map.presentation.categories.CategoriesFragment
 import jp.co.soramitsu.map.presentation.places.PlacesFragment
 
-class BottomSheetFragmentPagerAdapter(
+internal class BottomSheetFragmentPagerAdapter(
     fragmentManager: FragmentManager,
     private val titleDelegate: (Int) -> String
 ) : FragmentStatePagerAdapter(fragmentManager, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT) {

@@ -7,7 +7,7 @@ import jp.co.soramitsu.map.model.Position
 /**
  * All shops, supermarkets, stores and so on that will be displayed on the map
  */
-val Places.merchants
+internal val Places.merchants
     get() = listOf(
         // region merchants
         Place(

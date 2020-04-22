@@ -1,6 +1,6 @@
 package jp.co.soramitsu.map.model
 
-class Position(
+internal class Position(
     val latitude: Double,
     val longitude: Double
 )

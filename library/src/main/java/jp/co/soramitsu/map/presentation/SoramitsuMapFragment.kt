@@ -360,7 +360,7 @@ class SoramitsuMapFragment : Fragment(R.layout.fragment_map_soramitsu) {
             getString(R.string.sm_daily_interval, startTimeHumanFormat, finishTimeHumanFormat)
     }
 
-    class PlaceClusterItem(val place: Place) : ClusterItem {
+    internal class PlaceClusterItem(val place: Place) : ClusterItem {
         override fun getSnippet(): String = ""
         override fun getTitle(): String = place.name
         override fun getPosition(): LatLng =

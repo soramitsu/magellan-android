@@ -2,7 +2,7 @@ package jp.co.soramitsu.map.data
 
 import jp.co.soramitsu.map.model.Place
 
-class DemoPlacesRepository : PlacesRepository {
+internal class DemoPlacesRepository : PlacesRepository {
 
     override fun getAllPlaces(): List<Place> = Places.merchants + Places.banks + Places.agents
 }
@@ -12,4 +12,4 @@ class DemoPlacesRepository : PlacesRepository {
  * few separate files. This will help us to avoid opening one monstrous file
  * and dramatically slow down android studio while editing it
  */
-object Places
+internal object Places
