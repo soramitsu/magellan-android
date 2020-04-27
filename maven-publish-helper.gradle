@@ -36,6 +36,16 @@ task androidSourcesJar(type: Jar) {
 // configure your publications using the afterEvaluate() lifecycle method.
 afterEvaluate {
     publishing {
+        repositories {
+            maven {
+                url = "https://nexus.iroha.tech/repository/maven-soramitsu/"
+                credentials {
+                    username = System.getenv('NEXUS_USER')
+                    password = System.getenv('NEXUS_PASSWORD')
+                }
+            }
+        }
+
         publications {
             // Creates a Maven publication called "release".
             release(MavenPublication) {
