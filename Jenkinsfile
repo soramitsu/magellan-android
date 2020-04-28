@@ -40,7 +40,7 @@ pipeline {
   //      }
         stage('Push artifacts') {
             when {
-                expression { return (env.GIT_BRANCH in dockerTags ) }
+                expression { return (env.GIT_BRANCH in branchesList ) }
             }
             environment {
                 NEXUS_URL = "https://nexus.iroha.tech/repository/maven-soramitsu-private/"
