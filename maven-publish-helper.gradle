@@ -38,10 +38,10 @@ afterEvaluate {
     publishing {
         repositories {
             maven {
-                url = "https://nexus.iroha.tech/repository/maven-soramitsu/"
+                url = System.getenv('NEXUS_URL')
                 credentials {
-                    username = System.getenv('NEXUS_USER')
-                    password = System.getenv('NEXUS_PASSWORD')
+                    username = System.getenv('NEXUS_USR')
+                    password = System.getenv('NEXUS_PSW')
                 }
             }
         }
