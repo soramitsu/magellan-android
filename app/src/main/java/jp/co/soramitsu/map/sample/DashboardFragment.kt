@@ -1,4 +1,4 @@
-package jp.co.soramitsu.map
+package jp.co.soramitsu.map.sample
 
 import android.content.Intent
 import android.os.Bundle

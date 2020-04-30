@@ -1,4 +1,4 @@
-package jp.co.soramitsu.map
+package jp.co.soramitsu.map.sample
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity

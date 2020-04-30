@@ -36,6 +36,16 @@ task androidSourcesJar(type: Jar) {
 // configure your publications using the afterEvaluate() lifecycle method.
 afterEvaluate {
     publishing {
+        repositories {
+            maven {
+                url = System.getenv('NEXUS_URL')
+                credentials {
+                    username = System.getenv('NEXUS_USR')
+                    password = System.getenv('NEXUS_PSW')
+                }
+            }
+        }
+
         publications {
             // Creates a Maven publication called "release".
             release(MavenPublication) {
