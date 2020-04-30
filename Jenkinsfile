@@ -12,7 +12,8 @@ pipeline {
             image dockerImage
             registryUrl 'https://nexus.iroha.tech:19003'
             registryCredentialsId 'nexus-build-tools-ro'
-            args '-v /var/run/docker.sock:/var/run/docker.sock -v /tmp:/tmp'
+            // Uncomment if you need docker sock inside
+            // args '-v /var/run/docker.sock:/var/run/docker.sock -v /tmp:/tmp'
         }
     }
     stages {
