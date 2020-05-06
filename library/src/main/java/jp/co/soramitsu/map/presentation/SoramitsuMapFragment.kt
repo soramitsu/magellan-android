@@ -60,6 +60,8 @@ class SoramitsuMapFragment : Fragment(R.layout.fragment_map_soramitsu) {
             { place -> viewModel.onPlaceSelected(place) }
         )
 
+    private lateinit var bottomSheetPagerAdapter: BottomSheetFragmentPagerAdapter
+
     private val viewPagerListener = UpdateNestedScrollViewWhenPageChanges()
 
     private val textWatcher: TextWatcher = object : TextWatcher {
@@ -108,7 +110,7 @@ class SoramitsuMapFragment : Fragment(R.layout.fragment_map_soramitsu) {
             }
         })
 
-        categoriesViewPager.adapter =
+        bottomSheetPagerAdapter =
             BottomSheetFragmentPagerAdapter(parentFragmentManager) { position ->
                 @StringRes val titleId = when (position) {
                     0 -> R.string.sm_category
@@ -117,6 +119,7 @@ class SoramitsuMapFragment : Fragment(R.layout.fragment_map_soramitsu) {
 
                 getString(titleId)
             }
+        categoriesViewPager.adapter = bottomSheetPagerAdapter
         categoriesViewPager.addOnPageChangeListener(viewPagerListener)
 
         placeInformationBottomSheetBehavior = BottomSheetBehavior.from(placeBottomSheet)
@@ -391,14 +394,15 @@ class SoramitsuMapFragment : Fragment(R.layout.fragment_map_soramitsu) {
          * ```
          */
         override fun onPageSelected(position: Int) {
-            // viewpager stores fragments with tag android:switcher:{view_pager_id}:{position}
-            val currentFragment = fragmentManager
-                ?.findFragmentByTag("android:switcher:${categoriesViewPager.id}:$position")
             if (!viewCache.containsKey(R.id.placesRecyclerView)) {
-                currentFragment?.view?.findViewById<View>(R.id.placesRecyclerView)?.let {
-                    viewCache[R.id.placesRecyclerView] = it
+                val currentFragment = bottomSheetPagerAdapter.findFragmentAtPosition(position)
+                val fragmentView = currentFragment?.view
+                val placesRecyclerView = fragmentView?.findViewById<View>(R.id.placesRecyclerView)
+                if (placesRecyclerView != null) {
+                    viewCache[R.id.placesRecyclerView] = placesRecyclerView
                 }
             }
+
             viewCache[R.id.placesRecyclerView]?.let {
                 categoriesBottomSheetBehavior.updateScrollingChild(it)
             }
