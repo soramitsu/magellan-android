@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    tools:parentTag="androidx.constraintlayout.widget.ConstraintLayout">
+
+    <TextView
+        android:id="@+id/placeNameTextView"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:paddingHorizontal="16dp"
+        android:paddingVertical="8dp"
+        android:textAppearance="?soramitsuMapPlaceViewTitleTextAppearance"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="95 DEGREE COFFEE" />
+
+    <TextView
+        android:id="@+id/placeTypeTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingHorizontal="16dp"
+        android:textAppearance="?soramitsuMapPlaceViewCategoryTextAppearance"
+        app:layout_constraintStart_toStartOf="@id/placeNameTextView"
+        app:layout_constraintTop_toBottomOf="@id/placeNameTextView"
+        tools:text="Restaurant, Cafe, Bar" />
+
+    <RatingBar
+        android:id="@+id/placeRatingBar"
+        style="@style/Widget.AppCompat.RatingBar.Small"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginTop="10dp"
+        android:numStars="5"
+        android:progressTint="?soramitsuMapRatingBarColor"
+        app:layout_constraintStart_toStartOf="@id/placeTypeTextView"
+        app:layout_constraintTop_toBottomOf="@id/placeTypeTextView"
+        tools:rating="3" />
+
+    <TextView
+        android:id="@+id/placeRatingTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="8dp"
+        android:textAppearance="?soramitsuMapRatingTextAppearance"
+        app:layout_constraintStart_toEndOf="@id/placeRatingBar"
+        app:layout_constraintTop_toBottomOf="@id/placeTypeTextView"
+        tools:text="4.9" />
+
+    <TextView
+        android:id="@+id/placeReviewsTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="8dp"
+        android:textAppearance="?soramitsuMapReviewsTextAppearance"
+        app:layout_constraintBaseline_toBaselineOf="@id/placeRatingTextView"
+        app:layout_constraintStart_toEndOf="@id/placeRatingTextView"
+        app:layout_constraintTop_toBottomOf="@id/placeTypeTextView"
+        tools:text="(39 reviews)" />
+
+    <androidx.constraintlayout.widget.Barrier
+        android:id="@+id/placeBottomBarrier"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:barrierDirection="bottom"
+        app:constraint_referenced_ids="placeReviewsTextView,placeRatingTextView,placeRatingBar" />
+
+    <TextView
+        android:id="@+id/placeWorkTimeTextView"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginVertical="16dp"
+        android:text="@string/sm_undefined_schedule"
+        app:layout_constraintStart_toStartOf="@id/placeBottomBarrier"
+        app:layout_constraintTop_toBottomOf="@id/placeBottomBarrier"
+        tools:text="Open till 8:30pm" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16dp"
+        android:textAppearance="?soramitsuMapDistanceTextAppearance"
+        app:layout_constraintBaseline_toBaselineOf="@id/placeWorkTimeTextView"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/placeBottomBarrier"
+        tools:text="0.03km" />
+
+    <View
+        android:layout_width="0dp"
+        android:layout_height="1dp"
+        android:background="?soramitsuMapCategoriesBottomSheetSeparatorColor"
+        android:layout_marginTop="8dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        app:layout_constraintTop_toBottomOf="@id/placeWorkTimeTextView"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        />
+
+</merge>
