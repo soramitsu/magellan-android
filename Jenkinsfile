@@ -10,7 +10,7 @@ pipeline {
         docker {
             label 'd3-build-agent'
             image dockerImage
-            registryUrl 'https://nexus.iroha.tech:19003'
+            registryUrl 'https://docker.soramitsu.co.jp'
             registryCredentialsId 'nexus-build-tools-ro'
             // Uncomment if you need docker sock inside
             // args '-v /var/run/docker.sock:/var/run/docker.sock -v /tmp:/tmp'
