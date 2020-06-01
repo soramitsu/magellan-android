@@ -8,6 +8,6 @@ class GoogleMapActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_google_map)
+        setContentView(R.layout.sm_activity_google_map)
     }
 }

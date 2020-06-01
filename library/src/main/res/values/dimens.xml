@@ -1,4 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <dimen name="category_card_width">96dp</dimen>
+    <dimen name="sm_category_card_width">96dp</dimen>
+
+    <dimen name="sm_top_rectangle_width">36dp</dimen>
+    <dimen name="sm_top_rectangle_height">6dp</dimen>
+
+    <dimen name="sm_icon_size">36dp</dimen>
+
+    <dimen name="sm_margin_padding_size_xxlarge">40dp</dimen>
+    <dimen name="sm_margin_padding_size_xmedium">20dp</dimen>
+    <dimen name="sm_margin_padding_size_small">8dp</dimen>
 </resources>

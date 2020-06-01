@@ -1,11 +1,14 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="jp.co.soramitsu.map">
 
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+
     <application>
         <activity
             android:name="jp.co.soramitsu.map.presentation.GoogleMapActivity"
             android:screenOrientation="portrait"
-            android:theme="@style/Soramistu.Map.BaseTheme"
+            android:theme="@style/SM.Soramistu.Map.BaseTheme"
             />
     </application>
 

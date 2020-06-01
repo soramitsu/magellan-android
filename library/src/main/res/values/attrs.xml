@@ -1,61 +1,67 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <attr name="soramitsuMapCategoriesBottomSheetPeekHeight" format="dimension|reference" />
-    <attr name="soramitsuMapCategoriesBottomSheetBackground" format="color|reference" />
+    <attr name="sm_categoriesBottomSheetPeekHeight" format="dimension|reference" />
+    <attr name="sm_categoriesBottomSheetBackground" format="color|reference" />
 
-    <attr name="soramitsuMapCategoriesBottomSheetTabTextAppearance" format="reference" />
+    <attr name="sm_iconColor" format="color|reference" />
+    <attr name="sm_iconBackgroundColor" format="color|reference" />
+
+    <attr name="sm_categoriesBottomSheetTabTextAppearance" format="reference" />
 
     <!-- small rounded rectangle at top of bottom sheets -->
-    <attr name="soramitsuMapCategoriesBottomSheetTopperDrawable" format="reference" />
-    <attr name="soramitsuMapCategoriesBottomSheetTopperWidth" format="dimension|reference" />
-    <attr name="soramitsuMapCategoriesBottomSheetTopperHeight" format="dimension|reference" />
+    <attr name="sm_categoriesBottomSheetTopperDrawable" format="reference" />
+    <attr name="sm_categoriesBottomSheetTopperWidth" format="dimension|reference" />
+    <attr name="sm_categoriesBottomSheetTopperHeight" format="dimension|reference" />
 
-    <attr name="soramitsuMapCategoriesBottomSheetSearchTextHintColor" format="color|reference" />
-    <attr name="soramitsuMapCategoriesBottomSheetSearchBoxStrokeColor" format="color|reference" />
-    <attr name="soramitsuMapCategoriesBottomSheetSearchTextAppearance" format="reference" />
-    <attr name="soramitsuMapCategoriesBottomSheetSearchIcon" format="reference" />
+    <attr name="sm_categoriesBottomSheetSearchTextHintColor" format="color|reference" />
+    <attr name="sm_categoriesBottomSheetSearchBoxStrokeColor" format="color|reference" />
+    <attr name="sm_categoriesBottomSheetSearchTextAppearance" format="reference" />
 
-    <attr name="soramitsuMapCategoriesBottomSheetSeparatorColor" format="color|reference" />
+    <attr name="sm_categoriesBottomSheetSeparatorColor" format="color|reference" />
 
-    <attr name="soramitsuMapCloseIcon" format="reference" />
-
-    <attr name="soramitsuMapCategoryTitleTextAppearance" format="reference" />
+    <attr name="sm_categoryTitleTextAppearance" format="reference" />
 
     <!-- category icons -->
-    <attr name="soramitsuMapCategoryIconDeposit" format="reference" />
-    <attr name="soramitsuMapCategoryIconRestaurant" format="reference" />
-    <attr name="soramitsuMapCategoryIconServices" format="reference" />
-    <attr name="soramitsuMapCategoryIconSupermarket" format="reference" />
-    <attr name="soramitsuMapCategoryIconPharmacy" format="reference" />
-    <attr name="soramitsuMapCategoryIconEntertainment" format="reference" />
-    <attr name="soramitsuMapCategoryIconEducation" format="reference" />
-    <attr name="soramitsuMapCategoryIconOther" format="reference" />
+    <attr name="sm_categoryIconDeposit" format="reference" />
+    <attr name="sm_categoryIconRestaurant" format="reference" />
+    <attr name="sm_categoryIconServices" format="reference" />
+    <attr name="sm_categoryIconSupermarket" format="reference" />
+    <attr name="sm_categoryIconPharmacy" format="reference" />
+    <attr name="sm_categoryIconEntertainment" format="reference" />
+    <attr name="sm_categoryIconEducation" format="reference" />
+    <attr name="sm_categoryIconOther" format="reference" />
 
-    <attr name="soramitsuMapNearbyPlacesTitleText" format="string|reference" />
-    <attr name="soramitsuMapNearbyPlacesTitleTextAppearance" format="reference" />
+    <attr name="sm_nearbyPlacesTitleText" format="string|reference" />
+    <attr name="sm_nearbyPlacesTitleTextAppearance" format="reference" />
 
-    <attr name="soramitsuMapCheckIcon" format="reference" />
+    <attr name="sm_checkIcon" format="reference" />
 
-    <attr name="soramitsuMapPlaceBottomSheetBackground" format="reference" />
-    <attr name="soramitsuMapPlaceBottomSheetPeekHeight" format="dimension|reference" />
-    <attr name="soramitsuMapPlaceTitleTextColor" format="color|reference" />
+    <attr name="sm_placeBottomSheetBackground" format="reference" />
+    <attr name="sm_placeBottomSheetPeekHeight" format="dimension|reference" />
+    <attr name="sm_placeTitleTextColor" format="color|reference" />
 
-    <attr name="soramitsuMapPlaceInfoTitleTextAppearance" format="reference" />
-    <attr name="soramitsuMapPlaceInfoKeyTextAppearance" format="reference" />
-    <attr name="soramitsuMapPlaceInfoValueTextAppearance" format="reference" />
-    <attr name="soramitsuMapPlaceInfoValueClickableTextColor" format="color|reference" />
-    <attr name="soramitsuMapPlaceInfoValueActivatedTextColor" format="color|reference" />
+    <attr name="sm_placeInfoTitleTextAppearance" format="reference" />
+    <attr name="sm_placeInfoKeyTextAppearance" format="reference" />
+    <attr name="sm_placeInfoValueTextAppearance" format="reference" />
+    <attr name="sm_placeInfoValueClickableTextColor" format="color|reference" />
+    <attr name="sm_placeInfoValueActivatedTextColor" format="color|reference" />
 
-    <attr name="soramitsuMapPlaceViewTitleTextAppearance" format="reference" />
-    <attr name="soramitsuMapPlaceViewCategoryTextAppearance" format="reference" />
+    <attr name="sm_placeViewTitleTextAppearance" format="reference" />
+    <attr name="sm_placeViewCategoryTextAppearance" format="reference" />
 
-    <attr name="soramitsuMapOpenNowTextAppearance" format="reference" />
-    <attr name="soramitsuMapCloseNowTextAppearance" format="reference" />
+    <attr name="sm_openNowTextAppearance" format="reference" />
+    <attr name="sm_closeNowTextAppearance" format="reference" />
 
-    <attr name="soramitsuMapRatingBarColor" format="color|reference" />
-    <attr name="soramitsuMapRatingTextAppearance" format="reference" />
-    <attr name="soramitsuMapReviewsTextAppearance" format="reference" />
-    <attr name="soramitsuMapDistanceTextAppearance" format="reference" />
+    <attr name="sm_ratingBarColor" format="color|reference" />
+    <attr name="sm_ratingTextAppearance" format="reference" />
+    <attr name="sm_reviewsTextAppearance" format="reference" />
+    <attr name="sm_distanceTextAppearance" format="reference" />
 
-    <attr name="soramitsuMapCategorySelectedItemBackground" format="reference" />
+    <attr name="sm_categorySelectedItemBackground" format="reference" />
+
+    <declare-styleable name="SMTitleValueField">
+        <attr name="sm_title" format="string|reference"/>
+        <attr name="sm_value" format="string|reference"/>
+        <attr name="sm_icon" format="reference"/>
+    </declare-styleable>
 </resources>

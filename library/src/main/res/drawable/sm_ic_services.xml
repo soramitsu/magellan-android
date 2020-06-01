@@ -1,12 +1,12 @@
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
-    android:width="30dp"
-    android:height="30dp"
+    android:width="@dimen/sm_icon_size"
+    android:height="@dimen/sm_icon_size"
     android:viewportWidth="30"
     android:viewportHeight="30">
   <path
       android:pathData="M15,30C23.2843,30 30,23.2843 30,15C30,6.7157 23.2843,0 15,0C6.7157,0 0,6.7157 0,15C0,23.2843 6.7157,30 15,30Z"
-      android:fillColor="#616161"/>
+      android:fillColor="@color/sm_icon_background_color"/>
   <path
       android:pathData="M15.8,17.4722H14.2C13.76,17.4722 13.4,17.1097 13.4,16.6667H7.808V19.8889C7.808,20.775 8.528,21.5 9.408,21.5H20.6C21.48,21.5 22.2,20.775 22.2,19.8889V16.6667H16.6C16.6,17.1097 16.24,17.4722 15.8,17.4722ZM21.4,10.2222H18.2C18.2,8.4419 16.768,7 15,7C13.232,7 11.8,8.4419 11.8,10.2222H8.6C7.72,10.2222 7,10.9472 7,11.8333V14.25C7,15.1442 7.712,15.8611 8.6,15.8611H13.4V15.0556C13.4,14.6125 13.76,14.25 14.2,14.25H15.8C16.24,14.25 16.6,14.6125 16.6,15.0556V15.8611H21.4C22.28,15.8611 23,15.1361 23,14.25V11.8333C23,10.9472 22.28,10.2222 21.4,10.2222ZM13.4,10.2222C13.4,9.3361 14.12,8.6111 15,8.6111C15.88,8.6111 16.6,9.3361 16.6,10.2222H13.392H13.4Z"
-      android:fillColor="#ffffff"/>
+      android:fillColor="@color/sm_icon_color"/>
 </vector>

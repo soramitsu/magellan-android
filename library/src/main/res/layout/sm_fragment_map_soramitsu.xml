@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <com.google.android.gms.maps.MapView
+        android:id="@+id/soramitsuMapView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end|center_vertical"
+        android:layout_margin="8dp"
+        android:orientation="vertical">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/zoomInButton"
+            style="@style/SM.Widget.Soramitsu.MaterialComponents.Button.OutlinedButton.Circle"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:insetTop="12dp"
+            android:insetBottom="4dp"
+            app:iconGravity="textStart"
+            app:iconPadding="0dp"
+            app:icon="@drawable/sm_ic_add_14" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/zoomOutButton"
+            style="@style/SM.Widget.Soramitsu.MaterialComponents.Button.OutlinedButton.Circle"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:insetBottom="12dp"
+            android:insetTop="4dp"
+            app:iconGravity="textStart"
+            app:iconPadding="0dp"
+            app:icon="@drawable/sm_ic_remove_14" />
+
+    </LinearLayout>
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/showFiltersButton"
+        style="@style/SM.Widget.Soramitsu.MaterialComponents.Button.OutlinedButton.Circle"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_gravity="bottom|start"
+        android:layout_marginStart="8dp"
+        android:layout_marginBottom="88dp"
+        app:icon="@drawable/sm_ic_filter" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/findMeButton"
+        style="@style/SM.Widget.Soramitsu.MaterialComponents.Button.OutlinedButton.Circle"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_gravity="bottom|end"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="88dp"
+        app:icon="@drawable/sm_ic_gps_fixed_14" />
+
+    <include layout="@layout/sm_places_with_search_field" />
+
+    <include layout="@layout/sm_place_bottom_sheet" />
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

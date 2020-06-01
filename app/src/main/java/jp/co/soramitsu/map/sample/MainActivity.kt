@@ -4,7 +4,6 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import jp.co.soramitsu.map.presentation.SoramitsuMapFragment
-import jp.co.soramitsu.map.presentation.SoramitsuMapFragment.Companion.EXTRA_SINGLE_TAB
 import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity() {
@@ -16,11 +15,7 @@ class MainActivity : AppCompatActivity() {
             val fragment: Fragment = when (menuItem.itemId) {
                 R.id.dashboard -> DashboardFragment()
                 R.id.map_two_tabs -> SoramitsuMapFragment()
-                else -> SoramitsuMapFragment().apply {
-                    arguments = Bundle().apply {
-                        putBoolean(EXTRA_SINGLE_TAB, true)
-                    }
-                }
+                else -> SoramitsuMapFragment()
             }
 
             supportFragmentManager.beginTransaction()
