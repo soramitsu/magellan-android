@@ -7,67 +7,8 @@
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
-    <style name="MainMenuActivityStyle" parent="AppTheme">
+    <style name="MainMenuActivityStyle" parent="SM.Soramistu.Map.BaseTheme">
         <item name="colorControlNormal">#000000</item>
-
-        <!-- customize map appearance here -->
-        <item name="soramitsuMapCategoriesBottomSheetPeekHeight">68dp</item>
-        <item name="soramitsuMapCategoriesBottomSheetBackground">@drawable/rounded_background</item>
-
-        <item name="soramitsuMapCategoriesBottomSheetSearchTextHintColor">#898989</item>
-        <item name="soramitsuMapCategoriesBottomSheetSearchBoxStrokeColor">#898989</item>
-
-        <item name="soramitsuMapCategoriesBottomSheetSearchIcon">@drawable/ic_search_24dp</item>
-        <item name="soramitsuMapCategoriesBottomSheetSearchTextAppearance">@style/TextAppearance.Soramitsu.MaterialComponents.Caption</item>
-        <item name="soramitsuMapCategoriesBottomSheetSeparatorColor">#F5F5F5</item>
-
-        <item name="soramitsuMapCloseIcon">@drawable/ic_close_24dp</item>
-
-        <item name="soramitsuMapCategoriesBottomSheetTopperDrawable">@drawable/rounded_rectangle</item>
-        <item name="soramitsuMapCategoriesBottomSheetTopperHeight">4dp</item>
-        <item name="soramitsuMapCategoriesBottomSheetTopperWidth">36dp</item>
-
-        <item name="soramitsuMapCategoriesBottomSheetTabTextAppearance">@style/TextAppearance.Soramitsu.MaterialComponents.Body2</item>
-
-        <item name="soramitsuMapCategoryTitleTextAppearance">@style/TextAppearance.Soramitsu.MaterialComponents.Caption</item>
-
-        <item name="soramitsuMapCategoryIconDeposit">@drawable/ic_deposit</item>
-        <item name="soramitsuMapCategoryIconRestaurant">@drawable/ic_restaurant</item>
-        <item name="soramitsuMapCategoryIconServices">@drawable/ic_services</item>
-        <item name="soramitsuMapCategoryIconSupermarket">@drawable/ic_supermarket</item>
-        <item name="soramitsuMapCategoryIconPharmacy">@drawable/ic_pharmacy</item>
-        <item name="soramitsuMapCategoryIconEntertainment">@drawable/ic_entertainment</item>
-        <item name="soramitsuMapCategoryIconEducation">@drawable/ic_education</item>
-        <item name="soramitsuMapCategoryIconOther">@drawable/ic_other</item>
-
-        <item name="soramitsuMapNearbyPlacesTitleText">@string/sm_nearby_places</item>
-        <item name="soramitsuMapNearbyPlacesTitleTextAppearance">@style/TextAppearance.Soramitsu.MaterialComponents.Subtitle2</item>
-
-        <item name="soramitsuMapCheckIcon">@drawable/ic_check_24dp</item>
-
-        <item name="soramitsuMapPlaceBottomSheetBackground">@drawable/rounded_background</item>
-        <item name="soramitsuMapPlaceBottomSheetPeekHeight">166dp</item>
-        <item name="soramitsuMapPlaceTitleTextColor">#000000</item>
-
-
-        <item name="soramitsuMapPlaceInfoValueClickableTextColor">@color/text_color_clickable</item>
-        <item name="soramitsuMapPlaceInfoValueActivatedTextColor">@color/text_color_activated</item>
-
-        <item name="soramitsuMapPlaceInfoTitleTextAppearance">@style/TextAppearance.Soramitsu.MaterialComponents.Subtitle2</item>
-        <item name="soramitsuMapPlaceInfoKeyTextAppearance">@style/TextAppearance.Soramitsu.MaterialComponents.Caption</item>
-        <item name="soramitsuMapPlaceInfoValueTextAppearance">@style/TextAppearance.Soramitsu.MaterialComponents.Body2.Clickable</item>
-
-        <item name="soramitsuMapPlaceViewTitleTextAppearance">@style/TextAppearance.Soramitsu.MaterialComponents.Subtitle1</item>
-        <item name="soramitsuMapPlaceViewCategoryTextAppearance">@style/TextAppearance.Soramitsu.MaterialComponents.Caption</item>
-
-        <item name="soramitsuMapOpenNowTextAppearance">@style/TextAppearance.Soramitsu.MaterialComponents.Body2.Acitvated</item>
-
-        <item name="soramitsuMapRatingBarColor">@color/rating_bar</item>
-        <item name="soramitsuMapRatingTextAppearance">@style/TextAppearance.Soramitsu.MaterialComponents.Body2</item>
-        <item name="soramitsuMapReviewsTextAppearance">@style/TextAppearance.Soramitsu.MaterialComponents.Caption</item>
-        <item name="soramitsuMapDistanceTextAppearance">@style/TextAppearance.Soramitsu.MaterialComponents.Caption</item>
-
-        <item name="soramitsuMapCategorySelectedItemBackground">@drawable/selected_item_background</item>
     </style>
 
 </resources>
