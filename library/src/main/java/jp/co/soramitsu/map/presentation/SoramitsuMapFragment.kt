@@ -1,68 +1,51 @@
 package jp.co.soramitsu.map.presentation
 
+import android.Manifest
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
-import androidx.annotation.StringRes
-import androidx.annotation.StyleRes
 import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.core.widget.TextViewCompat
+import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.viewpager.widget.ViewPager
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
 import com.google.android.material.bottomsheet.BottomSheetBehavior
-import com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_EXPANDED
-import com.google.android.material.bottomsheet.ViewPagerBottomSheetBehavior
 import com.google.maps.android.clustering.ClusterItem
 import com.google.maps.android.clustering.ClusterManager
 import com.google.maps.android.clustering.algo.NonHierarchicalDistanceBasedAlgorithm
 import jp.co.soramitsu.map.R
-import jp.co.soramitsu.map.ext.asTime
-import jp.co.soramitsu.map.ext.getResourceIdForAttr
-import jp.co.soramitsu.map.ext.toMinutesOfDay
-import jp.co.soramitsu.map.ext.withTime
 import jp.co.soramitsu.map.model.Place
-import jp.co.soramitsu.map.presentation.category_with_places.CategoriesWithPlacesAdapter
-import kotlinx.android.synthetic.main.categories_bottom_sheet.*
-import kotlinx.android.synthetic.main.category_with_places.*
-import kotlinx.android.synthetic.main.fragment_map_soramitsu.*
-import kotlinx.android.synthetic.main.place_bottom_sheet.*
-import java.text.SimpleDateFormat
-import java.util.*
+import jp.co.soramitsu.map.presentation.categories.CategoriesFragment
+import jp.co.soramitsu.map.presentation.places.PlacesAdapter
+import kotlinx.android.synthetic.main.sm_fragment_map_soramitsu.*
+import kotlinx.android.synthetic.main.sm_place_bottom_sheet.*
+import kotlinx.android.synthetic.main.sm_places_with_search_field.*
 
 /**
  * Used fragment as a base class because Maps module have to minimize
  * number of connections with Bakong and its base classes
  */
-class SoramitsuMapFragment : Fragment(R.layout.fragment_map_soramitsu) {
+class SoramitsuMapFragment : Fragment(R.layout.sm_fragment_map_soramitsu) {
 
     private lateinit var viewModel: SoramitsuMapViewModel
     private lateinit var clusterManager: ClusterManager<PlaceClusterItem>
     private lateinit var placeInformationBottomSheetBehavior: BottomSheetBehavior<ConstraintLayout>
-    private lateinit var categoriesBottomSheetBehavior: ViewPagerBottomSheetBehavior<ConstraintLayout>
     private lateinit var categoriesWithPlacesBottomSheetBehavior: BottomSheetBehavior<ConstraintLayout>
 
-    private val categoriesWithPlacesAdapter: CategoriesWithPlacesAdapter =
-        CategoriesWithPlacesAdapter(
-            { category ->
-                categoriesWithPlacesBottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
-                viewModel.onCategorySelected(category)
-            },
-            { place -> viewModel.onPlaceSelected(place) }
-        )
+    private var googleMap: GoogleMap? = null
 
-    private lateinit var bottomSheetPagerAdapter: BottomSheetFragmentPagerAdapter
-
-    private val viewPagerListener = UpdateNestedScrollViewWhenPageChanges()
+    private val placesAdapter = PlacesAdapter { place ->
+        viewModel.onPlaceSelected(place)
+    }
 
     private val textWatcher: TextWatcher = object : TextWatcher {
         override fun afterTextChanged(s: Editable?) {}
@@ -84,50 +67,21 @@ class SoramitsuMapFragment : Fragment(R.layout.fragment_map_soramitsu) {
         soramitsuMapView.getMapAsync { onMapReady(it) }
 
         categoriesWithPlacesBottomSheetBehavior =
-            BottomSheetBehavior.from(categoriesWithPlacesBottomSheet)
+            BottomSheetBehavior.from(placesWithSearchBottomSheet)
         categoriesWithPlacesBottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
         categoriesWithPlacesBottomSheetBehavior.isHideable = false
-        categoriesWithNearbyPlacesRecyclerView.adapter = categoriesWithPlacesAdapter
-        categoriesWithNearbyPlacesRecyclerView.layoutManager = LinearLayoutManager(context)
+        placesRecyclerView.adapter = placesAdapter
+        placesRecyclerView.layoutManager = LinearLayoutManager(context)
 
-        if (arguments?.getBoolean(EXTRA_SINGLE_TAB, false) == true) {
-            categoriesBottomSheet.visibility = View.GONE
-        } else {
-            categoriesWithPlacesBottomSheet.visibility = View.GONE
+        showFiltersButton.setOnClickListener {
+            CategoriesFragment().show(parentFragmentManager, "Categories")
         }
-
-        categoriesBottomSheetBehavior = ViewPagerBottomSheetBehavior.from(categoriesBottomSheet)
-        categoriesBottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
-        categoriesBottomSheetBehavior.isHideable = false
-        categoriesBottomSheetBehavior.setBottomSheetCallback(object :
-            BottomSheetBehavior.BottomSheetCallback() {
-            override fun onSlide(p0: View, p1: Float) {}
-
-            override fun onStateChanged(view: View, state: Int) {
-                if (state == STATE_EXPANDED) {
-                    viewPagerListener.onPageSelected(categoriesViewPager.currentItem)
-                }
-            }
-        })
-
-        bottomSheetPagerAdapter =
-            BottomSheetFragmentPagerAdapter(parentFragmentManager) { position ->
-                @StringRes val titleId = when (position) {
-                    0 -> R.string.sm_category
-                    else -> R.string.sm_list_of_places
-                }
-
-                getString(titleId)
-            }
-        categoriesViewPager.adapter = bottomSheetPagerAdapter
-        categoriesViewPager.addOnPageChangeListener(viewPagerListener)
 
         placeInformationBottomSheetBehavior = BottomSheetBehavior.from(placeBottomSheet)
         placeInformationBottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
         placeInformationBottomSheetBehavior.isHideable = true
 
-        searchTextInputEditText.addTextChangedListener(textWatcher)
-        categoryWithPlacesSearchTextInputEditText.addTextChangedListener(textWatcher)
+        placesWithSearchTextInputEditText.addTextChangedListener(textWatcher)
     }
 
     override fun onStart() {
@@ -153,13 +107,13 @@ class SoramitsuMapFragment : Fragment(R.layout.fragment_map_soramitsu) {
     override fun onDestroyView() {
         super.onDestroyView()
         soramitsuMapView.onDestroy()
-        categoryWithPlacesSearchTextInputEditText.removeTextChangedListener(textWatcher)
-        searchTextInputEditText.removeTextChangedListener(textWatcher)
-        categoriesViewPager.removeOnPageChangeListener(viewPagerListener)
+        placesWithSearchTextInputEditText.removeTextChangedListener(textWatcher)
     }
 
     private fun onMapReady(map: GoogleMap?) {
         map?.let { googleMap ->
+            this.googleMap = googleMap
+
             clusterManager = ClusterManager(requireContext(), googleMap)
             clusterManager.setAnimation(true)
             val algorithm = NonHierarchicalDistanceBasedAlgorithm<PlaceClusterItem>()
@@ -181,7 +135,6 @@ class SoramitsuMapFragment : Fragment(R.layout.fragment_map_soramitsu) {
             viewModel.placeSelected().observe(viewLifecycleOwner, Observer { selectedPlace ->
                 categoriesWithPlacesBottomSheetBehavior.state =
                     BottomSheetBehavior.STATE_COLLAPSED
-                categoriesBottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
                 placeInformationBottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
                 bindBottomSheetWithPlace(selectedPlace)
 
@@ -201,19 +154,7 @@ class SoramitsuMapFragment : Fragment(R.layout.fragment_map_soramitsu) {
                 clusterManager.addItems(clusterItems)
                 clusterManager.cluster()
 
-                searchTextInputEditText.removeTextChangedListener(textWatcher)
-                searchTextInputEditText.setText(viewState.query)
-                searchTextInputEditText.addTextChangedListener(textWatcher)
-                searchTextInputEditText.setSelection(searchTextInputEditText.text?.length ?: 0)
-
-                categoryWithPlacesSearchTextInputEditText.removeTextChangedListener(textWatcher)
-                categoryWithPlacesSearchTextInputEditText.setText(viewState.query)
-                categoryWithPlacesSearchTextInputEditText.addTextChangedListener(textWatcher)
-                categoryWithPlacesSearchTextInputEditText.setSelection(
-                    categoryWithPlacesSearchTextInputEditText.text?.length ?: 0
-                )
-
-                categoriesWithPlacesAdapter.update(viewState.category, viewState.places)
+                placesAdapter.update(viewState.places)
             })
 
             clusterManager.setOnClusterItemClickListener { clusterItem ->
@@ -237,16 +178,8 @@ class SoramitsuMapFragment : Fragment(R.layout.fragment_map_soramitsu) {
 
             viewModel.onMapReady()
 
-            closeDialogButton.setOnClickListener {
-                placeInformationBottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
-            }
-
-            clearSearchViewButton.setOnClickListener {
-                searchTextInputEditText.text = null
-            }
-
-            categoryWithPlacesClearSearchViewButton.setOnClickListener {
-                categoryWithPlacesSearchTextInputEditText.text = null
+            findMeButton.setOnClickListener {
+                onFindMeButtonClicked(googleMap)
             }
 
             zoomInButton.setOnClickListener {
@@ -269,38 +202,85 @@ class SoramitsuMapFragment : Fragment(R.layout.fragment_map_soramitsu) {
         }
     }
 
+    private fun onFindMeButtonClicked(googleMap: GoogleMap) {
+        // check permission and request when not granted. When permissions will
+        // be granted, this method will be called again
+        val fineLocationPermissionGranted = ActivityCompat.checkSelfPermission(
+            requireContext(),
+            Manifest.permission.ACCESS_FINE_LOCATION
+        )
+        val coarseLocationPermissionGranter = ActivityCompat.checkSelfPermission(
+            requireContext(),
+            Manifest.permission.ACCESS_COARSE_LOCATION
+        )
+        if (fineLocationPermissionGranted != PackageManager.PERMISSION_GRANTED
+            && coarseLocationPermissionGranter != PackageManager.PERMISSION_GRANTED
+        ) {
+            val permissions = arrayOf(
+                Manifest.permission.ACCESS_FINE_LOCATION,
+                Manifest.permission.ACCESS_COARSE_LOCATION
+            )
+            requestPermissions(permissions, LOCATION_REQUEST_CODE)
+            return
+        }
+
+        // enable findMe functionality, but use custom findMe button
+        googleMap.isMyLocationEnabled = true
+
+        // dirty hack to use internal google implementation of the "find me" button
+        val defaultFindMeButtonResId = 2
+        val defaultLocationButton = soramitsuMapView.findViewById<View>(defaultFindMeButtonResId)
+        defaultLocationButton.visibility = View.GONE
+        defaultLocationButton?.callOnClick()
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+
+        if (requestCode == LOCATION_REQUEST_CODE) {
+            val anyPermissionGranted = grantResults.any { it == PackageManager.PERMISSION_GRANTED }
+            if (anyPermissionGranted) {
+                googleMap?.let { onFindMeButtonClicked(it) }
+            }
+        }
+    }
+
     private fun bindBottomSheetWithPlace(place: Place) {
         // header info
         placeListItem.bind(place)
 
         // additional info
-        additionalInfoMobilePhoneGroup.visibility =
+        additionalInfoMobilePhone.visibility =
             if (place.phone.isEmpty()) View.GONE else View.VISIBLE
-        additionalInfoWebsiteGroup.visibility =
+        additionalInfoWebsite.visibility =
             if (place.website.isEmpty()) View.GONE else View.VISIBLE
-        additionalInfoFacebookGroup.visibility =
+        additionalInfoFacebook.visibility =
             if (place.facebook.isEmpty()) View.GONE else View.VISIBLE
-        additionalInfoAddressGroup.visibility =
+        additionalInfoAddress.visibility =
             if (place.address.isEmpty()) View.GONE else View.VISIBLE
 
-        additionalInfoMobilePhoneValue.text = place.phone
-        additionalInfoWebsiteValue.text = place.website
-        additionalInfoFacebookValue.text = place.facebook
-        additionalInfoAddressValue.text = place.address
+        additionalInfoMobilePhone.setValue(place.phone)
+        additionalInfoWebsite.setValue(place.website)
+        additionalInfoFacebook.setValue(place.facebook)
+        additionalInfoAddress.setValue(place.address)
 
-        additionalInfoMobilePhoneValue.setOnClickListener {
+        additionalInfoMobilePhone.setOnClickListener {
             startActivity(Intent(Intent.ACTION_DIAL).apply {
                 data = Uri.parse("tel:${place.phone}")
             })
         }
 
-        additionalInfoWebsiteValue.setOnClickListener {
+        additionalInfoWebsite.setOnClickListener {
             startActivity(Intent(Intent.ACTION_VIEW).apply {
                 data = Uri.parse(place.website)
             })
         }
 
-        additionalInfoFacebookValue.setOnClickListener {
+        additionalInfoFacebook.setOnClickListener {
             val facebookIntent = Intent(Intent.ACTION_VIEW).apply {
                 data = Uri.parse("facebook://facebook.com/${place.facebook}")
             }
@@ -313,54 +293,12 @@ class SoramitsuMapFragment : Fragment(R.layout.fragment_map_soramitsu) {
             }
         }
 
-        additionalInfoAddressValue.setOnClickListener {
+        additionalInfoAddress.setOnClickListener {
             startActivity(Intent(Intent.ACTION_VIEW).apply {
                 data = Uri.parse("geo:0,0?q=${Uri.encode(place.address)}")
                 `package` = "com.google.android.apps.maps"
             })
         }
-
-        // we don't have working schedule in demo dataset
-//        bindWorkingTime(place)
-    }
-
-    private fun bindWorkingTime(place: Place) {
-        val calendar = Calendar.getInstance()
-        val minutesSinceMidnightNow = calendar.asTime().toMinutesOfDay()
-        val minutesSinceMidnightOpen = place.startWorkingAtTime.toMinutesOfDay()
-        val minutesSinceMidnightClose = place.finishWorkingAtTime.toMinutesOfDay()
-
-        val timeFormat = SimpleDateFormat("HH:mm", Locale.getDefault())
-        val openNow = minutesSinceMidnightNow in minutesSinceMidnightOpen..minutesSinceMidnightClose
-        if (openNow) {
-            calendar.withTime(place.finishWorkingAtTime)
-            additionalInfoOpenHoursStatus.setText(R.string.sm_open_now)
-
-
-            @StyleRes val textAppearance = requireContext()
-                .getResourceIdForAttr(R.attr.soramitsuMapOpenNowTextAppearance)
-
-            TextViewCompat.setTextAppearance(additionalInfoOpenHoursStatus, textAppearance)
-        } else {
-            calendar.withTime(place.startWorkingAtTime)
-            additionalInfoOpenHoursStatus.setText(R.string.sm_closed_now)
-
-            @StyleRes val textAppearance = requireContext()
-                .getResourceIdForAttr(R.attr.soramitsuMapCloseNowTextAppearance)
-
-            TextViewCompat.setTextAppearance(additionalInfoOpenHoursStatus, textAppearance)
-        }
-
-        calendar[Calendar.HOUR_OF_DAY] = place.startWorkingAtTime.hour
-        calendar[Calendar.MINUTE] = place.startWorkingAtTime.minute
-        val startTimeHumanFormat = timeFormat.format(calendar.time)
-
-        calendar[Calendar.HOUR_OF_DAY] = place.finishWorkingAtTime.hour
-        calendar[Calendar.MINUTE] = place.finishWorkingAtTime.minute
-        val finishTimeHumanFormat = timeFormat.format(calendar.time)
-
-        additionalInfoOpenHoursValue.text =
-            getString(R.string.sm_daily_interval, startTimeHumanFormat, finishTimeHumanFormat)
     }
 
     internal class PlaceClusterItem(val place: Place) : ClusterItem {
@@ -370,46 +308,7 @@ class SoramitsuMapFragment : Fragment(R.layout.fragment_map_soramitsu) {
             LatLng(place.position.latitude, place.position.longitude)
     }
 
-    /**
-     * Part of dirty trick. See details [ViewPagerBottomSheetBehavior]
-     */
-    inner class UpdateNestedScrollViewWhenPageChanges : ViewPager.OnPageChangeListener {
-
-        private val viewCache = hashMapOf<Int, View>()
-
-        override fun onPageScrollStateChanged(state: Int) {
-        }
-
-        override fun onPageScrolled(
-            position: Int,
-            positionOffset: Float,
-            positionOffsetPixels: Int
-        ) {
-        }
-
-        /**
-         * ```
-         * val scrollingChild = currencyFragment.view.recyclerView
-         * ViewPagerBehaviour.updateScrollingChild(scrollingChild)
-         * ```
-         */
-        override fun onPageSelected(position: Int) {
-            if (!viewCache.containsKey(R.id.placesRecyclerView)) {
-                val currentFragment = bottomSheetPagerAdapter.findFragmentAtPosition(position)
-                val fragmentView = currentFragment?.view
-                val placesRecyclerView = fragmentView?.findViewById<View>(R.id.placesRecyclerView)
-                if (placesRecyclerView != null) {
-                    viewCache[R.id.placesRecyclerView] = placesRecyclerView
-                }
-            }
-
-            viewCache[R.id.placesRecyclerView]?.let {
-                categoriesBottomSheetBehavior.updateScrollingChild(it)
-            }
-        }
-    }
-
     companion object {
-        const val EXTRA_SINGLE_TAB = "EXTRA_TABS"
+        const val LOCATION_REQUEST_CODE = 777
     }
 }

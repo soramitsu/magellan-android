@@ -10,9 +10,9 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import jp.co.soramitsu.map.R
 import jp.co.soramitsu.map.presentation.SoramitsuMapFragment
 import jp.co.soramitsu.map.presentation.SoramitsuMapViewModel
-import kotlinx.android.synthetic.main.places_fragment.*
+import kotlinx.android.synthetic.main.sm_places_fragment.*
 
-internal class PlacesFragment : Fragment(R.layout.places_fragment) {
+internal class PlacesFragment : Fragment(R.layout.sm_places_fragment) {
 
     private lateinit var placesAdapter: PlacesAdapter
 
