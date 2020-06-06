@@ -44,7 +44,7 @@ pipeline {
                 expression { return (env.GIT_BRANCH in branchesList ) }
             }
             environment {
-                NEXUS_URL = "https://nexus.iroha.tech/repository/maven-soramitsu-private/"
+                NEXUS_URL = "https://nexus.iroha.tech/repository/maven-soramitsu/"
                 NEXUS = credentials('nexus-soramitsu-rw') // -> NEXUS_USR NEXUS_PSW
             }
             steps {
