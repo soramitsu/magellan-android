@@ -1,5 +1,6 @@
 package jp.co.soramitsu.map.presentation.categories
 
+import android.content.DialogInterface
 import android.graphics.Color
 import android.os.Bundle
 import android.os.Handler
@@ -58,5 +59,11 @@ internal class CategoriesFragment : BottomSheetDialogFragment() {
                 viewModel.onResetCategoriesFilterButtonClicked()
             }
         }
+    }
+
+    override fun onDismiss(dialog: DialogInterface) {
+        super.onDismiss(dialog)
+
+        viewModel.applyNewFilters()
     }
 }

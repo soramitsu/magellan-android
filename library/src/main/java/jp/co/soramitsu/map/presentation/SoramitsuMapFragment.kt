@@ -3,26 +3,29 @@ package jp.co.soramitsu.map.presentation
 import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.Bitmap
+import android.graphics.Canvas
 import android.net.Uri
 import android.os.Bundle
+import android.os.Handler
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
-import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.LatLngBounds
+import com.google.android.gms.maps.model.*
 import com.google.android.material.bottomsheet.BottomSheetBehavior
-import com.google.maps.android.clustering.ClusterItem
-import com.google.maps.android.clustering.ClusterManager
-import com.google.maps.android.clustering.algo.NonHierarchicalDistanceBasedAlgorithm
+import com.google.maps.android.ui.IconGenerator
 import jp.co.soramitsu.map.R
+import jp.co.soramitsu.map.data.MapParams
+import jp.co.soramitsu.map.model.GeoPoint
 import jp.co.soramitsu.map.model.Place
 import jp.co.soramitsu.map.presentation.categories.CategoriesFragment
 import jp.co.soramitsu.map.presentation.places.PlacesAdapter
@@ -37,21 +40,51 @@ import kotlinx.android.synthetic.main.sm_places_with_search_field.*
 class SoramitsuMapFragment : Fragment(R.layout.sm_fragment_map_soramitsu) {
 
     private lateinit var viewModel: SoramitsuMapViewModel
-    private lateinit var clusterManager: ClusterManager<PlaceClusterItem>
     private lateinit var placeInformationBottomSheetBehavior: BottomSheetBehavior<ConstraintLayout>
     private lateinit var categoriesWithPlacesBottomSheetBehavior: BottomSheetBehavior<ConstraintLayout>
 
     private var googleMap: GoogleMap? = null
 
+    private fun getMapParams(googleMap: GoogleMap): MapParams {
+        val farLeft = googleMap.projection.visibleRegion.farLeft
+        val nearRight = googleMap.projection.visibleRegion.nearRight
+        val zoom = googleMap.cameraPosition.zoom.toInt()
+        return MapParams(
+            topLeft = GeoPoint(
+                latitude = farLeft.latitude,
+                longitude = farLeft.longitude
+            ),
+            bottomRight = GeoPoint(
+                latitude = nearRight.latitude,
+                longitude = nearRight.longitude
+            ),
+            zoom = zoom
+        )
+    }
+
+    private val markers = mutableListOf<Marker>()
+    private val clusters = mutableListOf<Marker>()
+
+    // will be used for throttling. Maybe we can achieve the same
+    // behavior using delay() before request and cancelling corresponding job
+    private val handler = Handler()
+    private var onMapScrollStopCallback: Runnable? = null
+
     private val placesAdapter = PlacesAdapter { place ->
         viewModel.onPlaceSelected(place)
+        val placePosition = GeoPoint(
+            latitude = place.position.latitude,
+            longitude = place.position.longitude
+        )
+        viewModel.onExtendedPlaceInfoRequested(placePosition)
     }
 
     private val textWatcher: TextWatcher = object : TextWatcher {
         override fun afterTextChanged(s: Editable?) {}
         override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
         override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-            s?.toString()?.let { viewModel.onSearchTextChanged(it) }
+            val searchText = s?.toString() ?: return
+            viewModel.requestParams = viewModel.requestParams.copy(query = searchText)
         }
     }
 
@@ -97,6 +130,8 @@ class SoramitsuMapFragment : Fragment(R.layout.sm_fragment_map_soramitsu) {
     override fun onPause() {
         super.onPause()
         soramitsuMapView.onPause()
+
+        handler.removeCallbacksAndMessages(null)
     }
 
     override fun onStop() {
@@ -114,14 +149,6 @@ class SoramitsuMapFragment : Fragment(R.layout.sm_fragment_map_soramitsu) {
         map?.let { googleMap ->
             this.googleMap = googleMap
 
-            clusterManager = ClusterManager(requireContext(), googleMap)
-            clusterManager.setAnimation(true)
-            val algorithm = NonHierarchicalDistanceBasedAlgorithm<PlaceClusterItem>()
-            // we have to adjust this value for better clusterization
-            algorithm.maxDistanceBetweenClusteredItems = 100
-            clusterManager.algorithm = algorithm
-            googleMap.setOnCameraIdleListener(clusterManager)
-            googleMap.setOnMarkerClickListener(clusterManager)
             googleMap.uiSettings.apply {
                 isZoomGesturesEnabled = true
                 isCompassEnabled = true
@@ -129,10 +156,34 @@ class SoramitsuMapFragment : Fragment(R.layout.sm_fragment_map_soramitsu) {
             }
 
             val zoomLevel = 10f
-            val cambodia = LatLng(11.541789, 104.913587)
-            googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(cambodia, zoomLevel))
+            val kolomna = LatLng(55.105181, 38.746115)
+            googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(kolomna, zoomLevel))
+
+            googleMap.setOnCameraMoveListener {
+                // throttleLast(onCardScrollStopCallback, 2000ms)
+                onMapScrollStopCallback?.let { handler.removeCallbacks(it) }
+                onMapScrollStopCallback = Runnable {
+                    val farLeft = googleMap.projection.visibleRegion.farLeft
+                    val nearRight = googleMap.projection.visibleRegion.nearRight
+                    val zoom = googleMap.cameraPosition.zoom.toInt()
+                    viewModel.mapParams = MapParams(
+                        topLeft = GeoPoint(
+                            latitude = farLeft.latitude,
+                            longitude = farLeft.longitude
+                        ),
+                        bottomRight = GeoPoint(
+                            latitude = nearRight.latitude,
+                            longitude = nearRight.longitude
+                        ),
+                        zoom = zoom
+                    )
+                }
+                onMapScrollStopCallback?.let { handler.postDelayed(it, 500) }
+            }
 
             viewModel.placeSelected().observe(viewLifecycleOwner, Observer { selectedPlace ->
+                bindBottomSheetWithPlace(selectedPlace)
+
                 categoriesWithPlacesBottomSheetBehavior.state =
                     BottomSheetBehavior.STATE_COLLAPSED
                 placeInformationBottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
@@ -143,40 +194,36 @@ class SoramitsuMapFragment : Fragment(R.layout.sm_fragment_map_soramitsu) {
                     selectedPlace.position.longitude
                 )
                 googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15f))
-
-                clusterManager.cluster()
             })
 
             viewModel.viewState().observe(viewLifecycleOwner, Observer { viewState ->
-                val clusterItems = viewState.places.map { place -> PlaceClusterItem(place) }
+                displayMarkers(viewState)
+                displayClusters(viewState)
 
-                clusterManager.clearItems()
-                clusterManager.addItems(clusterItems)
-                clusterManager.cluster()
+                googleMap.setOnMarkerClickListener { marker ->
+                    if (marker in clusters) {
+                        // zoom in
+                        googleMap.animateCamera(
+                            CameraUpdateFactory.newLatLngZoom(
+                                marker.position,
+                                googleMap.cameraPosition.zoom + 2
+                            )
+                        )
+                    } else if (marker in markers) {
+                        val placePoint = GeoPoint(
+                            latitude = marker.position.latitude,
+                            longitude = marker.position.longitude
+                        )
+                        viewModel.onExtendedPlaceInfoRequested(placePoint)
+                    }
+
+                    true
+                }
 
                 placesAdapter.update(viewState.places)
             })
 
-            clusterManager.setOnClusterItemClickListener { clusterItem ->
-                placeInformationBottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
-                bindBottomSheetWithPlace(clusterItem.place)
-                true
-            }
-
-            clusterManager.setOnClusterClickListener { cluster ->
-                val bounds = LatLngBounds.builder()
-                cluster.items.forEach { bounds.include(it.position) }
-                val paddingPx = 100
-                googleMap.animateCamera(
-                    CameraUpdateFactory.newLatLngBounds(
-                        bounds.build(),
-                        paddingPx
-                    )
-                )
-                true
-            }
-
-            viewModel.onMapReady()
+            viewModel.mapParams = getMapParams(googleMap)
 
             findMeButton.setOnClickListener {
                 onFindMeButtonClicked(googleMap)
@@ -200,6 +247,54 @@ class SoramitsuMapFragment : Fragment(R.layout.sm_fragment_map_soramitsu) {
                 )
             }
         }
+    }
+
+    private fun displayMarkers(viewState: SoramitsuMapViewState) {
+        markers.forEach { it.remove() }
+        markers.clear()
+
+        val newMarkers = viewState.places.mapNotNull {
+            val position = LatLng(it.position.latitude, it.position.longitude)
+            val markerOptions = MarkerOptions()
+                .position(position)
+                .icon(placePinIcon(it))
+            googleMap?.addMarker(markerOptions)
+        }
+        markers.addAll(newMarkers)
+    }
+
+    private fun placePinIcon(place: Place): BitmapDescriptor {
+        val drawable = ContextCompat.getDrawable(requireContext(), R.drawable.sm_pin_restaurant)
+        val bitmap = Bitmap.createBitmap(
+            drawable!!.intrinsicWidth, drawable.intrinsicHeight, Bitmap.Config.ARGB_8888
+        )
+        val canvas = Canvas(bitmap)
+        drawable.setBounds(0, 0, canvas.width, canvas.height)
+        drawable.draw(canvas)
+
+        return BitmapDescriptorFactory.fromBitmap(bitmap)
+    }
+
+    private fun displayClusters(viewState: SoramitsuMapViewState) {
+        clusters.forEach { it.remove() }
+        clusters.clear()
+        val iconGen = IconGenerator(requireContext()).apply {
+            val background = ContextCompat.getDrawable(
+                requireContext(),
+                R.drawable.sm_cluster_background
+            )
+            setBackground(background)
+            setTextAppearance(R.style.SM_TextAppearance_Soramitsu_MaterialComponents_Caption_White)
+        }
+        val newClusters = viewState.clusters.mapNotNull {
+            val position = LatLng(it.position.latitude, it.position.longitude)
+            val icon = iconGen.makeIcon(it.count.toString())
+            val markerOptions = MarkerOptions()
+                .icon(BitmapDescriptorFactory.fromBitmap(icon))
+                .position(position)
+            googleMap?.addMarker(markerOptions)
+        }
+        clusters.addAll(newClusters)
     }
 
     private fun onFindMeButtonClicked(googleMap: GoogleMap) {
@@ -299,13 +394,6 @@ class SoramitsuMapFragment : Fragment(R.layout.sm_fragment_map_soramitsu) {
                 `package` = "com.google.android.apps.maps"
             })
         }
-    }
-
-    internal class PlaceClusterItem(val place: Place) : ClusterItem {
-        override fun getSnippet(): String = ""
-        override fun getTitle(): String = place.name
-        override fun getPosition(): LatLng =
-            LatLng(place.position.latitude, place.position.longitude)
     }
 
     companion object {
