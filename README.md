@@ -18,7 +18,7 @@ You can check your credentials by sign in in [Nexus](https://nexus.iroha.tech). 
 allprojects {
     repositories {
         maven {
-            url "https://nexus.iroha.tech/repository/maven-soramitsu-private/"
+            url "https://nexus.iroha.tech/repository/maven-soramitsu/"
             credentials {
                 username = System.getenv("NEXUS_USR") ?: SORAMITSU_MAVEN_USER_NAME
                 password = System.getenv("NEXUS_PSW") ?: SORAMITSU_MAVEN_USER_PASSWORD
