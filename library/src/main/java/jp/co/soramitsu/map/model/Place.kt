@@ -2,7 +2,7 @@ package jp.co.soramitsu.map.model
 
 import java.util.*
 
-internal data class Place(
+data class Place(
     val name: String,
     val category: Category,
     val position: Position,
@@ -22,5 +22,6 @@ internal data class Place(
     val website: String = "",
     val facebook: String = "",
     val address: String = "",
-    val reviews: List<Review> = emptyList()
+    val reviews: List<Review> = emptyList(),
+    val id: String = ""
 )

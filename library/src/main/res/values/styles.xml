@@ -52,4 +52,9 @@
     <style name="SM.TextAppearance.Soramitsu.MaterialComponents.Subtitle1" parent="TextAppearance.MaterialComponents.Subtitle1" />
 
     <style name="SM.TextAppearance.Soramitsu.MaterialComponents.Subtitle2" parent="TextAppearance.MaterialComponents.Subtitle2" />
+
+    <style name="SM.TextAppearance.Soramitsu.MaterialComponents.Caption.White">
+        <item name="android:textColor">@android:color/white</item>
+        <item name="android:gravity">center</item>
+    </style>
 </resources>

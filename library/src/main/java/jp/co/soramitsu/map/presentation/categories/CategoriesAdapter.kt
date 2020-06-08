@@ -8,7 +8,6 @@ import androidx.appcompat.widget.AppCompatTextView
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import jp.co.soramitsu.map.R
-import jp.co.soramitsu.map.ext.asLocalizedString
 import jp.co.soramitsu.map.ext.getResourceIdForAttr
 import jp.co.soramitsu.map.model.Category
 
@@ -65,7 +64,7 @@ internal class CategoryViewHolder(itemView: View) : RecyclerView.ViewHolder(item
         itemView.findViewById<AppCompatTextView>(R.id.categoryNameTextView)
 
     fun bind(categoryListItem: CategoryListItem) {
-        categoryTextView.setText(categoryListItem.category.asLocalizedString())
+        categoryTextView.text = categoryListItem.category.name
         categoryTextView.isSelected = categoryListItem.selected
         val checkIconId = if (categoryListItem.selected) R.drawable.sm_ic_check_24dp else 0
         categoryTextView.setCompoundDrawablesRelativeWithIntrinsicBounds(
@@ -81,7 +80,7 @@ internal class CategoryViewHolder(itemView: View) : RecyclerView.ViewHolder(item
         Category.PHARMACY -> context.getResourceIdForAttr(R.attr.sm_categoryIconPharmacy)
         Category.ENTERTAINMENT -> context.getResourceIdForAttr(R.attr.sm_categoryIconEntertainment)
         Category.EDUCATION -> context.getResourceIdForAttr(R.attr.sm_categoryIconEducation)
-        Category.OTHER -> context.getResourceIdForAttr(R.attr.sm_categoryIconOther)
+        else -> context.getResourceIdForAttr(R.attr.sm_categoryIconOther)
     }
 
 }
