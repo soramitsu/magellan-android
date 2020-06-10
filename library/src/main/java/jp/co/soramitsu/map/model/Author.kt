@@ -1,6 +1,6 @@
 package jp.co.soramitsu.map.model
 
-internal class Author(
+class Author(
     val name: String,
     val avatarUrl: String = ""
 )

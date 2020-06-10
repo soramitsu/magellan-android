@@ -1,6 +1,6 @@
 package jp.co.soramitsu.map.model
 
-class Position(
+data class GeoPoint(
     val latitude: Double,
     val longitude: Double
 )
