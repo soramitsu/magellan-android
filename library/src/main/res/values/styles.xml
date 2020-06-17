@@ -47,11 +47,15 @@
 
     <style name="SM.TextAppearance.Soramitsu.MaterialComponents.Body2" parent="TextAppearance.MaterialComponents.Body2" />
 
-    <style name="SM.TextAppearance.Soramitsu.MaterialComponents.Caption" parent="TextAppearance.MaterialComponents.Caption" />
+    <style name="SM.TextAppearance.Soramitsu.MaterialComponents.Caption" parent="TextAppearance.MaterialComponents.Caption">
+        <item name="android:textSize">13sp</item>
+    </style>
 
     <style name="SM.TextAppearance.Soramitsu.MaterialComponents.Subtitle1" parent="TextAppearance.MaterialComponents.Subtitle1" />
 
-    <style name="SM.TextAppearance.Soramitsu.MaterialComponents.Subtitle2" parent="TextAppearance.MaterialComponents.Subtitle2" />
+    <style name="SM.TextAppearance.Soramitsu.MaterialComponents.Subtitle2" parent="TextAppearance.MaterialComponents.Subtitle2">
+        <item name="android:textSize">16sp</item>
+    </style>
 
     <style name="SM.TextAppearance.Soramitsu.MaterialComponents.Caption.White">
         <item name="android:textColor">@android:color/white</item>

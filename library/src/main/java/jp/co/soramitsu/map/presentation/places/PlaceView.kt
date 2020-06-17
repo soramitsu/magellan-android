@@ -3,18 +3,10 @@ package jp.co.soramitsu.map.presentation.places
 import android.content.Context
 import android.util.AttributeSet
 import android.view.View
-import androidx.annotation.StyleRes
 import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.core.widget.TextViewCompat
 import jp.co.soramitsu.map.R
-import jp.co.soramitsu.map.ext.asLocalizedString
-import jp.co.soramitsu.map.ext.asTime
-import jp.co.soramitsu.map.ext.getResourceIdForAttr
-import jp.co.soramitsu.map.ext.toMinutesOfDay
 import jp.co.soramitsu.map.model.Place
 import kotlinx.android.synthetic.main.sm_place_view.view.*
-import java.text.SimpleDateFormat
-import java.util.*
 
 internal class PlaceView @JvmOverloads constructor(
     context: Context,
@@ -24,7 +16,7 @@ internal class PlaceView @JvmOverloads constructor(
 
     fun bind(place: Place) {
         placeNameTextView.text = place.name
-        placeTypeTextView.setText(place.category.asLocalizedString())
+        placeAddressTextView.text = place.address
         placeRatingBar.rating = place.rating
         placeRatingTextView.text = place.rating.toString()
         placeReviewsTextView.text =
