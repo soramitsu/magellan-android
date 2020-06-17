@@ -11,7 +11,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="4dp"
-        android:paddingHorizontal="16dp"
+        android:paddingHorizontal="20dp"
         android:paddingVertical="8dp"
         android:textAppearance="?sm_placeViewTitleTextAppearance"
         app:layout_constraintEnd_toEndOf="parent"
@@ -20,26 +20,26 @@
         tools:text="95 DEGREE COFFEE" />
 
     <TextView
-        android:id="@+id/placeTypeTextView"
+        android:id="@+id/placeAddressTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:paddingHorizontal="16dp"
-        android:textAppearance="?sm_placeViewCategoryTextAppearance"
+        android:paddingHorizontal="20dp"
+        android:textAppearance="?attr/sm_placeViewAddressTextAppearance"
         app:layout_constraintStart_toStartOf="@id/placeNameTextView"
         app:layout_constraintTop_toBottomOf="@id/placeNameTextView"
-        tools:text="Restaurant, Cafe, Bar" />
+        tools:text="Bank · #298 Street 93, Phnom Penh 12258, Cambodia" />
 
     <RatingBar
         android:id="@+id/placeRatingBar"
         style="@style/Widget.AppCompat.RatingBar.Small"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginHorizontal="16dp"
+        android:layout_marginHorizontal="20dp"
         android:layout_marginTop="10dp"
         android:numStars="5"
         android:progressTint="?sm_ratingBarColor"
-        app:layout_constraintStart_toStartOf="@id/placeTypeTextView"
-        app:layout_constraintTop_toBottomOf="@id/placeTypeTextView"
+        app:layout_constraintStart_toStartOf="@id/placeAddressTextView"
+        app:layout_constraintTop_toBottomOf="@id/placeAddressTextView"
         tools:rating="3" />
 
     <TextView
@@ -49,7 +49,7 @@
         android:layout_margin="8dp"
         android:textAppearance="?sm_ratingTextAppearance"
         app:layout_constraintStart_toEndOf="@id/placeRatingBar"
-        app:layout_constraintTop_toBottomOf="@id/placeTypeTextView"
+        app:layout_constraintTop_toBottomOf="@id/placeAddressTextView"
         tools:text="4.9" />
 
     <TextView
@@ -60,7 +60,7 @@
         android:textAppearance="?sm_reviewsTextAppearance"
         app:layout_constraintBaseline_toBaselineOf="@id/placeRatingTextView"
         app:layout_constraintStart_toEndOf="@id/placeRatingTextView"
-        app:layout_constraintTop_toBottomOf="@id/placeTypeTextView"
+        app:layout_constraintTop_toBottomOf="@id/placeAddressTextView"
         tools:text="(39 reviews)" />
 
     <androidx.constraintlayout.widget.Barrier
@@ -74,8 +74,8 @@
         android:id="@+id/placeWorkTimeTextView"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginHorizontal="16dp"
-        android:layout_marginVertical="16dp"
+        android:layout_marginHorizontal="20dp"
+        android:layout_marginVertical="8dp"
         android:text="@string/sm_undefined_schedule"
         app:layout_constraintStart_toStartOf="@id/placeBottomBarrier"
         app:layout_constraintTop_toBottomOf="@id/placeBottomBarrier"
@@ -84,7 +84,7 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginHorizontal="16dp"
+        android:layout_marginHorizontal="20dp"
         android:textAppearance="?attr/sm_distanceTextAppearance"
         app:layout_constraintBaseline_toBaselineOf="@id/placeWorkTimeTextView"
         app:layout_constraintEnd_toEndOf="parent"

@@ -14,7 +14,8 @@
         android:layout_height="wrap_content"
         android:layout_gravity="end|center_vertical"
         android:layout_margin="8dp"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        >
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/zoomInButton"

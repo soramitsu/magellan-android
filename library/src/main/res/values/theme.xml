@@ -32,12 +32,11 @@
         <item name="sm_categoryIconOther">@drawable/sm_ic_other</item>
 
         <item name="sm_nearbyPlacesTitleText">@string/sm_nearby_places</item>
-        <item name="sm_nearbyPlacesTitleTextAppearance">@style/SM.TextAppearance.Soramitsu.MaterialComponents.Subtitle2</item>
 
         <item name="sm_checkIcon">@drawable/sm_ic_check_24dp</item>
 
         <item name="sm_placeBottomSheetBackground">@drawable/sm_rounded_background</item>
-        <item name="sm_placeBottomSheetPeekHeight">142dp</item>
+        <item name="sm_placeBottomSheetPeekHeight">134dp</item>
         <item name="sm_placeTitleTextColor">#000000</item>
 
         <item name="sm_iconColor">@color/sm_icon_color</item>
@@ -51,7 +50,7 @@
         <item name="sm_placeInfoValueTextAppearance">@style/SM.TextAppearance.Soramitsu.MaterialComponents.Body2.Clickable</item>
 
         <item name="sm_placeViewTitleTextAppearance">@style/SM.TextAppearance.Soramitsu.MaterialComponents.Subtitle1</item>
-        <item name="sm_placeViewCategoryTextAppearance">@style/SM.TextAppearance.Soramitsu.MaterialComponents.Caption</item>
+        <item name="sm_placeViewAddressTextAppearance">@style/SM.TextAppearance.Soramitsu.MaterialComponents.Caption</item>
 
         <item name="sm_openNowTextAppearance">@style/SM.TextAppearance.Soramitsu.MaterialComponents.Body2.Acitvated</item>
 
