@@ -32,7 +32,6 @@
     <attr name="sm_categoryIconOther" format="reference" />
 
     <attr name="sm_nearbyPlacesTitleText" format="string|reference" />
-    <attr name="sm_nearbyPlacesTitleTextAppearance" format="reference" />
 
     <attr name="sm_checkIcon" format="reference" />
 
@@ -47,7 +46,7 @@
     <attr name="sm_placeInfoValueActivatedTextColor" format="color|reference" />
 
     <attr name="sm_placeViewTitleTextAppearance" format="reference" />
-    <attr name="sm_placeViewCategoryTextAppearance" format="reference" />
+    <attr name="sm_placeViewAddressTextAppearance" format="reference" />
 
     <attr name="sm_openNowTextAppearance" format="reference" />
     <attr name="sm_closeNowTextAppearance" format="reference" />
