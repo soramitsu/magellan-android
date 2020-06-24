@@ -156,8 +156,8 @@ class SoramitsuMapFragment : Fragment(R.layout.sm_fragment_map_soramitsu) {
             }
 
             val zoomLevel = 10f
-            val kolomna = LatLng(55.105181, 38.746115)
-            googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(kolomna, zoomLevel))
+            val cambodia = LatLng(11.541789, 104.913587)
+            googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(cambodia, zoomLevel))
 
             googleMap.setOnCameraMoveListener {
                 // throttleLast(onCardScrollStopCallback, 2000ms)
