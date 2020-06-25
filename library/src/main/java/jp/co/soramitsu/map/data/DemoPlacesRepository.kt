@@ -16,8 +16,12 @@ internal class DemoPlacesRepository : PlacesRepository {
     override fun getAllPlaces(
         mapParams: MapParams,
         requestParams: RequestParams
-    ): Pair<List<Place>, List<Cluster>> =
-        Pair(Places.merchants + Places.banks + Places.agents, emptyList())
+    ): Pair<List<Place>, List<Cluster>> {
+        val places = (Places.merchants + Places.banks + Places.agents).mapIndexed { index, place ->
+            place.copy(id = index.toString())
+        }
+        return Pair(places, emptyList())
+    }
 }
 
 /**

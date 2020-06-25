@@ -20,11 +20,16 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
-import com.google.android.gms.maps.model.*
+import com.google.android.gms.maps.model.BitmapDescriptor
+import com.google.android.gms.maps.model.BitmapDescriptorFactory
+import com.google.android.gms.maps.model.Marker
+import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.maps.android.ui.IconGenerator
 import jp.co.soramitsu.map.R
+import jp.co.soramitsu.map.SoramitsuMapLibraryConfig
 import jp.co.soramitsu.map.data.MapParams
+import jp.co.soramitsu.map.ext.asLatLng
 import jp.co.soramitsu.map.model.GeoPoint
 import jp.co.soramitsu.map.model.Place
 import jp.co.soramitsu.map.presentation.categories.CategoriesFragment
@@ -155,9 +160,12 @@ class SoramitsuMapFragment : Fragment(R.layout.sm_fragment_map_soramitsu) {
                 isMyLocationButtonEnabled = true
             }
 
-            val zoomLevel = 10f
-            val cambodia = LatLng(11.541789, 104.913587)
-            googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(cambodia, zoomLevel))
+            googleMap.moveCamera(
+                CameraUpdateFactory.newLatLngZoom(
+                    SoramitsuMapLibraryConfig.defaultPosition.asLatLng(),
+                    SoramitsuMapLibraryConfig.defaultZoom
+                )
+            )
 
             googleMap.setOnCameraMoveListener {
                 // throttleLast(onCardScrollStopCallback, 2000ms)
@@ -182,18 +190,28 @@ class SoramitsuMapFragment : Fragment(R.layout.sm_fragment_map_soramitsu) {
             }
 
             viewModel.placeSelected().observe(viewLifecycleOwner, Observer { selectedPlace ->
-                bindBottomSheetWithPlace(selectedPlace)
-
                 categoriesWithPlacesBottomSheetBehavior.state =
                     BottomSheetBehavior.STATE_COLLAPSED
                 placeInformationBottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
                 bindBottomSheetWithPlace(selectedPlace)
 
-                val latLng = LatLng(
-                    selectedPlace.position.latitude,
-                    selectedPlace.position.longitude
-                )
-                googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15f))
+                // change selected place icon:
+                // 1. change icon of previously selected place
+                // 2. updated selected place (change icon of currently selected element)
+                markers.forEach { marker ->
+                    val tagData = marker.tag as? MarkerTagData
+                    if (tagData?.selected == true && tagData.place.id != selectedPlace.id) {
+                        marker.setIcon(placePinIcon(tagData.place))
+                        marker.tag = tagData.copy(selected = false)
+                        marker.zIndex = 0f
+                    }
+
+                    if (tagData != null && tagData.place.id == selectedPlace.id) {
+                        marker.setIcon(placePinIcon(tagData.place, scale = 1.25f))
+                        marker.tag = tagData.copy(selected = true)
+                        marker.zIndex = 1f
+                    }
+                }
             })
 
             viewModel.viewState().observe(viewLifecycleOwner, Observer { viewState ->
@@ -250,24 +268,35 @@ class SoramitsuMapFragment : Fragment(R.layout.sm_fragment_map_soramitsu) {
     }
 
     private fun displayMarkers(viewState: SoramitsuMapViewState) {
-        markers.forEach { it.remove() }
-        markers.clear()
+        val markersToRemove = markers.filter { marker ->
+            if (marker.tag is MarkerTagData) {
+                val markerTagData = marker.tag as MarkerTagData
+                markerTagData.place !in viewState.places
+            } else {
+                true
+            }
+        }
+        markersToRemove.forEach { it.remove() }
+        markers.removeAll(markersToRemove)
 
-        val newMarkers = viewState.places.mapNotNull {
-            val position = LatLng(it.position.latitude, it.position.longitude)
+        val displayedPlaces = markers.mapNotNull { marker -> (marker.tag as? MarkerTagData)?.place }
+        val newPlaces = viewState.places.filter { place -> place !in displayedPlaces }
+        val newMarkers = newPlaces.mapNotNull {
             val markerOptions = MarkerOptions()
-                .position(position)
+                .position(it.position.asLatLng())
                 .icon(placePinIcon(it))
-            googleMap?.addMarker(markerOptions)
+            googleMap?.addMarker(markerOptions)?.apply {
+                tag = MarkerTagData(it, false)
+            }
         }
         markers.addAll(newMarkers)
     }
 
-    private fun placePinIcon(place: Place): BitmapDescriptor {
+    private fun placePinIcon(place: Place, scale: Float = 1f): BitmapDescriptor {
         val drawable = ContextCompat.getDrawable(requireContext(), R.drawable.sm_pin_restaurant)
-        val bitmap = Bitmap.createBitmap(
-            drawable!!.intrinsicWidth, drawable.intrinsicHeight, Bitmap.Config.ARGB_8888
-        )
+        val iconWidth = (drawable!!.intrinsicWidth * scale).toInt()
+        val iconHeight = (drawable.intrinsicHeight * scale).toInt()
+        val bitmap = Bitmap.createBitmap(iconWidth, iconHeight, Bitmap.Config.ARGB_8888)
         val canvas = Canvas(bitmap)
         drawable.setBounds(0, 0, canvas.width, canvas.height)
         drawable.draw(canvas)
@@ -287,11 +316,10 @@ class SoramitsuMapFragment : Fragment(R.layout.sm_fragment_map_soramitsu) {
             setTextAppearance(R.style.SM_TextAppearance_Soramitsu_MaterialComponents_Caption_White)
         }
         val newClusters = viewState.clusters.mapNotNull {
-            val position = LatLng(it.position.latitude, it.position.longitude)
             val icon = iconGen.makeIcon(it.count.toString())
             val markerOptions = MarkerOptions()
                 .icon(BitmapDescriptorFactory.fromBitmap(icon))
-                .position(position)
+                .position(it.asLatLng())
             googleMap?.addMarker(markerOptions)
         }
         clusters.addAll(newClusters)
@@ -395,6 +423,11 @@ class SoramitsuMapFragment : Fragment(R.layout.sm_fragment_map_soramitsu) {
             })
         }
     }
+
+    data class MarkerTagData(
+        val place: Place,
+        val selected: Boolean = false
+    )
 
     companion object {
         const val LOCATION_REQUEST_CODE = 777
