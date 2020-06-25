@@ -16,7 +16,14 @@ internal class PlaceView @JvmOverloads constructor(
 
     fun bind(place: Place) {
         placeNameTextView.text = place.name
-        placeAddressTextView.text = place.address
+
+        val placeAddress = if (place.address.isNotBlank()) {
+            resources.getString(R.string.sm_category_address, place.category.name, place.address)
+        } else {
+            place.category.name
+        }
+        placeAddressTextView.text = placeAddress
+
         placeRatingBar.rating = place.rating
         placeRatingTextView.text = place.rating.toString()
         placeReviewsTextView.text =
