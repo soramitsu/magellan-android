@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/placeBottomSheet"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="?sm_placeBottomSheetBackground"
+    android:clickable="true"
+    android:focusable="true"
+    android:paddingVertical="8dp"
+    app:behavior_hideable="true"
+    app:behavior_peekHeight="?sm_placeBottomSheetPeekHeight"
+    app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior">
+
+    <View
+        android:layout_width="?attr/sm_categoriesBottomSheetTopperWidth"
+        android:layout_height="?attr/sm_categoriesBottomSheetTopperHeight"
+        android:background="?attr/sm_categoriesBottomSheetTopperDrawable"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <jp.co.soramitsu.map.presentation.places.PlaceView
+        android:id="@+id/placeListItem"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <View
+        android:id="@+id/basicInfoBottomBar"
+        android:layout_width="match_parent"
+        android:layout_height="8dp"
+        android:background="?attr/sm_categoriesBottomSheetSeparatorColor"
+        app:layout_constraintTop_toBottomOf="@id/placeListItem" />
+
+    <TextView
+        android:id="@+id/additionalInfoTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingStart="20dp"
+        android:paddingTop="16dp"
+        android:paddingEnd="20dp"
+        android:paddingBottom="16dp"
+        android:text="@string/sm_information"
+        android:textAppearance="?sm_placeInfoTitleTextAppearance"
+        app:layout_constraintTop_toBottomOf="@id/basicInfoBottomBar" />
+
+    <jp.co.soramitsu.map.presentation.SMTitleValueField
+        android:id="@+id/additionalInfoMobilePhone"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/additionalInfoTitle"
+        app:sm_icon="@drawable/sm_ic_call"
+        app:sm_title="@string/sm_mobile_phone"
+        tools:sm_value="+855 98 333 395" />
+
+    <jp.co.soramitsu.map.presentation.SMTitleValueField
+        android:id="@+id/additionalInfoWebsite"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/additionalInfoMobilePhone"
+        app:sm_icon="@drawable/sm_ic_open"
+        app:sm_title="@string/sm_website"
+        tools:sm_value="www.degree.com" />
+
+    <jp.co.soramitsu.map.presentation.SMTitleValueField
+        android:id="@+id/additionalInfoFacebook"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/additionalInfoWebsite"
+        app:sm_icon="@drawable/sm_ic_open"
+        app:sm_title="@string/sm_facebook"
+        tools:sm_value="95DegreesCoffee" />
+
+    <jp.co.soramitsu.map.presentation.SMTitleValueField
+        android:id="@+id/additionalInfoAddress"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintTop_toBottomOf="@id/additionalInfoFacebook"
+        app:sm_icon="@drawable/sm_ic_navigate"
+        app:sm_title="@string/sm_address"
+        tools:sm_value="#34A, St 240 Sangkat Chak Tomuk, Phnom Penh 12207, Cambodia" />
+
+    <jp.co.soramitsu.map.presentation.SMTitleValueField
+        android:id="@+id/additionalInfoOpenHours"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        app:layout_constraintTop_toBottomOf="@id/additionalInfoAddress"
+        app:sm_title="@string/sm_open_hours"
+        tools:value="@string/sm_open_now" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,10 +1,27 @@
 package jp.co.soramitsu.map.data
 
+import jp.co.soramitsu.map.model.Category
+import jp.co.soramitsu.map.model.Cluster
 import jp.co.soramitsu.map.model.Place
 
 internal class DemoPlacesRepository : PlacesRepository {
+    override fun getCategories(): List<Category> = emptyList()
 
-    override fun getAllPlaces(): List<Place> = Places.merchants + Places.banks + Places.agents
+    override fun getPlaceInfo(place: Place): Place {
+        val allPlaces = Places.merchants + Places.banks + Places.agents
+        val foundPlace = allPlaces.find { it.id == place.id }
+        return foundPlace ?: place
+    }
+
+    override fun getAllPlaces(
+        mapParams: MapParams,
+        requestParams: RequestParams
+    ): Pair<List<Place>, List<Cluster>> {
+        val places = (Places.merchants + Places.banks + Places.agents).mapIndexed { index, place ->
+            place.copy(id = index.toString())
+        }
+        return Pair(places, emptyList())
+    }
 }
 
 /**

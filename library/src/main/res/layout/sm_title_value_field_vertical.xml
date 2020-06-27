@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="?selectableItemBackground"
+    android:paddingLeft="@dimen/sm_margin_padding_size_xmedium"
+    android:paddingRight="@dimen/sm_margin_padding_size_xmedium"
+    tools:parentTag="androidx.constraintlayout.widget.ConstraintLayout">
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/keyTextView"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/sm_margin_padding_size_xmedium"
+        android:layout_marginEnd="@dimen/sm_margin_padding_size_small"
+        android:lineSpacingExtra="45sp"
+        android:maxLines="1"
+        android:textAppearance="@style/SM.TextAppearance.Soramitsu.MaterialComponents.Caption"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/iconImageView"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="Key" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/valueTextView"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/sm_margin_padding_size_small"
+        android:layout_marginEnd="@dimen/sm_margin_padding_size_small"
+        android:maxLines="1"
+        android:textAppearance="@style/SM.TextAppearance.Soramitsu.MaterialComponents.Body1"
+        app:autoSizeMaxTextSize="15sp"
+        app:autoSizeMinTextSize="12sp"
+        app:autoSizeStepGranularity="1sp"
+        app:autoSizeTextType="uniform"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/iconImageView"
+        app:layout_constraintTop_toBottomOf="@id/keyTextView"
+        tools:text="Value" />
+
+    <ImageView
+        android:id="@+id/iconImageView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:importantForAccessibility="no"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        tools:src="@drawable/sm_ic_call"
+        />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="@dimen/sm_margin_padding_size_xmedium"
+        android:background="?attr/sm_categoriesBottomSheetSeparatorColor"
+        app:layout_constraintTop_toBottomOf="@id/valueTextView" />
+
+</merge>

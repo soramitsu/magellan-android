@@ -8,7 +8,6 @@ import androidx.appcompat.widget.AppCompatTextView
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import jp.co.soramitsu.map.R
-import jp.co.soramitsu.map.ext.asLocalizedString
 import jp.co.soramitsu.map.ext.getResourceIdForAttr
 import jp.co.soramitsu.map.model.Category
 
@@ -27,7 +26,7 @@ internal class CategoriesAdapter : RecyclerView.Adapter<CategoryViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CategoryViewHolder {
         val inflater = LayoutInflater.from(parent.context)
-        val view = inflater.inflate(R.layout.category_list_item, parent, false)
+        val view = inflater.inflate(R.layout.sm_category_list_item, parent, false)
         val viewHolder = CategoryViewHolder(view)
         view.setOnClickListener {
             onCategoryClick.invoke(items[viewHolder.adapterPosition].category)
@@ -65,23 +64,23 @@ internal class CategoryViewHolder(itemView: View) : RecyclerView.ViewHolder(item
         itemView.findViewById<AppCompatTextView>(R.id.categoryNameTextView)
 
     fun bind(categoryListItem: CategoryListItem) {
-        categoryTextView.setText(categoryListItem.category.asLocalizedString())
+        categoryTextView.text = categoryListItem.category.name
         categoryTextView.isSelected = categoryListItem.selected
-        val checkIconId = if (categoryListItem.selected) R.drawable.ic_check_24dp else 0
+        val checkIconId = if (categoryListItem.selected) R.drawable.sm_ic_check_24dp else 0
         categoryTextView.setCompoundDrawablesRelativeWithIntrinsicBounds(
             iconForCategory(categoryTextView.context, categoryListItem.category), 0, checkIconId, 0
         )
     }
 
     private fun iconForCategory(context: Context, category: Category): Int = when (category) {
-        Category.BANK -> context.getResourceIdForAttr(R.attr.soramitsuMapCategoryIconDeposit)
-        Category.FOOD -> context.getResourceIdForAttr(R.attr.soramitsuMapCategoryIconRestaurant)
-        Category.SERVICES -> context.getResourceIdForAttr(R.attr.soramitsuMapCategoryIconServices)
-        Category.SUPERMARKETS -> context.getResourceIdForAttr(R.attr.soramitsuMapCategoryIconSupermarket)
-        Category.PHARMACY -> context.getResourceIdForAttr(R.attr.soramitsuMapCategoryIconPharmacy)
-        Category.ENTERTAINMENT -> context.getResourceIdForAttr(R.attr.soramitsuMapCategoryIconEntertainment)
-        Category.EDUCATION -> context.getResourceIdForAttr(R.attr.soramitsuMapCategoryIconEducation)
-        Category.OTHER -> context.getResourceIdForAttr(R.attr.soramitsuMapCategoryIconOther)
+        Category.BANK -> context.getResourceIdForAttr(R.attr.sm_categoryIconDeposit)
+        Category.FOOD -> context.getResourceIdForAttr(R.attr.sm_categoryIconRestaurant)
+        Category.SERVICES -> context.getResourceIdForAttr(R.attr.sm_categoryIconServices)
+        Category.SUPERMARKETS -> context.getResourceIdForAttr(R.attr.sm_categoryIconSupermarket)
+        Category.PHARMACY -> context.getResourceIdForAttr(R.attr.sm_categoryIconPharmacy)
+        Category.ENTERTAINMENT -> context.getResourceIdForAttr(R.attr.sm_categoryIconEntertainment)
+        Category.EDUCATION -> context.getResourceIdForAttr(R.attr.sm_categoryIconEducation)
+        else -> context.getResourceIdForAttr(R.attr.sm_categoryIconOther)
     }
 
 }

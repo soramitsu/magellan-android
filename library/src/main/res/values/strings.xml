@@ -37,4 +37,8 @@
     <string name="sm_zoom_out_button_caption">–</string>
 
     <string name="sm_undefined_schedule">Undefined schedule</string>
+    <string name="sm_filter">Filter</string>
+    <string name="sm_reset">Reset</string>
+
+    <string name="sm_category_address">%1$s, %2$s</string>
 </resources>

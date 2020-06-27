@@ -5,8 +5,11 @@ import android.util.TypedValue
 import android.view.View
 import androidx.annotation.AttrRes
 import androidx.annotation.StringRes
+import com.google.android.gms.maps.model.LatLng
 import jp.co.soramitsu.map.R
 import jp.co.soramitsu.map.model.Category
+import jp.co.soramitsu.map.model.Cluster
+import jp.co.soramitsu.map.model.Position
 import jp.co.soramitsu.map.model.Time
 import java.util.*
 
@@ -32,7 +35,7 @@ internal fun Category.asLocalizedString() = when (this) {
     Category.PHARMACY -> R.string.sm_category_pharmacy
     Category.SERVICES -> R.string.sm_category_services
     Category.SUPERMARKETS -> R.string.sm_category_supermarkets
-    Category.OTHER -> R.string.sm_category_other
+    else -> R.string.sm_category_other
 }
 
 internal fun View.selectableItemBackground() {
@@ -46,3 +49,7 @@ internal fun Context.getResourceIdForAttr(@AttrRes attribute: Int): Int {
     theme.resolveAttribute(attribute, typedValue, true)
     return typedValue.resourceId
 }
+
+internal fun Position.asLatLng(): LatLng = LatLng(latitude, longitude)
+
+internal fun Cluster.asLatLng(): LatLng = LatLng(position.latitude, position.longitude)

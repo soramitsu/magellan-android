@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="?selectableItemBackground"
+    android:paddingLeft="@dimen/sm_margin_padding_size_xmedium"
+    android:paddingRight="@dimen/sm_margin_padding_size_xmedium"
+    tools:parentTag="androidx.constraintlayout.widget.ConstraintLayout">
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/keyTextView"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:lineSpacingExtra="45sp"
+        android:maxLines="1"
+        android:textAppearance="@style/SM.TextAppearance.Soramitsu.MaterialComponents.Caption"
+        app:layout_constraintEnd_toStartOf="@id/valueTextView"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        tools:text="Key" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/valueTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/sm_margin_padding_size_small"
+        android:drawablePadding="8dp"
+        android:gravity="center"
+        android:maxLines="1"
+        android:textAppearance="@style/SM.TextAppearance.Soramitsu.MaterialComponents.Body2"
+        app:autoSizeMaxTextSize="15sp"
+        app:autoSizeMinTextSize="12sp"
+        app:autoSizeStepGranularity="1sp"
+        app:autoSizeTextType="uniform"
+        app:drawableTint="?attr/sm_iconColor"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/keyTextView"
+        tools:drawableEnd="@drawable/sm_ic_call"
+        tools:text="Value" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="@dimen/sm_margin_padding_size_xmedium"
+        android:background="?attr/sm_categoriesBottomSheetSeparatorColor"
+        app:layout_constraintTop_toBottomOf="@id/valueTextView" />
+
+</merge>
