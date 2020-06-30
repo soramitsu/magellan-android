@@ -8,12 +8,14 @@ import android.graphics.Canvas
 import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
-import android.text.Editable
-import android.text.TextWatcher
+import android.view.KeyEvent
 import android.view.View
+import android.view.inputmethod.EditorInfo
+import android.view.inputmethod.InputMethodManager
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.core.content.ContextCompat.getSystemService
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -47,6 +49,11 @@ class SoramitsuMapFragment : Fragment(R.layout.sm_fragment_map_soramitsu) {
     private lateinit var viewModel: SoramitsuMapViewModel
     private lateinit var placeInformationBottomSheetBehavior: BottomSheetBehavior<ConstraintLayout>
     private lateinit var categoriesWithPlacesBottomSheetBehavior: BottomSheetBehavior<ConstraintLayout>
+
+    private val inputMethodService: InputMethodManager?
+        get() = context?.let { context ->
+            getSystemService(context, InputMethodManager::class.java)
+        }
 
     private var googleMap: GoogleMap? = null
 
@@ -84,15 +91,6 @@ class SoramitsuMapFragment : Fragment(R.layout.sm_fragment_map_soramitsu) {
         viewModel.onExtendedPlaceInfoRequested(placePosition)
     }
 
-    private val textWatcher: TextWatcher = object : TextWatcher {
-        override fun afterTextChanged(s: Editable?) {}
-        override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-        override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-            val searchText = s?.toString() ?: return
-            viewModel.requestParams = viewModel.requestParams.copy(query = searchText)
-        }
-    }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         viewModel = ViewModelProvider(this, ViewModelProvider.NewInstanceFactory())
@@ -119,7 +117,23 @@ class SoramitsuMapFragment : Fragment(R.layout.sm_fragment_map_soramitsu) {
         placeInformationBottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
         placeInformationBottomSheetBehavior.isHideable = true
 
-        placesWithSearchTextInputEditText.addTextChangedListener(textWatcher)
+        placesWithSearchTextInputEditText.setOnEditorActionListener { v, actionId, event ->
+            if (actionId == EditorInfo.IME_ACTION_SEARCH) {
+                inputMethodService?.hideSoftInputFromWindow(v.windowToken, 0)
+
+                val searchText = placesWithSearchTextInputEditText.text?.toString().orEmpty()
+                viewModel.requestParams = viewModel.requestParams.copy(query = searchText)
+            }
+
+            true;
+        }
+        placesWithSearchTextInputLayout.setEndIconOnClickListener {
+            placesWithSearchTextInputEditText.text = null
+            inputMethodService?.hideSoftInputFromWindow(
+                placesWithSearchTextInputEditText.windowToken, 0
+            )
+            viewModel.requestParams = viewModel.requestParams.copy(query = "")
+        }
     }
 
     override fun onStart() {
@@ -136,6 +150,7 @@ class SoramitsuMapFragment : Fragment(R.layout.sm_fragment_map_soramitsu) {
         super.onPause()
         soramitsuMapView.onPause()
 
+        inputMethodService?.hideSoftInputFromWindow(view?.windowToken, 0)
         handler.removeCallbacksAndMessages(null)
     }
 
@@ -147,7 +162,6 @@ class SoramitsuMapFragment : Fragment(R.layout.sm_fragment_map_soramitsu) {
     override fun onDestroyView() {
         super.onDestroyView()
         soramitsuMapView.onDestroy()
-        placesWithSearchTextInputEditText.removeTextChangedListener(textWatcher)
     }
 
     private fun onMapReady(map: GoogleMap?) {
@@ -190,6 +204,10 @@ class SoramitsuMapFragment : Fragment(R.layout.sm_fragment_map_soramitsu) {
             }
 
             viewModel.placeSelected().observe(viewLifecycleOwner, Observer { selectedPlace ->
+                inputMethodService?.hideSoftInputFromWindow(
+                    placesWithSearchTextInputEditText.windowToken, 0
+                )
+
                 categoriesWithPlacesBottomSheetBehavior.state =
                     BottomSheetBehavior.STATE_COLLAPSED
                 placeInformationBottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED

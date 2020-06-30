@@ -11,12 +11,11 @@
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/keyTextView"
-        android:layout_width="0dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:lineSpacingExtra="45sp"
         android:maxLines="1"
         android:textAppearance="@style/SM.TextAppearance.Soramitsu.MaterialComponents.Caption"
-        app:layout_constraintEnd_toStartOf="@id/valueTextView"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -24,11 +23,11 @@
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/valueTextView"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/sm_margin_padding_size_small"
         android:drawablePadding="8dp"
-        android:gravity="center"
+        android:gravity="center_vertical|end"
         android:maxLines="1"
         android:textAppearance="@style/SM.TextAppearance.Soramitsu.MaterialComponents.Body2"
         app:autoSizeMaxTextSize="15sp"
@@ -40,6 +39,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/keyTextView"
+        app:layout_constraintHorizontal_bias="1"
         tools:drawableEnd="@drawable/sm_ic_call"
         tools:text="Value" />
 
