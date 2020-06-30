@@ -25,5 +25,5 @@ data class MapParams(
 
 data class RequestParams(
     val query: String,
-    val categories: List<String>
+    val categoriesIds: List<Long>
 )
