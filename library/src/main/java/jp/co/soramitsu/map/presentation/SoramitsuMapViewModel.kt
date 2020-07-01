@@ -51,10 +51,10 @@ internal class SoramitsuMapViewModel(
     fun applyNewFilters() {
         val selectedCategories = currentState.categories
             .filter { it.selected }
-            .map { it.category.name }
+            .map { it.category.id }
 
         requestParams = requestParams.copy(
-            categories = selectedCategories
+            categoriesIds = selectedCategories
         )
     }
 
@@ -65,7 +65,7 @@ internal class SoramitsuMapViewModel(
             val categoryListItems = allCategories.map { category ->
                 CategoryListItem(
                     category,
-                    category.name in requestParams.categories || requestParams.categories.isEmpty()
+                    category.id in requestParams.categoriesIds || requestParams.categoriesIds.isEmpty()
                 )
             }
             val placesAndClusters = getAllPlacesAndClustersSuspend(mapParams, requestParams)
@@ -136,7 +136,7 @@ internal class SoramitsuMapViewModel(
             .map { category -> CategoryListItem(category, false) }
 
         requestParams = requestParams.copy(
-            categories = categories.filter { it.selected }.map { it.category.name }
+            categoriesIds = categories.filter { it.selected }.map { it.category.id }
         )
         viewState.value = currentState.copy(
             categories = categories,
