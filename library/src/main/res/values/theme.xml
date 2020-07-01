@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+
     <style name="SM.Soramistu.Map.BaseTheme" parent="Theme.MaterialComponents.Light.NoActionBar">
         <item name="colorControlNormal">#000000</item>
         <item name="colorAccent">#D0021B</item>
@@ -11,16 +12,22 @@
         <item name="sm_categoriesBottomSheetSearchTextHintColor">#898989</item>
         <item name="sm_categoriesBottomSheetSearchBoxStrokeColor">#898989</item>
 
-        <item name="sm_categoriesBottomSheetSearchTextAppearance">@style/SM.TextAppearance.Soramitsu.MaterialComponents.Caption</item>
+        <item name="sm_categoriesBottomSheetSearchTextAppearance">
+            @style/SM.TextAppearance.Soramitsu.MaterialComponents.Caption
+        </item>
         <item name="sm_categoriesBottomSheetSeparatorColor">#F5F5F5</item>
 
         <item name="sm_categoriesBottomSheetTopperDrawable">@drawable/sm_rounded_rectangle</item>
         <item name="sm_categoriesBottomSheetTopperHeight">4dp</item>
         <item name="sm_categoriesBottomSheetTopperWidth">36dp</item>
 
-        <item name="sm_categoriesBottomSheetTabTextAppearance">@style/SM.TextAppearance.Soramitsu.MaterialComponents.Body2</item>
+        <item name="sm_categoriesBottomSheetTabTextAppearance">
+            @style/SM.TextAppearance.Soramitsu.MaterialComponents.Body2
+        </item>
 
-        <item name="sm_categoryTitleTextAppearance">@style/SM.TextAppearance.Soramitsu.MaterialComponents.Caption</item>
+        <item name="sm_categoryTitleTextAppearance">
+            @style/SM.TextAppearance.Soramitsu.MaterialComponents.Caption
+        </item>
 
         <item name="sm_categoryIconDeposit">@drawable/sm_ic_deposit</item>
         <item name="sm_categoryIconRestaurant">@drawable/sm_ic_restaurant</item>
@@ -30,6 +37,15 @@
         <item name="sm_categoryIconEntertainment">@drawable/sm_ic_entertainment</item>
         <item name="sm_categoryIconEducation">@drawable/sm_ic_education</item>
         <item name="sm_categoryIconOther">@drawable/sm_ic_other</item>
+
+        <item name="sm_categoryPinIconDeposit">@drawable/sm_pin_bank</item>
+        <item name="sm_categoryPinIconRestaurant">@drawable/sm_pin_restaurant</item>
+        <item name="sm_categoryPinIconServices">@drawable/sm_pin_services</item>
+        <item name="sm_categoryPinIconSupermarket">@drawable/sm_pin_supermarkets</item>
+        <item name="sm_categoryPinIconPharmacy">@drawable/sm_pin_pharmacy</item>
+        <item name="sm_categoryPinIconEntertainment">@drawable/sm_pin_entertainment</item>
+        <item name="sm_categoryPinIconEducation">@drawable/sm_pin_education</item>
+        <item name="sm_categoryPinIconOther">@drawable/sm_pin_other</item>
 
         <item name="sm_nearbyPlacesTitleText">@string/sm_nearby_places</item>
 
@@ -45,19 +61,37 @@
         <item name="sm_placeInfoValueClickableTextColor">@color/sm_text_color_clickable</item>
         <item name="sm_placeInfoValueActivatedTextColor">@color/sm_text_color_activated</item>
 
-        <item name="sm_placeInfoTitleTextAppearance">@style/SM.TextAppearance.Soramitsu.MaterialComponents.Subtitle2</item>
-        <item name="sm_placeInfoKeyTextAppearance">@style/SM.TextAppearance.Soramitsu.MaterialComponents.Caption</item>
-        <item name="sm_placeInfoValueTextAppearance">@style/SM.TextAppearance.Soramitsu.MaterialComponents.Body2.Clickable</item>
+        <item name="sm_placeInfoTitleTextAppearance">
+            @style/SM.TextAppearance.Soramitsu.MaterialComponents.Subtitle2
+        </item>
+        <item name="sm_placeInfoKeyTextAppearance">
+            @style/SM.TextAppearance.Soramitsu.MaterialComponents.Caption
+        </item>
+        <item name="sm_placeInfoValueTextAppearance">
+            @style/SM.TextAppearance.Soramitsu.MaterialComponents.Body2.Clickable
+        </item>
 
-        <item name="sm_placeViewTitleTextAppearance">@style/SM.TextAppearance.Soramitsu.MaterialComponents.Subtitle1</item>
-        <item name="sm_placeViewAddressTextAppearance">@style/SM.TextAppearance.Soramitsu.MaterialComponents.Caption</item>
+        <item name="sm_placeViewTitleTextAppearance">
+            @style/SM.TextAppearance.Soramitsu.MaterialComponents.Subtitle1
+        </item>
+        <item name="sm_placeViewAddressTextAppearance">
+            @style/SM.TextAppearance.Soramitsu.MaterialComponents.Caption
+        </item>
 
-        <item name="sm_openNowTextAppearance">@style/SM.TextAppearance.Soramitsu.MaterialComponents.Body2.Acitvated</item>
+        <item name="sm_openNowTextAppearance">
+            @style/SM.TextAppearance.Soramitsu.MaterialComponents.Body2.Acitvated
+        </item>
 
         <item name="sm_ratingBarColor">@color/sm_rating_bar</item>
-        <item name="sm_ratingTextAppearance">@style/SM.TextAppearance.Soramitsu.MaterialComponents.Body2</item>
-        <item name="sm_reviewsTextAppearance">@style/SM.TextAppearance.Soramitsu.MaterialComponents.Caption</item>
-        <item name="sm_distanceTextAppearance">@style/SM.TextAppearance.Soramitsu.MaterialComponents.Caption</item>
+        <item name="sm_ratingTextAppearance">
+            @style/SM.TextAppearance.Soramitsu.MaterialComponents.Body2
+        </item>
+        <item name="sm_reviewsTextAppearance">
+            @style/SM.TextAppearance.Soramitsu.MaterialComponents.Caption
+        </item>
+        <item name="sm_distanceTextAppearance">
+            @style/SM.TextAppearance.Soramitsu.MaterialComponents.Caption
+        </item>
 
         <item name="sm_categorySelectedItemBackground">@drawable/sm_selected_item_background</item>
     </style>
