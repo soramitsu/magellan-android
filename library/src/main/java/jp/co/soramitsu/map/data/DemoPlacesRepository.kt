@@ -5,7 +5,16 @@ import jp.co.soramitsu.map.model.Cluster
 import jp.co.soramitsu.map.model.Place
 
 internal class DemoPlacesRepository : PlacesRepository {
-    override fun getCategories(): List<Category> = emptyList()
+    override fun getCategories(): List<Category> = listOf(
+        Category.BANK,
+        Category.FOOD,
+        Category.SERVICES,
+        Category.SUPERMARKETS,
+        Category.PHARMACY,
+        Category.ENTERTAINMENT,
+        Category.EDUCATION,
+        Category.OTHER
+    )
 
     override fun getPlaceInfo(place: Place): Place {
         val allPlaces = Places.merchants + Places.banks + Places.agents
