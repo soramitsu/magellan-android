@@ -31,6 +31,16 @@
     <attr name="sm_categoryIconEducation" format="reference" />
     <attr name="sm_categoryIconOther" format="reference" />
 
+    <!-- category pins -->
+    <attr name="sm_categoryPinIconDeposit" format="reference" />
+    <attr name="sm_categoryPinIconRestaurant" format="reference" />
+    <attr name="sm_categoryPinIconServices" format="reference" />
+    <attr name="sm_categoryPinIconSupermarket" format="reference" />
+    <attr name="sm_categoryPinIconPharmacy" format="reference" />
+    <attr name="sm_categoryPinIconEntertainment" format="reference" />
+    <attr name="sm_categoryPinIconEducation" format="reference" />
+    <attr name="sm_categoryPinIconOther" format="reference" />
+
     <attr name="sm_nearbyPlacesTitleText" format="string|reference" />
 
     <attr name="sm_checkIcon" format="reference" />
