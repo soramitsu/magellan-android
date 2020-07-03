@@ -1,6 +1,7 @@
 package jp.co.soramitsu.map.presentation
 
 import android.Manifest
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
@@ -8,12 +9,14 @@ import android.graphics.Canvas
 import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
-import android.text.Editable
-import android.text.TextWatcher
 import android.view.View
+import android.view.inputmethod.EditorInfo
+import android.view.inputmethod.InputMethodManager
+import androidx.annotation.DrawableRes
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.core.content.ContextCompat.getSystemService
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -30,6 +33,8 @@ import jp.co.soramitsu.map.R
 import jp.co.soramitsu.map.SoramitsuMapLibraryConfig
 import jp.co.soramitsu.map.data.MapParams
 import jp.co.soramitsu.map.ext.asLatLng
+import jp.co.soramitsu.map.ext.getResourceIdForAttr
+import jp.co.soramitsu.map.model.Category
 import jp.co.soramitsu.map.model.GeoPoint
 import jp.co.soramitsu.map.model.Place
 import jp.co.soramitsu.map.presentation.categories.CategoriesFragment
@@ -47,6 +52,11 @@ class SoramitsuMapFragment : Fragment(R.layout.sm_fragment_map_soramitsu) {
     private lateinit var viewModel: SoramitsuMapViewModel
     private lateinit var placeInformationBottomSheetBehavior: BottomSheetBehavior<ConstraintLayout>
     private lateinit var categoriesWithPlacesBottomSheetBehavior: BottomSheetBehavior<ConstraintLayout>
+
+    private val inputMethodService: InputMethodManager?
+        get() = context?.let { context ->
+            getSystemService(context, InputMethodManager::class.java)
+        }
 
     private var googleMap: GoogleMap? = null
 
@@ -84,15 +94,6 @@ class SoramitsuMapFragment : Fragment(R.layout.sm_fragment_map_soramitsu) {
         viewModel.onExtendedPlaceInfoRequested(placePosition)
     }
 
-    private val textWatcher: TextWatcher = object : TextWatcher {
-        override fun afterTextChanged(s: Editable?) {}
-        override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-        override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-            val searchText = s?.toString() ?: return
-            viewModel.requestParams = viewModel.requestParams.copy(query = searchText)
-        }
-    }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         viewModel = ViewModelProvider(this, ViewModelProvider.NewInstanceFactory())
@@ -119,7 +120,23 @@ class SoramitsuMapFragment : Fragment(R.layout.sm_fragment_map_soramitsu) {
         placeInformationBottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
         placeInformationBottomSheetBehavior.isHideable = true
 
-        placesWithSearchTextInputEditText.addTextChangedListener(textWatcher)
+        placesWithSearchTextInputEditText.setOnEditorActionListener { v, actionId, event ->
+            if (actionId == EditorInfo.IME_ACTION_SEARCH) {
+                inputMethodService?.hideSoftInputFromWindow(v.windowToken, 0)
+
+                val searchText = placesWithSearchTextInputEditText.text?.toString().orEmpty()
+                viewModel.requestParams = viewModel.requestParams.copy(query = searchText)
+            }
+
+            true;
+        }
+        placesWithSearchTextInputLayout.setEndIconOnClickListener {
+            placesWithSearchTextInputEditText.text = null
+            inputMethodService?.hideSoftInputFromWindow(
+                placesWithSearchTextInputEditText.windowToken, 0
+            )
+            viewModel.requestParams = viewModel.requestParams.copy(query = "")
+        }
     }
 
     override fun onStart() {
@@ -136,6 +153,7 @@ class SoramitsuMapFragment : Fragment(R.layout.sm_fragment_map_soramitsu) {
         super.onPause()
         soramitsuMapView.onPause()
 
+        inputMethodService?.hideSoftInputFromWindow(view?.windowToken, 0)
         handler.removeCallbacksAndMessages(null)
     }
 
@@ -147,7 +165,6 @@ class SoramitsuMapFragment : Fragment(R.layout.sm_fragment_map_soramitsu) {
     override fun onDestroyView() {
         super.onDestroyView()
         soramitsuMapView.onDestroy()
-        placesWithSearchTextInputEditText.removeTextChangedListener(textWatcher)
     }
 
     private fun onMapReady(map: GoogleMap?) {
@@ -190,6 +207,10 @@ class SoramitsuMapFragment : Fragment(R.layout.sm_fragment_map_soramitsu) {
             }
 
             viewModel.placeSelected().observe(viewLifecycleOwner, Observer { selectedPlace ->
+                inputMethodService?.hideSoftInputFromWindow(
+                    placesWithSearchTextInputEditText.windowToken, 0
+                )
+
                 categoriesWithPlacesBottomSheetBehavior.state =
                     BottomSheetBehavior.STATE_COLLAPSED
                 placeInformationBottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
@@ -293,7 +314,8 @@ class SoramitsuMapFragment : Fragment(R.layout.sm_fragment_map_soramitsu) {
     }
 
     private fun placePinIcon(place: Place, scale: Float = 1f): BitmapDescriptor {
-        val drawable = ContextCompat.getDrawable(requireContext(), R.drawable.sm_pin_restaurant)
+        val iconId = iconForCategory(requireContext(), place.category)
+        val drawable = ContextCompat.getDrawable(requireContext(), iconId)
         val iconWidth = (drawable!!.intrinsicWidth * scale).toInt()
         val iconHeight = (drawable.intrinsicHeight * scale).toInt()
         val bitmap = Bitmap.createBitmap(iconWidth, iconHeight, Bitmap.Config.ARGB_8888)
@@ -302,6 +324,18 @@ class SoramitsuMapFragment : Fragment(R.layout.sm_fragment_map_soramitsu) {
         drawable.draw(canvas)
 
         return BitmapDescriptorFactory.fromBitmap(bitmap)
+    }
+
+    @DrawableRes
+    private fun iconForCategory(context: Context, category: Category): Int = when (category.name) {
+        Category.BANK.name -> context.getResourceIdForAttr(R.attr.sm_categoryPinIconDeposit)
+        Category.FOOD.name -> context.getResourceIdForAttr(R.attr.sm_categoryPinIconRestaurant)
+        Category.SERVICES.name -> context.getResourceIdForAttr(R.attr.sm_categoryPinIconServices)
+        Category.SUPERMARKETS.name -> context.getResourceIdForAttr(R.attr.sm_categoryPinIconSupermarket)
+        Category.PHARMACY.name -> context.getResourceIdForAttr(R.attr.sm_categoryPinIconPharmacy)
+        Category.ENTERTAINMENT.name -> context.getResourceIdForAttr(R.attr.sm_categoryPinIconEntertainment)
+        Category.EDUCATION.name -> context.getResourceIdForAttr(R.attr.sm_categoryPinIconEducation)
+        else -> context.getResourceIdForAttr(R.attr.sm_categoryPinIconOther)
     }
 
     private fun displayClusters(viewState: SoramitsuMapViewState) {
