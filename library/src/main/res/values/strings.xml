@@ -41,4 +41,5 @@
     <string name="sm_reset">Reset</string>
 
     <string name="sm_category_address">%1$s, %2$s</string>
+    <string name="sm_close_place_info_button">Close place info button</string>
 </resources>
