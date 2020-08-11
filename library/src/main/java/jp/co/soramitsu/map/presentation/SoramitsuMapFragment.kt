@@ -119,6 +119,31 @@ class SoramitsuMapFragment : Fragment(R.layout.sm_fragment_map_soramitsu) {
         placeInformationBottomSheetBehavior = BottomSheetBehavior.from(placeBottomSheet)
         placeInformationBottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
         placeInformationBottomSheetBehavior.isHideable = true
+        placeInformationBottomSheetBehavior.addBottomSheetCallback(object :
+            BottomSheetBehavior.BottomSheetCallback() {
+
+            override fun onSlide(bottomSheet: View, slideOffset: Float) {
+            }
+
+            override fun onStateChanged(bottomSheet: View, newState: Int) {
+                when (newState) {
+                    BottomSheetBehavior.STATE_HIDDEN -> {
+                        // show back categories bottom sheet
+                        categoriesWithPlacesBottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
+                        categoriesWithPlacesBottomSheetBehavior.isHideable = false
+
+                        closePlaceInfoButton.visibility = View.GONE
+                    }
+                    else -> {
+                        // hide categories bottom sheet to prevent touch events propagation
+                        categoriesWithPlacesBottomSheetBehavior.isHideable = true
+                        categoriesWithPlacesBottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
+
+                        closePlaceInfoButton.visibility = View.VISIBLE
+                    }
+                }
+            }
+        })
 
         placesWithSearchTextInputEditText.setOnEditorActionListener { v, actionId, event ->
             if (actionId == EditorInfo.IME_ACTION_SEARCH) {
@@ -420,10 +445,10 @@ class SoramitsuMapFragment : Fragment(R.layout.sm_fragment_map_soramitsu) {
         additionalInfoAddress.visibility =
             if (place.address.isEmpty()) View.GONE else View.VISIBLE
 
-        additionalInfoMobilePhone.setValue(place.phone)
-        additionalInfoWebsite.setValue(place.website)
-        additionalInfoFacebook.setValue(place.facebook)
-        additionalInfoAddress.setValue(place.address)
+        additionalInfoMobilePhone.text = place.phone
+        additionalInfoWebsite.text = place.website
+        additionalInfoFacebook.text = place.facebook
+        additionalInfoAddress.text = place.address
 
         additionalInfoMobilePhone.setOnClickListener {
             startActivity(Intent(Intent.ACTION_DIAL).apply {
@@ -455,6 +480,10 @@ class SoramitsuMapFragment : Fragment(R.layout.sm_fragment_map_soramitsu) {
                 data = Uri.parse("geo:0,0?q=${Uri.encode(place.address)}")
                 `package` = "com.google.android.apps.maps"
             })
+        }
+
+        closePlaceInfoButton.setOnClickListener {
+            placeInformationBottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
         }
     }
 
