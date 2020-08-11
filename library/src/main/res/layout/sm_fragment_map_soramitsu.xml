@@ -89,7 +89,7 @@
         tools:visibility="visible"
         />
 
-    <include layout="@layout/sm_places_with_search_field" />
+    <include layout="@layout/sm_search_panel" />
 
     <include layout="@layout/sm_place_bottom_sheet" />
 
