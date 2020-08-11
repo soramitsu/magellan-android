@@ -38,10 +38,10 @@ import jp.co.soramitsu.map.model.Category
 import jp.co.soramitsu.map.model.GeoPoint
 import jp.co.soramitsu.map.model.Place
 import jp.co.soramitsu.map.presentation.categories.CategoriesFragment
-import jp.co.soramitsu.map.presentation.places.PlacesAdapter
+import jp.co.soramitsu.map.presentation.places.PlacesSearchResultsAdapter
 import kotlinx.android.synthetic.main.sm_fragment_map_soramitsu.*
 import kotlinx.android.synthetic.main.sm_place_bottom_sheet.*
-import kotlinx.android.synthetic.main.sm_places_with_search_field.*
+import kotlinx.android.synthetic.main.sm_search_panel.*
 
 /**
  * Used fragment as a base class because Maps module have to minimize
@@ -85,7 +85,7 @@ class SoramitsuMapFragment : Fragment(R.layout.sm_fragment_map_soramitsu) {
     private val handler = Handler()
     private var onMapScrollStopCallback: Runnable? = null
 
-    private val placesAdapter = PlacesAdapter { place ->
+    private val placesAdapter = PlacesSearchResultsAdapter { place ->
         viewModel.onPlaceSelected(place)
         val placePosition = GeoPoint(
             latitude = place.position.latitude,
