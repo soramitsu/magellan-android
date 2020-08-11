@@ -14,17 +14,18 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="end|center_vertical"
-        android:layout_margin="8dp"
-        android:orientation="vertical"
-        >
+        android:layout_margin="16dp"
+        android:orientation="vertical">
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/zoomInButton"
             style="@style/SM.Widget.Soramitsu.MaterialComponents.Button.OutlinedButton.Circle"
             android:layout_width="48dp"
             android:layout_height="48dp"
-            android:insetTop="12dp"
-            android:insetBottom="4dp"
+            android:insetTop="2dp"
+            android:insetLeft="4dp"
+            android:insetRight="4dp"
+            android:insetBottom="6dp"
             app:iconGravity="textStart"
             app:iconPadding="0dp"
             app:icon="@drawable/sm_ic_add_14" />
@@ -34,8 +35,10 @@
             style="@style/SM.Widget.Soramitsu.MaterialComponents.Button.OutlinedButton.Circle"
             android:layout_width="48dp"
             android:layout_height="48dp"
-            android:insetBottom="12dp"
-            android:insetTop="4dp"
+            android:insetBottom="2dp"
+            android:insetLeft="4dp"
+            android:insetRight="4dp"
+            android:insetTop="6dp"
             app:iconGravity="textStart"
             app:iconPadding="0dp"
             app:icon="@drawable/sm_ic_remove_14" />
@@ -49,8 +52,12 @@
         android:layout_height="48dp"
         android:layout_gravity="bottom|start"
         android:layout_marginStart="8dp"
-        android:layout_marginBottom="88dp"
-        app:icon="@drawable/sm_ic_filter" />
+        android:layout_marginBottom="114dp"
+        android:insetTop="4dp"
+        android:insetBottom="4dp"
+        android:insetLeft="4dp"
+        android:insetRight="4dp"
+        app:icon="@drawable/sm_ic_filter_list_24dp" />
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/findMeButton"
@@ -58,8 +65,12 @@
         android:layout_width="48dp"
         android:layout_height="48dp"
         android:layout_gravity="bottom|end"
-        android:layout_marginEnd="8dp"
-        android:layout_marginBottom="88dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="114dp"
+        android:insetTop="4dp"
+        android:insetBottom="4dp"
+        android:insetLeft="4dp"
+        android:insetRight="4dp"
         app:icon="@drawable/sm_ic_gps_fixed_14" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
