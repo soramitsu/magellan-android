@@ -24,7 +24,7 @@ internal class SoramitsuMapViewModel(
 ) : ViewModel() {
 
     private val viewState: MutableLiveData<SoramitsuMapViewState> = MutableLiveData()
-    private val selectedPlaceSingleLiveEvent: SingleLiveEvent<Place> = SingleLiveEvent()
+    private val selectedPlaceSingleLiveEvent: SingleLiveEvent<Place?> = SingleLiveEvent()
 
     private val currentState: SoramitsuMapViewState
         get() = viewState.value!!
@@ -46,7 +46,7 @@ internal class SoramitsuMapViewModel(
         }
 
     fun viewState(): LiveData<SoramitsuMapViewState> = viewState
-    fun placeSelected(): LiveData<Place> = selectedPlaceSingleLiveEvent
+    fun placeSelected(): LiveData<Place?> = selectedPlaceSingleLiveEvent
 
     fun applyNewFilters() {
         val selectedCategories = currentState.categories
@@ -79,7 +79,7 @@ internal class SoramitsuMapViewModel(
         }
     }
 
-    fun onPlaceSelected(place: Place) {
+    fun onPlaceSelected(place: Place?) {
         selectedPlaceSingleLiveEvent.value = place
     }
 

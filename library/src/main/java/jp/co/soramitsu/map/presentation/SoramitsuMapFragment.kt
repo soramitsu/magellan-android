@@ -133,6 +133,8 @@ class SoramitsuMapFragment : Fragment(R.layout.sm_fragment_map_soramitsu) {
                         categoriesWithPlacesBottomSheetBehavior.isHideable = false
 
                         closePlaceInfoButton.visibility = View.GONE
+
+                        viewModel.onPlaceSelected(null)
                     }
                     else -> {
                         // hide categories bottom sheet to prevent touch events propagation
@@ -236,33 +238,21 @@ class SoramitsuMapFragment : Fragment(R.layout.sm_fragment_map_soramitsu) {
                     placesWithSearchTextInputEditText.windowToken, 0
                 )
 
-                categoriesWithPlacesBottomSheetBehavior.state =
-                    BottomSheetBehavior.STATE_COLLAPSED
-                placeInformationBottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
-                bindBottomSheetWithPlace(selectedPlace)
-
-                // change selected place icon:
-                // 1. change icon of previously selected place
-                // 2. updated selected place (change icon of currently selected element)
-                markers.forEach { marker ->
-                    val tagData = marker.tag as? MarkerTagData
-                    if (tagData?.selected == true && tagData.place.id != selectedPlace.id) {
-                        marker.setIcon(placePinIcon(tagData.place))
-                        marker.tag = tagData.copy(selected = false)
-                        marker.zIndex = 0f
-                    }
-
-                    if (tagData != null && tagData.place.id == selectedPlace.id) {
-                        marker.setIcon(placePinIcon(tagData.place, scale = 1.25f))
-                        marker.tag = tagData.copy(selected = true)
-                        marker.zIndex = 1f
-                    }
+                if (selectedPlace != null) {
+                    categoriesWithPlacesBottomSheetBehavior.state =
+                        BottomSheetBehavior.STATE_COLLAPSED
+                    placeInformationBottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+                    bindBottomSheetWithPlace(selectedPlace)
                 }
+
+                highlightSelectedPlace()
             })
 
             viewModel.viewState().observe(viewLifecycleOwner, Observer { viewState ->
                 displayMarkers(viewState)
                 displayClusters(viewState)
+
+                highlightSelectedPlace()
 
                 googleMap.setOnMarkerClickListener { marker ->
                     if (marker in clusters) {
@@ -309,6 +299,28 @@ class SoramitsuMapFragment : Fragment(R.layout.sm_fragment_map_soramitsu) {
                         googleMap.cameraPosition.zoom - 2
                     )
                 )
+            }
+        }
+    }
+
+    private fun highlightSelectedPlace() {
+        val selectedPlace = viewModel.placeSelected().value
+
+        // change selected place icon:
+        // 1. change icon of previously selected place
+        // 2. updated selected place (change icon of currently selected element)
+        markers.forEach { marker ->
+            val tagData = marker.tag as? MarkerTagData
+            if (tagData?.selected == true && tagData.place.id != selectedPlace?.id) {
+                marker.setIcon(placePinIcon(tagData.place))
+                marker.tag = tagData.copy(selected = false)
+                marker.zIndex = 0f
+            }
+
+            if (tagData != null && tagData.place.id == selectedPlace?.id) {
+                marker.setIcon(placePinIcon(tagData.place, scale = 1.25f))
+                marker.tag = tagData.copy(selected = true)
+                marker.zIndex = 1f
             }
         }
     }
