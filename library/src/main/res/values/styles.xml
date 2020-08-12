@@ -12,18 +12,6 @@
         <item name="iconPadding">16dp</item>
     </style>
 
-    <style name="SM.Widget.Soramitsu.MaterialComponents.Button.OutlinedButton.Circle" parent="Widget.MaterialComponents.Button.OutlinedButton">
-        <item name="android:insetLeft">8dp</item>
-        <item name="android:insetRight">8dp</item>
-        <item name="android:insetTop">8dp</item>
-        <item name="android:insetBottom">8dp</item>
-        <item name="iconTint">?colorControlNormal</item>
-        <item name="backgroundTint">@android:color/white</item>
-        <item name="cornerRadius">24dp</item>
-        <item name="iconPadding">0dp</item>
-        <item name="iconGravity">textStart</item>
-    </style>
-
     <style name="SM.Widget.Soramitsu.Map.Category" parent="Widget.AppCompat.TextView">
         <item name="android:gravity">center</item>
         <item name="android:paddingTop">16dp</item>
