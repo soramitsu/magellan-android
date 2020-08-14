@@ -28,7 +28,6 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.material.bottomsheet.BottomSheetBehavior
-import com.google.maps.android.ui.IconGenerator
 import jp.co.soramitsu.map.R
 import jp.co.soramitsu.map.SoramitsuMapLibraryConfig
 import jp.co.soramitsu.map.data.MapParams
@@ -378,16 +377,9 @@ class SoramitsuMapFragment : Fragment(R.layout.sm_fragment_map_soramitsu) {
     private fun displayClusters(viewState: SoramitsuMapViewState) {
         clusters.forEach { it.remove() }
         clusters.clear()
-        val iconGen = IconGenerator(requireContext()).apply {
-            val background = ContextCompat.getDrawable(
-                requireContext(),
-                R.drawable.sm_cluster_background
-            )
-            setBackground(background)
-            setTextAppearance(R.style.SM_TextAppearance_Soramitsu_MaterialComponents_Caption_White)
-        }
+        val iconGen = IconGenerator(requireContext())
         val newClusters = viewState.clusters.mapNotNull {
-            val icon = iconGen.makeIcon(it.count.toString())
+            val icon = iconGen.createClusterDrawable(it.count.toString())
             val markerOptions = MarkerOptions()
                 .icon(BitmapDescriptorFactory.fromBitmap(icon))
                 .position(it.asLatLng())
@@ -459,7 +451,7 @@ class SoramitsuMapFragment : Fragment(R.layout.sm_fragment_map_soramitsu) {
 
         additionalInfoMobilePhone.text = place.phone
         additionalInfoWebsite.text = place.website
-        additionalInfoFacebook.text = place.facebook
+        additionalInfoFacebook.text = "facebook.com/${place.facebook}"
         additionalInfoAddress.text = place.address
 
         additionalInfoMobilePhone.setOnClickListener {

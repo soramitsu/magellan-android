@@ -7,7 +7,11 @@
 
     <dimen name="sm_icon_size">36dp</dimen>
 
+    <dimen name="sm_cluster_icon_size">36dp</dimen>
+
     <dimen name="sm_margin_padding_size_xxlarge">40dp</dimen>
     <dimen name="sm_margin_padding_size_xmedium">20dp</dimen>
     <dimen name="sm_margin_padding_size_small">8dp</dimen>
+
+    <dimen name="sm_cluster_text_size">14sp</dimen>
 </resources>
