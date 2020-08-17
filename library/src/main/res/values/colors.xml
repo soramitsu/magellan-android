@@ -2,9 +2,10 @@
 <resources>
     <color name="sm_text_color_activated">#00A167</color>
     <color name="sm_text_color_deactivated">#D0021B</color>
-    <color name="sm_text_color_clickable">#027AD0</color>
     <color name="sm_rating_bar">#FFC516</color>
 
     <color name="sm_icon_background_color">#FAE6E8</color>
     <color name="sm_icon_color">#B3D0021B</color>
+
+    <color name="sm_cluster_background">#2D2926</color>
 </resources>

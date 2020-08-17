@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -10,58 +11,80 @@
         android:layout_height="match_parent" />
 
     <LinearLayout
+        android:id="@+id/zoomButtonsPanel"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="end|center_vertical"
-        android:layout_margin="8dp"
-        android:orientation="vertical"
-        >
+        android:padding="16dp"
+        android:clipToPadding="false"
+        android:orientation="vertical">
 
-        <com.google.android.material.button.MaterialButton
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/zoomInButton"
-            style="@style/SM.Widget.Soramitsu.MaterialComponents.Button.OutlinedButton.Circle"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:insetTop="12dp"
-            android:insetBottom="4dp"
-            app:iconGravity="textStart"
-            app:iconPadding="0dp"
-            app:icon="@drawable/sm_ic_add_14" />
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:contentDescription="@string/sm_zoom_in"
+            android:src="@drawable/sm_ic_add_24dp"
+            app:backgroundTint="@android:color/white"
+            app:ensureMinTouchTargetSize="true"
+            app:fabSize="mini" />
 
-        <com.google.android.material.button.MaterialButton
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/zoomOutButton"
-            style="@style/SM.Widget.Soramitsu.MaterialComponents.Button.OutlinedButton.Circle"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:insetBottom="12dp"
-            android:insetTop="4dp"
-            app:iconGravity="textStart"
-            app:iconPadding="0dp"
-            app:icon="@drawable/sm_ic_remove_14" />
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:contentDescription="@string/sm_zoom_out"
+            android:src="@drawable/sm_ic_remove_24dp"
+            app:backgroundTint="@android:color/white"
+            app:ensureMinTouchTargetSize="true"
+            app:fabSize="mini" />
 
     </LinearLayout>
 
-    <com.google.android.material.button.MaterialButton
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/showFiltersButton"
-        style="@style/SM.Widget.Soramitsu.MaterialComponents.Button.OutlinedButton.Circle"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_gravity="bottom|start"
-        android:layout_marginStart="8dp"
-        android:layout_marginBottom="88dp"
-        app:icon="@drawable/sm_ic_filter" />
+        android:layout_marginStart="16dp"
+        android:layout_marginBottom="114dp"
+        android:contentDescription="@string/sm_filters"
+        android:src="@drawable/sm_ic_filter_list_24dp"
+        app:backgroundTint="@android:color/white"
+        app:ensureMinTouchTargetSize="true"
+        app:fabSize="mini"
+        app:useCompatPadding="true" />
 
-    <com.google.android.material.button.MaterialButton
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/findMeButton"
-        style="@style/SM.Widget.Soramitsu.MaterialComponents.Button.OutlinedButton.Circle"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
-        android:layout_marginEnd="8dp"
-        android:layout_marginBottom="88dp"
-        app:icon="@drawable/sm_ic_gps_fixed_14" />
+        android:layout_marginEnd="20dp"
+        android:layout_marginBottom="114dp"
+        android:contentDescription="@string/sm_find_me"
+        android:src="@drawable/sm_ic_location_24dp"
+        app:backgroundTint="@android:color/white"
+        app:ensureMinTouchTargetSize="true"
+        app:fabSize="mini"
+        app:useCompatPadding="true" />
 
-    <include layout="@layout/sm_places_with_search_field" />
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/closePlaceInfoButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top"
+        android:contentDescription="@string/sm_close_place_info_button"
+        android:src="@drawable/sm_ic_arrow_back_24"
+        android:visibility="gone"
+        app:backgroundTint="@android:color/white"
+        app:ensureMinTouchTargetSize="true"
+        app:fabSize="mini"
+        app:layout_anchor="@id/placeBottomSheet"
+        app:useCompatPadding="true"
+        tools:visibility="visible" />
+
+    <include layout="@layout/sm_search_panel" />
 
     <include layout="@layout/sm_place_bottom_sheet" />
 

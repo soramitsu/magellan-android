@@ -12,18 +12,6 @@
         <item name="iconPadding">16dp</item>
     </style>
 
-    <style name="SM.Widget.Soramitsu.MaterialComponents.Button.OutlinedButton.Circle" parent="Widget.MaterialComponents.Button.OutlinedButton">
-        <item name="android:insetLeft">8dp</item>
-        <item name="android:insetRight">8dp</item>
-        <item name="android:insetTop">8dp</item>
-        <item name="android:insetBottom">8dp</item>
-        <item name="iconTint">?colorControlNormal</item>
-        <item name="backgroundTint">@android:color/white</item>
-        <item name="cornerRadius">24dp</item>
-        <item name="iconPadding">0dp</item>
-        <item name="iconGravity">textStart</item>
-    </style>
-
     <style name="SM.Widget.Soramitsu.Map.Category" parent="Widget.AppCompat.TextView">
         <item name="android:gravity">center</item>
         <item name="android:paddingTop">16dp</item>
@@ -31,14 +19,6 @@
         <item name="android:drawablePadding">6dp</item>
         <item name="android:maxLines">1</item>
         <item name="android:textAppearance">?attr/sm_categoryTitleTextAppearance</item>
-    </style>
-
-    <style name="SM.TextAppearance.Soramitsu.MaterialComponents.Body2.Clickable" parent="SM.TextAppearance.Soramitsu.MaterialComponents.Body2">
-        <item name="android:textColor">?sm_placeInfoValueClickableTextColor</item>
-    </style>
-
-    <style name="SM.TextAppearance.Soramitsu.MaterialComponents.Body2.Acitvated" parent="SM.TextAppearance.Soramitsu.MaterialComponents.Body2">
-        <item name="android:textColor">?sm_placeInfoValueActivatedTextColor</item>
     </style>
 
     <style name="SM.TextAppearance.Soramitsu.MaterialComponents.Headline6" parent="TextAppearance.MaterialComponents.Headline6" />
@@ -53,8 +33,10 @@
 
     <style name="SM.TextAppearance.Soramitsu.MaterialComponents.Subtitle1" parent="TextAppearance.MaterialComponents.Subtitle1" />
 
-    <style name="SM.TextAppearance.Soramitsu.MaterialComponents.Subtitle2" parent="TextAppearance.MaterialComponents.Subtitle2">
-        <item name="android:textSize">16sp</item>
+    <style name="SM.TextAppearance.Soramitsu.MaterialComponents.Subtitle2" parent="TextAppearance.MaterialComponents.Subtitle2" />
+
+    <style name="SM.TextAppearance.Soramitsu.MaterialComponents.Subtitle2.Secondary">
+        <item name="android:textColor">?android:attr/textColorSecondary</item>
     </style>
 
     <style name="SM.TextAppearance.Soramitsu.MaterialComponents.Caption.White">

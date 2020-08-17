@@ -41,4 +41,9 @@
     <string name="sm_reset">Reset</string>
 
     <string name="sm_category_address">%1$s, %2$s</string>
+    <string name="sm_close_place_info_button">Close place info button</string>
+    <string name="sm_find_me">Find me</string>
+    <string name="sm_filters">Filters</string>
+    <string name="sm_zoom_out">Zoom out</string>
+    <string name="sm_zoom_in">Zoom in</string>
 </resources>

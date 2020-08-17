@@ -50,15 +50,10 @@
     <attr name="sm_placeTitleTextColor" format="color|reference" />
 
     <attr name="sm_placeInfoTitleTextAppearance" format="reference" />
-    <attr name="sm_placeInfoKeyTextAppearance" format="reference" />
-    <attr name="sm_placeInfoValueTextAppearance" format="reference" />
-    <attr name="sm_placeInfoValueClickableTextColor" format="color|reference" />
-    <attr name="sm_placeInfoValueActivatedTextColor" format="color|reference" />
 
     <attr name="sm_placeViewTitleTextAppearance" format="reference" />
     <attr name="sm_placeViewAddressTextAppearance" format="reference" />
 
-    <attr name="sm_openNowTextAppearance" format="reference" />
     <attr name="sm_closeNowTextAppearance" format="reference" />
 
     <attr name="sm_ratingBarColor" format="color|reference" />
@@ -67,10 +62,4 @@
     <attr name="sm_distanceTextAppearance" format="reference" />
 
     <attr name="sm_categorySelectedItemBackground" format="reference" />
-
-    <declare-styleable name="SMTitleValueField">
-        <attr name="sm_title" format="string|reference"/>
-        <attr name="sm_value" format="string|reference"/>
-        <attr name="sm_icon" format="reference"/>
-    </declare-styleable>
 </resources>

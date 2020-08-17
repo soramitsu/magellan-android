@@ -1,11 +1,15 @@
 package jp.co.soramitsu.map.presentation.places
 
+import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
+import jp.co.soramitsu.map.R
 import jp.co.soramitsu.map.model.Place
 
-internal class PlacesAdapter(
+internal class PlacesSearchResultsAdapter(
     private val onPlaceSelected: (Place) -> Unit = {}
 ) : RecyclerView.Adapter<PlaceViewHolder>() {
 
@@ -19,12 +23,10 @@ internal class PlacesAdapter(
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PlaceViewHolder {
-        val view = PlaceView(parent.context).apply {
-            layoutParams = RecyclerView.LayoutParams(
-                RecyclerView.LayoutParams.MATCH_PARENT,
-                RecyclerView.LayoutParams.WRAP_CONTENT
-            )
-        }
+        val view = LayoutInflater
+            .from(parent.context)
+            .inflate(R.layout.sm_place_search_result, parent, false)
+
         val viewHolder = PlaceViewHolder(view)
         view.setOnClickListener {
             items[viewHolder.adapterPosition].apply(onPlaceSelected)
@@ -35,11 +37,20 @@ internal class PlacesAdapter(
     override fun getItemCount(): Int = items.size
 
     override fun onBindViewHolder(holder: PlaceViewHolder, position: Int) {
-        holder.placeView.bind(items[position])
+        holder.bind(items[position])
     }
 }
 
-internal class PlaceViewHolder(val placeView: PlaceView) : RecyclerView.ViewHolder(placeView)
+internal class PlaceViewHolder(placeView: View) : RecyclerView.ViewHolder(placeView) {
+
+    private val title: TextView = placeView.findViewById(R.id.searchResultTitle)
+    private val subtite: TextView = placeView.findViewById(R.id.searchResultSubtitle)
+
+    fun bind(place: Place) {
+        title.text = place.name
+        subtite.text = "${place.category.name} ${place.address}"
+    }
+}
 
 internal class DiffUtilCallback(
     private val beforeList: List<Place>,

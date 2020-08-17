@@ -52,34 +52,21 @@
         <item name="sm_checkIcon">@drawable/sm_ic_check_24dp</item>
 
         <item name="sm_placeBottomSheetBackground">@drawable/sm_rounded_background</item>
-        <item name="sm_placeBottomSheetPeekHeight">134dp</item>
+        <item name="sm_placeBottomSheetPeekHeight">234dp</item>
         <item name="sm_placeTitleTextColor">#000000</item>
 
         <item name="sm_iconColor">@color/sm_icon_color</item>
         <item name="sm_iconBackgroundColor">@color/sm_icon_background_color</item>
 
-        <item name="sm_placeInfoValueClickableTextColor">@color/sm_text_color_clickable</item>
-        <item name="sm_placeInfoValueActivatedTextColor">@color/sm_text_color_activated</item>
-
         <item name="sm_placeInfoTitleTextAppearance">
             @style/SM.TextAppearance.Soramitsu.MaterialComponents.Subtitle2
         </item>
-        <item name="sm_placeInfoKeyTextAppearance">
-            @style/SM.TextAppearance.Soramitsu.MaterialComponents.Caption
-        </item>
-        <item name="sm_placeInfoValueTextAppearance">
-            @style/SM.TextAppearance.Soramitsu.MaterialComponents.Body2.Clickable
-        </item>
 
         <item name="sm_placeViewTitleTextAppearance">
-            @style/SM.TextAppearance.Soramitsu.MaterialComponents.Subtitle1
+            @style/SM.TextAppearance.Soramitsu.MaterialComponents.Headline6
         </item>
         <item name="sm_placeViewAddressTextAppearance">
             @style/SM.TextAppearance.Soramitsu.MaterialComponents.Caption
-        </item>
-
-        <item name="sm_openNowTextAppearance">
-            @style/SM.TextAppearance.Soramitsu.MaterialComponents.Body2.Acitvated
         </item>
 
         <item name="sm_ratingBarColor">@color/sm_rating_bar</item>

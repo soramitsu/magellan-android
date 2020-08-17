@@ -28,7 +28,6 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.material.bottomsheet.BottomSheetBehavior
-import com.google.maps.android.ui.IconGenerator
 import jp.co.soramitsu.map.R
 import jp.co.soramitsu.map.SoramitsuMapLibraryConfig
 import jp.co.soramitsu.map.data.MapParams
@@ -38,10 +37,10 @@ import jp.co.soramitsu.map.model.Category
 import jp.co.soramitsu.map.model.GeoPoint
 import jp.co.soramitsu.map.model.Place
 import jp.co.soramitsu.map.presentation.categories.CategoriesFragment
-import jp.co.soramitsu.map.presentation.places.PlacesAdapter
+import jp.co.soramitsu.map.presentation.places.PlacesSearchResultsAdapter
 import kotlinx.android.synthetic.main.sm_fragment_map_soramitsu.*
 import kotlinx.android.synthetic.main.sm_place_bottom_sheet.*
-import kotlinx.android.synthetic.main.sm_places_with_search_field.*
+import kotlinx.android.synthetic.main.sm_search_panel.*
 
 /**
  * Used fragment as a base class because Maps module have to minimize
@@ -85,7 +84,7 @@ class SoramitsuMapFragment : Fragment(R.layout.sm_fragment_map_soramitsu) {
     private val handler = Handler()
     private var onMapScrollStopCallback: Runnable? = null
 
-    private val placesAdapter = PlacesAdapter { place ->
+    private val placesAdapter = PlacesSearchResultsAdapter { place ->
         viewModel.onPlaceSelected(place)
         val placePosition = GeoPoint(
             latitude = place.position.latitude,
@@ -119,6 +118,39 @@ class SoramitsuMapFragment : Fragment(R.layout.sm_fragment_map_soramitsu) {
         placeInformationBottomSheetBehavior = BottomSheetBehavior.from(placeBottomSheet)
         placeInformationBottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
         placeInformationBottomSheetBehavior.isHideable = true
+        placeInformationBottomSheetBehavior.addBottomSheetCallback(object :
+            BottomSheetBehavior.BottomSheetCallback() {
+
+            override fun onSlide(bottomSheet: View, slideOffset: Float) {
+            }
+
+            override fun onStateChanged(bottomSheet: View, newState: Int) {
+                when (newState) {
+                    BottomSheetBehavior.STATE_HIDDEN -> {
+                        // show back categories bottom sheet
+                        categoriesWithPlacesBottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
+                        categoriesWithPlacesBottomSheetBehavior.isHideable = false
+
+                        closePlaceInfoButton.visibility = View.GONE
+                        zoomButtonsPanel.visibility = View.VISIBLE
+                        findMeButton.visibility = View.VISIBLE
+                        showFiltersButton.visibility = View.VISIBLE
+
+                        viewModel.onPlaceSelected(null)
+                    }
+                    else -> {
+                        // hide categories bottom sheet to prevent touch events propagation
+                        categoriesWithPlacesBottomSheetBehavior.isHideable = true
+                        categoriesWithPlacesBottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
+
+                        closePlaceInfoButton.visibility = View.VISIBLE
+                        zoomButtonsPanel.visibility = View.GONE
+                        findMeButton.visibility = View.GONE
+                        showFiltersButton.visibility = View.GONE
+                    }
+                }
+            }
+        })
 
         placesWithSearchTextInputEditText.setOnEditorActionListener { v, actionId, event ->
             if (actionId == EditorInfo.IME_ACTION_SEARCH) {
@@ -211,33 +243,19 @@ class SoramitsuMapFragment : Fragment(R.layout.sm_fragment_map_soramitsu) {
                     placesWithSearchTextInputEditText.windowToken, 0
                 )
 
-                categoriesWithPlacesBottomSheetBehavior.state =
-                    BottomSheetBehavior.STATE_COLLAPSED
-                placeInformationBottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
-                bindBottomSheetWithPlace(selectedPlace)
-
-                // change selected place icon:
-                // 1. change icon of previously selected place
-                // 2. updated selected place (change icon of currently selected element)
-                markers.forEach { marker ->
-                    val tagData = marker.tag as? MarkerTagData
-                    if (tagData?.selected == true && tagData.place.id != selectedPlace.id) {
-                        marker.setIcon(placePinIcon(tagData.place))
-                        marker.tag = tagData.copy(selected = false)
-                        marker.zIndex = 0f
-                    }
-
-                    if (tagData != null && tagData.place.id == selectedPlace.id) {
-                        marker.setIcon(placePinIcon(tagData.place, scale = 1.25f))
-                        marker.tag = tagData.copy(selected = true)
-                        marker.zIndex = 1f
-                    }
+                if (selectedPlace != null) {
+                    placeInformationBottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+                    bindBottomSheetWithPlace(selectedPlace)
                 }
+
+                highlightSelectedPlace()
             })
 
             viewModel.viewState().observe(viewLifecycleOwner, Observer { viewState ->
                 displayMarkers(viewState)
                 displayClusters(viewState)
+
+                highlightSelectedPlace()
 
                 googleMap.setOnMarkerClickListener { marker ->
                     if (marker in clusters) {
@@ -284,6 +302,28 @@ class SoramitsuMapFragment : Fragment(R.layout.sm_fragment_map_soramitsu) {
                         googleMap.cameraPosition.zoom - 2
                     )
                 )
+            }
+        }
+    }
+
+    private fun highlightSelectedPlace() {
+        val selectedPlace = viewModel.placeSelected().value
+
+        // change selected place icon:
+        // 1. change icon of previously selected place
+        // 2. updated selected place (change icon of currently selected element)
+        markers.forEach { marker ->
+            val tagData = marker.tag as? MarkerTagData
+            if (tagData?.selected == true && tagData.place.id != selectedPlace?.id) {
+                marker.setIcon(placePinIcon(tagData.place))
+                marker.tag = tagData.copy(selected = false)
+                marker.zIndex = 0f
+            }
+
+            if (tagData != null && tagData.place.id == selectedPlace?.id) {
+                marker.setIcon(placePinIcon(tagData.place, scale = 1.25f))
+                marker.tag = tagData.copy(selected = true)
+                marker.zIndex = 1f
             }
         }
     }
@@ -341,16 +381,9 @@ class SoramitsuMapFragment : Fragment(R.layout.sm_fragment_map_soramitsu) {
     private fun displayClusters(viewState: SoramitsuMapViewState) {
         clusters.forEach { it.remove() }
         clusters.clear()
-        val iconGen = IconGenerator(requireContext()).apply {
-            val background = ContextCompat.getDrawable(
-                requireContext(),
-                R.drawable.sm_cluster_background
-            )
-            setBackground(background)
-            setTextAppearance(R.style.SM_TextAppearance_Soramitsu_MaterialComponents_Caption_White)
-        }
+        val iconGen = IconGenerator(requireContext())
         val newClusters = viewState.clusters.mapNotNull {
-            val icon = iconGen.makeIcon(it.count.toString())
+            val icon = iconGen.createClusterDrawable(it.count.toString())
             val markerOptions = MarkerOptions()
                 .icon(BitmapDescriptorFactory.fromBitmap(icon))
                 .position(it.asLatLng())
@@ -420,10 +453,10 @@ class SoramitsuMapFragment : Fragment(R.layout.sm_fragment_map_soramitsu) {
         additionalInfoAddress.visibility =
             if (place.address.isEmpty()) View.GONE else View.VISIBLE
 
-        additionalInfoMobilePhone.setValue(place.phone)
-        additionalInfoWebsite.setValue(place.website)
-        additionalInfoFacebook.setValue(place.facebook)
-        additionalInfoAddress.setValue(place.address)
+        additionalInfoMobilePhone.text = place.phone
+        additionalInfoWebsite.text = place.website
+        additionalInfoFacebook.text = "facebook.com/${place.facebook}"
+        additionalInfoAddress.text = place.address
 
         additionalInfoMobilePhone.setOnClickListener {
             startActivity(Intent(Intent.ACTION_DIAL).apply {
@@ -455,6 +488,10 @@ class SoramitsuMapFragment : Fragment(R.layout.sm_fragment_map_soramitsu) {
                 data = Uri.parse("geo:0,0?q=${Uri.encode(place.address)}")
                 `package` = "com.google.android.apps.maps"
             })
+        }
+
+        closePlaceInfoButton.setOnClickListener {
+            placeInformationBottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
         }
     }
 
