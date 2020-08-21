@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
     android:background="?attr/sm_categoriesBottomSheetBackground"
     app:behavior_peekHeight="?sm_placeBottomSheetPeekHeight"
     app:behavior_hideable="true"
@@ -58,6 +58,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
         android:nestedScrollingEnabled="true"
+        app:layout_constraintHeight_max="?sm_categoriesListHeight"
         app:layout_constraintTop_toBottomOf="@id/titleTextView"
         tools:listitem="@layout/sm_category_list_item" />
 

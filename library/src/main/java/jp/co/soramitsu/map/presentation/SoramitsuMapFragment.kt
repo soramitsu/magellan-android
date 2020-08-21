@@ -146,7 +146,7 @@ class SoramitsuMapFragment : Fragment(R.layout.sm_fragment_map_soramitsu) {
             }
         })
 
-        placesWithSearchTextInputEditText.setOnEditorActionListener { v, actionId, event ->
+        placesWithSearchTextInputEditText.setOnEditorActionListener { v, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_SEARCH) {
                 inputMethodService?.hideSoftInputFromWindow(v.windowToken, 0)
 
