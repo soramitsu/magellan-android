@@ -2,6 +2,7 @@ package jp.co.soramitsu.map.data
 
 import jp.co.soramitsu.map.model.Category
 import jp.co.soramitsu.map.model.Cluster
+import jp.co.soramitsu.map.model.GeoPoint
 import jp.co.soramitsu.map.model.Place
 
 internal class DemoPlacesRepository : PlacesRepository {
@@ -28,8 +29,13 @@ internal class DemoPlacesRepository : PlacesRepository {
     ): Pair<List<Place>, List<Cluster>> {
         val places = (Places.merchants + Places.banks + Places.agents).mapIndexed { index, place ->
             place.copy(id = index.toString())
-        }
-        return Pair(places, emptyList())
+        }.subList(5, 30)
+        val clusters = listOf(
+            Cluster(GeoPoint(places[0].position.latitude, places[0].position.longitude), 3),
+            Cluster(GeoPoint(places[0].position.latitude, places[0].position.longitude), 30),
+            Cluster(GeoPoint(places[0].position.latitude, places[0].position.longitude), 99)
+        )
+        return Pair(places, clusters)
     }
 }
 
