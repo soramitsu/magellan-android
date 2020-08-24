@@ -125,6 +125,11 @@ class SoramitsuMapFragment : Fragment(R.layout.sm_fragment_map_soramitsu) {
             }
         }
 
+        placesWithSearchTextInputEditText.setOnFocusChangeListener { _, hasFocus ->
+            if (hasFocus) {
+                searchPanelBottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
+            }
+        }
         placesWithSearchTextInputEditText.setOnEditorActionListener { v, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_SEARCH) {
                 inputMethodService?.hideSoftInputFromWindow(v.windowToken, 0)
@@ -494,6 +499,11 @@ class SoramitsuMapFragment : Fragment(R.layout.sm_fragment_map_soramitsu) {
         searchPanelBottomSheetBehavior.onStateChanged { newState ->
             if (newState == BottomSheetBehavior.STATE_HALF_EXPANDED) {
                 searchPanelBottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+            }
+
+            if (searchPanelBottomSheetBehavior.state == BottomSheetBehavior.STATE_COLLAPSED) {
+                inputMethodService?.hideSoftInputFromWindow(placesWithSearchTextInputEditText.windowToken, 0)
+                placesWithSearchTextInputEditText.clearFocus()
             }
         }
 
