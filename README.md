@@ -31,6 +31,6 @@ allprojects {
 4. Add `implementation` to your module's `build.gradle` file 
 ```groovy 
 dependencies {
-    implementation 'jp.co.soramitsu:map:0.1.0'
+    implementation 'jp.co.soramitsu:map:0.1.1'
 }
 ```

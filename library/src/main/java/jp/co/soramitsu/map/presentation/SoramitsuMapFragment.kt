@@ -132,6 +132,9 @@ class SoramitsuMapFragment : Fragment(R.layout.sm_fragment_map_soramitsu) {
                         categoriesWithPlacesBottomSheetBehavior.isHideable = false
 
                         closePlaceInfoButton.visibility = View.GONE
+                        zoomButtonsPanel.visibility = View.VISIBLE
+                        findMeButton.visibility = View.VISIBLE
+                        showFiltersButton.visibility = View.VISIBLE
 
                         viewModel.onPlaceSelected(null)
                     }
@@ -141,6 +144,9 @@ class SoramitsuMapFragment : Fragment(R.layout.sm_fragment_map_soramitsu) {
                         categoriesWithPlacesBottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
 
                         closePlaceInfoButton.visibility = View.VISIBLE
+                        zoomButtonsPanel.visibility = View.GONE
+                        findMeButton.visibility = View.GONE
+                        showFiltersButton.visibility = View.GONE
                     }
                 }
             }
@@ -238,8 +244,6 @@ class SoramitsuMapFragment : Fragment(R.layout.sm_fragment_map_soramitsu) {
                 )
 
                 if (selectedPlace != null) {
-                    categoriesWithPlacesBottomSheetBehavior.state =
-                        BottomSheetBehavior.STATE_COLLAPSED
                     placeInformationBottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
                     bindBottomSheetWithPlace(selectedPlace)
                 }
