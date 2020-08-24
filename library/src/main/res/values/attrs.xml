@@ -62,4 +62,5 @@
     <attr name="sm_distanceTextAppearance" format="reference" />
 
     <attr name="sm_categorySelectedItemBackground" format="reference" />
+    <attr name="sm_categoriesListHeight" format="dimension|reference" />
 </resources>
