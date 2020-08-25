@@ -81,5 +81,7 @@
         </item>
 
         <item name="sm_categorySelectedItemBackground">@drawable/sm_selected_item_background</item>
+
+        <item name="sm_categoriesListHeight">400dp</item>
     </style>
 </resources>

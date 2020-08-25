@@ -17,6 +17,7 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.content.ContextCompat.getSystemService
+import androidx.core.view.ViewCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -50,7 +51,7 @@ class SoramitsuMapFragment : Fragment(R.layout.sm_fragment_map_soramitsu) {
 
     private lateinit var viewModel: SoramitsuMapViewModel
     private lateinit var placeInformationBottomSheetBehavior: BottomSheetBehavior<ConstraintLayout>
-    private lateinit var categoriesWithPlacesBottomSheetBehavior: BottomSheetBehavior<ConstraintLayout>
+    private lateinit var searchPanelBottomSheetBehavior: BottomSheetBehavior<ConstraintLayout>
 
     private val inputMethodService: InputMethodManager?
         get() = context?.let { context ->
@@ -104,55 +105,32 @@ class SoramitsuMapFragment : Fragment(R.layout.sm_fragment_map_soramitsu) {
         soramitsuMapView.onCreate(savedInstanceState)
         soramitsuMapView.getMapAsync { onMapReady(it) }
 
-        categoriesWithPlacesBottomSheetBehavior =
-            BottomSheetBehavior.from(placesWithSearchBottomSheet)
-        categoriesWithPlacesBottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
-        categoriesWithPlacesBottomSheetBehavior.isHideable = false
-        placesRecyclerView.adapter = placesAdapter
-        placesRecyclerView.layoutManager = LinearLayoutManager(context)
+        initSearchPanel()
+        initPlaceInformationPanel()
 
-        showFiltersButton.setOnClickListener {
-            CategoriesFragment().show(parentFragmentManager, "Categories")
+        showFiltersButton.setOnClickListener { CategoriesFragment().show(parentFragmentManager, "Categories") }
+
+        findMeButton.setOnClickListener {
+            googleMap?.let { googleMap -> onFindMeButtonClicked(googleMap) }
         }
 
-        placeInformationBottomSheetBehavior = BottomSheetBehavior.from(placeBottomSheet)
-        placeInformationBottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
-        placeInformationBottomSheetBehavior.isHideable = true
-        placeInformationBottomSheetBehavior.addBottomSheetCallback(object :
-            BottomSheetBehavior.BottomSheetCallback() {
-
-            override fun onSlide(bottomSheet: View, slideOffset: Float) {
+        zoomInButton.setOnClickListener {
+            googleMap?.let { googleMap ->
+                googleMap.animateCamera(
+                    CameraUpdateFactory.newLatLngZoom(
+                        googleMap.cameraPosition.target,
+                        googleMap.cameraPosition.zoom + 2
+                    )
+                )
             }
+        }
 
-            override fun onStateChanged(bottomSheet: View, newState: Int) {
-                when (newState) {
-                    BottomSheetBehavior.STATE_HIDDEN -> {
-                        // show back categories bottom sheet
-                        categoriesWithPlacesBottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
-                        categoriesWithPlacesBottomSheetBehavior.isHideable = false
-
-                        closePlaceInfoButton.visibility = View.GONE
-                        zoomButtonsPanel.visibility = View.VISIBLE
-                        findMeButton.visibility = View.VISIBLE
-                        showFiltersButton.visibility = View.VISIBLE
-
-                        viewModel.onPlaceSelected(null)
-                    }
-                    else -> {
-                        // hide categories bottom sheet to prevent touch events propagation
-                        categoriesWithPlacesBottomSheetBehavior.isHideable = true
-                        categoriesWithPlacesBottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
-
-                        closePlaceInfoButton.visibility = View.VISIBLE
-                        zoomButtonsPanel.visibility = View.GONE
-                        findMeButton.visibility = View.GONE
-                        showFiltersButton.visibility = View.GONE
-                    }
-                }
+        placesWithSearchTextInputEditText.setOnFocusChangeListener { _, hasFocus ->
+            if (hasFocus) {
+                searchPanelBottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
             }
-        })
-
-        placesWithSearchTextInputEditText.setOnEditorActionListener { v, actionId, event ->
+        }
+        placesWithSearchTextInputEditText.setOnEditorActionListener { v, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_SEARCH) {
                 inputMethodService?.hideSoftInputFromWindow(v.windowToken, 0)
 
@@ -160,14 +138,18 @@ class SoramitsuMapFragment : Fragment(R.layout.sm_fragment_map_soramitsu) {
                 viewModel.requestParams = viewModel.requestParams.copy(query = searchText)
             }
 
-            true;
+            true
         }
-        placesWithSearchTextInputLayout.setEndIconOnClickListener {
-            placesWithSearchTextInputEditText.text = null
-            inputMethodService?.hideSoftInputFromWindow(
-                placesWithSearchTextInputEditText.windowToken, 0
-            )
-            viewModel.requestParams = viewModel.requestParams.copy(query = "")
+
+        zoomOutButton.setOnClickListener {
+            googleMap?.let { googleMap ->
+                googleMap.animateCamera(
+                    CameraUpdateFactory.newLatLngZoom(
+                        googleMap.cameraPosition.target,
+                        googleMap.cameraPosition.zoom - 2
+                    )
+                )
+            }
         }
     }
 
@@ -281,28 +263,6 @@ class SoramitsuMapFragment : Fragment(R.layout.sm_fragment_map_soramitsu) {
             })
 
             viewModel.mapParams = getMapParams(googleMap)
-
-            findMeButton.setOnClickListener {
-                onFindMeButtonClicked(googleMap)
-            }
-
-            zoomInButton.setOnClickListener {
-                googleMap.animateCamera(
-                    CameraUpdateFactory.newLatLngZoom(
-                        googleMap.cameraPosition.target,
-                        googleMap.cameraPosition.zoom + 2
-                    )
-                )
-            }
-
-            zoomOutButton.setOnClickListener {
-                googleMap.animateCamera(
-                    CameraUpdateFactory.newLatLngZoom(
-                        googleMap.cameraPosition.target,
-                        googleMap.cameraPosition.zoom - 2
-                    )
-                )
-            }
         }
     }
 
@@ -493,6 +453,98 @@ class SoramitsuMapFragment : Fragment(R.layout.sm_fragment_map_soramitsu) {
         closePlaceInfoButton.setOnClickListener {
             placeInformationBottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
         }
+    }
+
+    private fun initPlaceInformationPanel() {
+        placeInformationBottomSheetBehavior = BottomSheetBehavior.from(placeBottomSheet)
+        placeInformationBottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
+        placeInformationBottomSheetBehavior.isHideable = true
+        placeInformationBottomSheetBehavior.onStateChanged { newState ->
+            when (newState) {
+                BottomSheetBehavior.STATE_HIDDEN -> {
+                    // show back categories bottom sheet
+                    searchPanelBottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
+                    searchPanelBottomSheetBehavior.isHideable = false
+
+                    closePlaceInfoButton.visibility = View.GONE
+                    zoomButtonsPanel.visibility = View.VISIBLE
+                    findMeButton.visibility = View.VISIBLE
+                    showFiltersButton.visibility = View.VISIBLE
+
+                    viewModel.onPlaceSelected(null)
+                }
+                else -> {
+                    // hide categories bottom sheet to prevent touch events propagation
+                    searchPanelBottomSheetBehavior.isHideable = true
+                    searchPanelBottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
+
+                    closePlaceInfoButton.visibility = View.VISIBLE
+                    zoomButtonsPanel.visibility = View.GONE
+                    findMeButton.visibility = View.GONE
+                    showFiltersButton.visibility = View.GONE
+                }
+            }
+        }
+    }
+
+    private fun initSearchPanel() {
+        placesRecyclerView.adapter = placesAdapter
+        placesRecyclerView.layoutManager = LinearLayoutManager(context)
+
+        searchPanelBottomSheetBehavior = BottomSheetBehavior.from(searchPanelBottomSheet)
+        searchPanelBottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
+        searchPanelBottomSheetBehavior.isHideable = false
+        searchPanelBottomSheetBehavior.isFitToContents = false
+        searchPanelBottomSheetBehavior.halfExpandedRatio = 0.0001f
+        searchPanelBottomSheetBehavior.onStateChanged { newState ->
+            if (newState == BottomSheetBehavior.STATE_HALF_EXPANDED) {
+                searchPanelBottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+            }
+
+            if (searchPanelBottomSheetBehavior.state == BottomSheetBehavior.STATE_COLLAPSED) {
+                inputMethodService?.hideSoftInputFromWindow(placesWithSearchTextInputEditText.windowToken, 0)
+                placesWithSearchTextInputEditText.clearFocus()
+            }
+        }
+
+        ViewCompat.setOnApplyWindowInsetsListener(searchPanelBottomSheet) { _, insets ->
+            val statusBarHeight = insets.systemWindowInsetTop
+            val topOffset = (statusBarHeight * 1.15f).toInt()
+            searchPanelBottomSheetBehavior.setExpandedOffset(topOffset)
+
+            insets.consumeSystemWindowInsets()
+        }
+
+        placesWithSearchTextInputEditText.setOnEditorActionListener { v, actionId, _ ->
+            if (actionId == EditorInfo.IME_ACTION_SEARCH) {
+                inputMethodService?.hideSoftInputFromWindow(v.windowToken, 0)
+
+                val searchText = placesWithSearchTextInputEditText.text?.toString().orEmpty()
+                viewModel.requestParams = viewModel.requestParams.copy(query = searchText)
+            }
+
+            true
+        }
+
+        placesWithSearchTextInputLayout.setEndIconOnClickListener { v ->
+            placesWithSearchTextInputEditText.text = null
+            inputMethodService?.hideSoftInputFromWindow(v.windowToken, 0)
+            viewModel.requestParams = viewModel.requestParams.copy(query = "")
+        }
+    }
+
+    /**
+     * Just a syntax sugar to hide onSlide method from bottom sheet state change callbacks
+     */
+    private fun <T : View> BottomSheetBehavior<T>.onStateChanged(stateChangeHandler: (Int) -> Unit) {
+        this.addBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback() {
+            override fun onSlide(bottomSheet: View, slideOffset: Float) {
+            }
+
+            override fun onStateChanged(bottomSheet: View, newState: Int) {
+                stateChangeHandler.invoke(newState)
+            }
+        })
     }
 
     data class MarkerTagData(
