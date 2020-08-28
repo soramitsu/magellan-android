@@ -199,7 +199,7 @@ class SoramitsuMapFragment : Fragment(R.layout.sm_fragment_map_soramitsu) {
             )
 
             googleMap.setOnCameraMoveListener {
-                // throttleLast(onCardScrollStopCallback, 2000ms)
+                // throttleLast(onCardScrollStopCallback, 500ms)
                 onMapScrollStopCallback?.let { handler.removeCallbacks(it) }
                 onMapScrollStopCallback = Runnable {
                     val farLeft = googleMap.projection.visibleRegion.farLeft
