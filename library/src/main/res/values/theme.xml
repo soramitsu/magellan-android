@@ -21,13 +21,9 @@
         <item name="sm_categoriesBottomSheetTopperHeight">4dp</item>
         <item name="sm_categoriesBottomSheetTopperWidth">36dp</item>
 
-        <item name="sm_categoriesBottomSheetTabTextAppearance">
-            @style/SM.TextAppearance.Soramitsu.MaterialComponents.Body2
-        </item>
+        <item name="sm_categoryResetButtonStyle">@style/SM.Widget.Soramitsu.Map.Category.ResetButton</item>
 
-        <item name="sm_categoryTitleTextAppearance">
-            @style/SM.TextAppearance.Soramitsu.MaterialComponents.Caption
-        </item>
+        <item name="sm_categoryTitleStyle">@style/SM.Widget.Soramitsu.Map.Category</item>
 
         <item name="sm_categoryIconDeposit">@drawable/sm_ic_deposit</item>
         <item name="sm_categoryIconRestaurant">@drawable/sm_ic_restaurant</item>
