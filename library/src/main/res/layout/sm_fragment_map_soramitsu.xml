@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/coordinatorLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
@@ -70,23 +69,6 @@
         app:fabSize="mini"
         app:useCompatPadding="true" />
 
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/closePlaceInfoButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="top"
-        android:contentDescription="@string/sm_close_place_info_button"
-        android:src="@drawable/sm_ic_arrow_back_24"
-        android:visibility="gone"
-        app:backgroundTint="@android:color/white"
-        app:ensureMinTouchTargetSize="true"
-        app:fabSize="mini"
-        app:layout_anchor="@id/placeBottomSheet"
-        app:useCompatPadding="true"
-        tools:visibility="visible" />
-
     <include layout="@layout/sm_search_panel" />
-
-    <include layout="@layout/sm_place_bottom_sheet" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
