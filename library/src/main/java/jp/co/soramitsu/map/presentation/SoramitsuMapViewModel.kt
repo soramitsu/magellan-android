@@ -53,30 +53,7 @@ internal class SoramitsuMapViewModel(
             .filter { it.selected }
             .map { it.category.id }
 
-        requestParams = requestParams.copy(
-            categoriesIds = selectedCategories
-        )
-    }
-
-    private fun updateScreen() {
-        loadAllPlacesAndClustersJob?.cancel()
-        loadAllPlacesAndClustersJob = viewModelScope.launch(mainThreadDispatcher) {
-            val allCategories = getAllCategoriesSuspend()
-            val categoryListItems = allCategories.map { category ->
-                CategoryListItem(
-                    category,
-                    category.id in requestParams.categoriesIds || requestParams.categoriesIds.isEmpty()
-                )
-            }
-            val placesAndClusters = getAllPlacesAndClustersSuspend(mapParams, requestParams)
-            val clusters = placesAndClusters.second.filter { cluster -> cluster.count > 1 }
-            viewState.value = currentState.copy(
-                places = placesAndClusters.first,
-                categories = categoryListItems,
-                enableResetButton = categoryListItems.any { !it.selected },
-                clusters = clusters
-            )
-        }
+        requestParams = requestParams.copy(categoriesIds = selectedCategories)
     }
 
     fun onPlaceSelected(place: Place?) {
@@ -126,7 +103,7 @@ internal class SoramitsuMapViewModel(
         newCategoriesList[clickedListItemPosition] = clickedItemNewState
         viewState.value = currentState.copy(
             categories = newCategoriesList,
-            enableResetButton = newCategoriesList.any { !it.selected }
+            enableResetButton = newCategoriesList.any { it.selected }
         )
     }
 
@@ -153,7 +130,24 @@ internal class SoramitsuMapViewModel(
             placesRepository.getAllPlaces(mapParams, requestParams)
         } catch (exception: Exception) {
             Log.w("Network", exception)
-            Pair<List<Place>, List<Cluster>>(emptyList<Place>(), emptyList<Cluster>())
+            Pair(emptyList<Place>(), emptyList<Cluster>())
+        }
+    }
+    private fun updateScreen() {
+        loadAllPlacesAndClustersJob?.cancel()
+        loadAllPlacesAndClustersJob = viewModelScope.launch(mainThreadDispatcher) {
+            val allCategories = getAllCategoriesSuspend()
+            val categoryListItems = allCategories.map { category ->
+                CategoryListItem(category, category.id in requestParams.categoriesIds)
+            }
+            val placesAndClusters = getAllPlacesAndClustersSuspend(mapParams, requestParams)
+            val clusters = placesAndClusters.second.filter { cluster -> cluster.count > 1 }
+            viewState.value = currentState.copy(
+                places = placesAndClusters.first,
+                categories = categoryListItems,
+                enableResetButton = requestParams.categoriesIds.isNotEmpty(),
+                clusters = clusters
+            )
         }
     }
 

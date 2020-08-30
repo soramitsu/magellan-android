@@ -1,16 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.appcompat.widget.AppCompatTextView xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/categoryNameTextView"
     android:layout_width="match_parent"
-    android:layout_height="64dp"
+    android:layout_height="wrap_content"
+    android:minHeight="64dp"
     android:background="?selectableItemBackground"
-    android:drawablePadding="16dp"
-    android:gravity="center_vertical"
+    android:orientation="horizontal"
     android:paddingHorizontal="16dp"
-    android:paddingVertical="8dp"
-    android:textAppearance="@style/SM.TextAppearance.Soramitsu.MaterialComponents.Body1"
-    tools:drawableEnd="?sm_checkIcon"
-    tools:drawableStart="?attr/sm_categoryIconDeposit"
-    tools:text="Top up places" />
+    android:paddingVertical="8dp">
 
+    <ImageView
+        android:id="@+id/categoryIcon"
+        android:layout_width="@dimen/sm_icon_size"
+        android:layout_height="@dimen/sm_icon_size"
+        android:layout_gravity="center_vertical"
+        android:background="@drawable/sm_icon_background"
+        android:importantForAccessibility="no"
+        android:scaleType="centerInside"
+        android:src="@drawable/sm_ic_deposit" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/categoryNameTextView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:layout_marginStart="64dp"
+        android:textAppearance="@style/SM.TextAppearance.Soramitsu.MaterialComponents.Body1"
+        tools:drawableEnd="?sm_checkIcon"
+        tools:text="Top up places" />
+
+</FrameLayout>
