@@ -5,12 +5,35 @@
     android:id="@+id/placeBottomSheet"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="?sm_placeBottomSheetBackground"
     android:clickable="true"
     android:focusable="true"
+    android:background="@null"
     app:behavior_hideable="true"
     app:behavior_peekHeight="?sm_placeBottomSheetPeekHeight"
     app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior">
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/closePlaceInfoButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top"
+        android:contentDescription="@string/sm_close_place_info_button"
+        android:src="@drawable/sm_ic_arrow_back_24"
+        app:backgroundTint="@android:color/white"
+        app:ensureMinTouchTargetSize="true"
+        app:fabSize="mini"
+        app:layout_anchor="@id/placeBottomSheet"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:useCompatPadding="true" />
+
+    <View
+        android:id="@+id/contentBackground"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:background="?sm_placeBottomSheetBackground"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/closePlaceInfoButton" />
 
     <View
         android:layout_width="?attr/sm_categoriesBottomSheetTopperWidth"
@@ -19,15 +42,97 @@
         android:background="?attr/sm_categoriesBottomSheetTopperDrawable"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="@id/contentBackground" />
 
-    <jp.co.soramitsu.map.presentation.places.PlaceView
-        android:id="@+id/placeListItem"
-        android:layout_width="match_parent"
+    <TextView
+        android:id="@+id/placeNameTextView"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="12dp"
+        android:layout_marginTop="16dp"
+        android:paddingHorizontal="16dp"
+        android:paddingVertical="8dp"
+        android:textAppearance="?sm_placeViewTitleTextAppearance"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="@id/contentBackground"
+        tools:text="95 DEGREE COFFEE" />
+
+    <TextView
+        android:id="@+id/placeAddressTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingHorizontal="16dp"
+        android:textAppearance="?attr/sm_placeViewAddressTextAppearance"
+        app:layout_constraintStart_toStartOf="@id/placeNameTextView"
+        app:layout_constraintTop_toBottomOf="@id/placeNameTextView"
+        tools:text="Bank · #298 Street 93, Phnom Penh 12258, Cambodia" />
+
+    <RatingBar
+        android:id="@+id/placeRatingBar"
+        style="@style/Widget.AppCompat.RatingBar.Small"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginTop="10dp"
+        android:numStars="5"
+        android:progressTint="?sm_ratingBarColor"
+        android:visibility="gone"
+        app:layout_constraintStart_toStartOf="@id/placeAddressTextView"
+        app:layout_constraintTop_toBottomOf="@id/placeAddressTextView"
+        tools:rating="3" />
+
+    <TextView
+        android:id="@+id/placeRatingTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="8dp"
+        android:textAppearance="?sm_ratingTextAppearance"
+        android:visibility="gone"
+        app:layout_constraintStart_toEndOf="@id/placeRatingBar"
+        app:layout_constraintTop_toBottomOf="@id/placeAddressTextView"
+        tools:text="4.9" />
+
+    <TextView
+        android:id="@+id/placeReviewsTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="8dp"
+        android:textAppearance="?sm_reviewsTextAppearance"
+        android:visibility="gone"
+        app:layout_constraintBaseline_toBaselineOf="@id/placeRatingTextView"
+        app:layout_constraintStart_toEndOf="@id/placeRatingTextView"
+        app:layout_constraintTop_toBottomOf="@id/placeAddressTextView"
+        tools:text="(39 reviews)" />
+
+    <androidx.constraintlayout.widget.Barrier
+        android:id="@+id/placeBottomBarrier"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:barrierDirection="bottom"
+        app:constraint_referenced_ids="placeReviewsTextView,placeRatingTextView,placeRatingBar" />
+
+    <TextView
+        android:id="@+id/placeWorkTimeTextView"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="20dp"
+        android:layout_marginVertical="8dp"
+        android:text="@string/sm_undefined_schedule"
+        android:visibility="gone"
+        app:layout_constraintStart_toStartOf="@id/placeBottomBarrier"
+        app:layout_constraintTop_toBottomOf="@id/placeBottomBarrier"
+        tools:text="Open till 8:30pm" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="20dp"
+        android:textAppearance="?attr/sm_distanceTextAppearance"
+        android:visibility="gone"
+        app:layout_constraintBaseline_toBaselineOf="@id/placeWorkTimeTextView"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/placeBottomBarrier"
+        tools:text="0.03km" />
 
     <TextView
         android:id="@+id/additionalInfoTitle"
@@ -37,7 +142,7 @@
         android:padding="16dp"
         android:text="@string/sm_information"
         android:textAppearance="?sm_placeInfoTitleTextAppearance"
-        app:layout_constraintTop_toBottomOf="@id/placeListItem" />
+        app:layout_constraintTop_toBottomOf="@id/placeWorkTimeTextView" />
 
     <TextView
         android:id="@+id/additionalInfoMobilePhone"
