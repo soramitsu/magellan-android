@@ -47,7 +47,7 @@ import kotlinx.android.synthetic.main.sm_search_panel.*
  * Used fragment as a base class because Maps module have to minimize
  * number of connections with Bakong and its base classes
  */
-class SoramitsuMapFragment : Fragment(R.layout.sm_fragment_map_soramitsu) {
+open class SoramitsuMapFragment : Fragment(R.layout.sm_fragment_map_soramitsu) {
 
     private lateinit var viewModel: SoramitsuMapViewModel
     private lateinit var placeInformationBottomSheetBehavior: BottomSheetBehavior<ConstraintLayout>
@@ -92,6 +92,38 @@ class SoramitsuMapFragment : Fragment(R.layout.sm_fragment_map_soramitsu) {
             longitude = place.position.longitude
         )
         viewModel.onExtendedPlaceInfoRequested(placePosition)
+    }
+
+    protected fun retryGetPlacesRequest() {
+        googleMap?.let { googleMap ->
+            viewModel.mapParams = getMapParams(googleMap)
+        }
+    }
+
+    protected fun retryGetPlaceInfoRequest() {
+        viewModel.onPlaceSelected(viewModel.placeSelected().value)
+    }
+
+    protected fun retryGetCategoriesRequest() {
+        // will trigger "get categories" request before "get places"
+        googleMap?.let { googleMap ->
+            viewModel.mapParams = getMapParams(googleMap)
+        }
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+
+        if (requestCode == LOCATION_REQUEST_CODE) {
+            val anyPermissionGranted = grantResults.any { it == PackageManager.PERMISSION_GRANTED }
+            if (anyPermissionGranted) {
+                googleMap?.let { onFindMeButtonClicked(it) }
+            }
+        }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -382,21 +414,6 @@ class SoramitsuMapFragment : Fragment(R.layout.sm_fragment_map_soramitsu) {
         val defaultLocationButton = soramitsuMapView.findViewById<View>(defaultFindMeButtonResId)
         defaultLocationButton.visibility = View.GONE
         defaultLocationButton?.callOnClick()
-    }
-
-    override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<out String>,
-        grantResults: IntArray
-    ) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-
-        if (requestCode == LOCATION_REQUEST_CODE) {
-            val anyPermissionGranted = grantResults.any { it == PackageManager.PERMISSION_GRANTED }
-            if (anyPermissionGranted) {
-                googleMap?.let { onFindMeButtonClicked(it) }
-            }
-        }
     }
 
     private fun bindBottomSheetWithPlace(place: Place) {
