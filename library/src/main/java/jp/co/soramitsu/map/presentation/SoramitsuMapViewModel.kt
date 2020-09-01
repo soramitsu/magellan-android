@@ -24,7 +24,7 @@ internal class SoramitsuMapViewModel(
 ) : ViewModel() {
 
     private val viewState: MutableLiveData<SoramitsuMapViewState> = MutableLiveData()
-    private val selectedPlaceSingleLiveEvent: SingleLiveEvent<Place?> = SingleLiveEvent()
+    private val selectedPlaceSingleLiveEvent: MutableLiveData<Place?> = MutableLiveData()
 
     private val currentState: SoramitsuMapViewState
         get() = viewState.value!!
