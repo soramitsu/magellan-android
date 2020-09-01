@@ -72,14 +72,14 @@ internal class CategoryViewHolder(itemView: View) : RecyclerView.ViewHolder(item
         categoryTextView.setCompoundDrawablesRelativeWithIntrinsicBounds(0, 0, checkIconId, 0)
     }
 
-    private fun iconForCategory(context: Context, category: Category): Int = when (category) {
-        Category.BANK -> context.getResourceIdForAttr(R.attr.sm_categoryIconDeposit)
-        Category.FOOD -> context.getResourceIdForAttr(R.attr.sm_categoryIconRestaurant)
-        Category.SERVICES -> context.getResourceIdForAttr(R.attr.sm_categoryIconServices)
-        Category.SUPERMARKETS -> context.getResourceIdForAttr(R.attr.sm_categoryIconSupermarket)
-        Category.PHARMACY -> context.getResourceIdForAttr(R.attr.sm_categoryIconPharmacy)
-        Category.ENTERTAINMENT -> context.getResourceIdForAttr(R.attr.sm_categoryIconEntertainment)
-        Category.EDUCATION -> context.getResourceIdForAttr(R.attr.sm_categoryIconEducation)
+    private fun iconForCategory(context: Context, category: Category): Int = when (category.name) {
+        Category.BANK.name -> context.getResourceIdForAttr(R.attr.sm_categoryIconDeposit)
+        Category.FOOD.name -> context.getResourceIdForAttr(R.attr.sm_categoryIconRestaurant)
+        Category.SERVICES.name -> context.getResourceIdForAttr(R.attr.sm_categoryIconServices)
+        Category.SUPERMARKETS.name -> context.getResourceIdForAttr(R.attr.sm_categoryIconSupermarket)
+        Category.PHARMACY.name -> context.getResourceIdForAttr(R.attr.sm_categoryIconPharmacy)
+        Category.ENTERTAINMENT.name -> context.getResourceIdForAttr(R.attr.sm_categoryIconEntertainment)
+        Category.EDUCATION.name -> context.getResourceIdForAttr(R.attr.sm_categoryIconEducation)
         else -> context.getResourceIdForAttr(R.attr.sm_categoryIconOther)
     }
 
