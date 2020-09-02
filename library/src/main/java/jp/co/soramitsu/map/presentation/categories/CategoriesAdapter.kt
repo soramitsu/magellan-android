@@ -4,6 +4,7 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
@@ -60,26 +61,25 @@ internal class CategoryDiffUtilCallback(
 
 internal class CategoryViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
-    private val categoryTextView =
-        itemView.findViewById<AppCompatTextView>(R.id.categoryNameTextView)
+    private val categoryTextView = itemView.findViewById<AppCompatTextView>(R.id.categoryNameTextView)
+    private val categoryIcon = itemView.findViewById<ImageView>(R.id.categoryIcon)
 
     fun bind(categoryListItem: CategoryListItem) {
         categoryTextView.text = categoryListItem.category.name
         categoryTextView.isSelected = categoryListItem.selected
         val checkIconId = if (categoryListItem.selected) R.drawable.sm_ic_check_24dp else 0
-        categoryTextView.setCompoundDrawablesRelativeWithIntrinsicBounds(
-            iconForCategory(categoryTextView.context, categoryListItem.category), 0, checkIconId, 0
-        )
+        categoryIcon.setImageResource(iconForCategory(categoryTextView.context, categoryListItem.category))
+        categoryTextView.setCompoundDrawablesRelativeWithIntrinsicBounds(0, 0, checkIconId, 0)
     }
 
-    private fun iconForCategory(context: Context, category: Category): Int = when (category) {
-        Category.BANK -> context.getResourceIdForAttr(R.attr.sm_categoryIconDeposit)
-        Category.FOOD -> context.getResourceIdForAttr(R.attr.sm_categoryIconRestaurant)
-        Category.SERVICES -> context.getResourceIdForAttr(R.attr.sm_categoryIconServices)
-        Category.SUPERMARKETS -> context.getResourceIdForAttr(R.attr.sm_categoryIconSupermarket)
-        Category.PHARMACY -> context.getResourceIdForAttr(R.attr.sm_categoryIconPharmacy)
-        Category.ENTERTAINMENT -> context.getResourceIdForAttr(R.attr.sm_categoryIconEntertainment)
-        Category.EDUCATION -> context.getResourceIdForAttr(R.attr.sm_categoryIconEducation)
+    private fun iconForCategory(context: Context, category: Category): Int = when (category.name) {
+        Category.BANK.name -> context.getResourceIdForAttr(R.attr.sm_categoryIconDeposit)
+        Category.FOOD.name -> context.getResourceIdForAttr(R.attr.sm_categoryIconRestaurant)
+        Category.SERVICES.name -> context.getResourceIdForAttr(R.attr.sm_categoryIconServices)
+        Category.SUPERMARKETS.name -> context.getResourceIdForAttr(R.attr.sm_categoryIconSupermarket)
+        Category.PHARMACY.name -> context.getResourceIdForAttr(R.attr.sm_categoryIconPharmacy)
+        Category.ENTERTAINMENT.name -> context.getResourceIdForAttr(R.attr.sm_categoryIconEntertainment)
+        Category.EDUCATION.name -> context.getResourceIdForAttr(R.attr.sm_categoryIconEducation)
         else -> context.getResourceIdForAttr(R.attr.sm_categoryIconOther)
     }
 

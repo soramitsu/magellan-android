@@ -1,18 +1,15 @@
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
-    android:width="@dimen/sm_icon_size"
-    android:height="@dimen/sm_icon_size"
-    android:viewportWidth="37"
-    android:viewportHeight="37">
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
   <path
-      android:pathData="M18.5,37C28.7173,37 37,28.7173 37,18.5C37,8.2827 28.7173,0 18.5,0C8.2827,0 0,8.2827 0,18.5C0,28.7173 8.2827,37 18.5,37Z"
-      android:fillColor="@color/sm_icon_background_color"/>
+      android:pathData="M12,12m-2,0a2,2 0,1 1,4 0a2,2 0,1 1,-4 0"
+      android:fillColor="?sm_iconColor"/>
   <path
-      android:pathData="M10.5,16L10.5,16A2.5,2.5 0,0 1,13 18.5L13,18.5A2.5,2.5 0,0 1,10.5 21L10.5,21A2.5,2.5 0,0 1,8 18.5L8,18.5A2.5,2.5 0,0 1,10.5 16z"
-      android:fillColor="@color/sm_icon_color"/>
+      android:pathData="M18,12m-2,0a2,2 0,1 1,4 0a2,2 0,1 1,-4 0"
+      android:fillColor="?sm_iconColor"/>
   <path
-      android:pathData="M18.5,16L18.5,16A2.5,2.5 0,0 1,21 18.5L21,18.5A2.5,2.5 0,0 1,18.5 21L18.5,21A2.5,2.5 0,0 1,16 18.5L16,18.5A2.5,2.5 0,0 1,18.5 16z"
-      android:fillColor="@color/sm_icon_color"/>
-  <path
-      android:pathData="M26.5,16L26.5,16A2.5,2.5 0,0 1,29 18.5L29,18.5A2.5,2.5 0,0 1,26.5 21L26.5,21A2.5,2.5 0,0 1,24 18.5L24,18.5A2.5,2.5 0,0 1,26.5 16z"
-      android:fillColor="@color/sm_icon_color"/>
+      android:pathData="M6,12m-2,0a2,2 0,1 1,4 0a2,2 0,1 1,-4 0"
+      android:fillColor="?sm_iconColor"/>
 </vector>
