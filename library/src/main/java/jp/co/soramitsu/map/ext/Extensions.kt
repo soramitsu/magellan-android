@@ -4,6 +4,7 @@ import android.content.Context
 import android.util.TypedValue
 import android.view.View
 import androidx.annotation.AttrRes
+import androidx.annotation.ColorInt
 import androidx.annotation.StringRes
 import com.google.android.gms.maps.model.LatLng
 import jp.co.soramitsu.map.R
@@ -36,6 +37,13 @@ internal fun Category.asLocalizedString() = when (this) {
     Category.SERVICES -> R.string.sm_category_services
     Category.SUPERMARKETS -> R.string.sm_category_supermarkets
     else -> R.string.sm_category_other
+}
+
+@ColorInt
+internal fun Context.colorFromTheme(@AttrRes attributeRes: Int): Int {
+    val outValue = TypedValue()
+    theme.resolveAttribute(attributeRes, outValue, true)
+    return outValue.data
 }
 
 internal fun View.selectableItemBackground() {
