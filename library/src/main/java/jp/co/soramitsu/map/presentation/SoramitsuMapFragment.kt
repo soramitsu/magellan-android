@@ -2,11 +2,9 @@ package jp.co.soramitsu.map.presentation
 
 import android.Manifest
 import android.content.Context
-import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.Canvas
-import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
 import android.view.View
@@ -38,9 +36,9 @@ import jp.co.soramitsu.map.model.Category
 import jp.co.soramitsu.map.model.GeoPoint
 import jp.co.soramitsu.map.model.Place
 import jp.co.soramitsu.map.presentation.categories.CategoriesFragment
+import jp.co.soramitsu.map.presentation.places.PlaceFragment
 import jp.co.soramitsu.map.presentation.places.PlacesSearchResultsAdapter
 import kotlinx.android.synthetic.main.sm_fragment_map_soramitsu.*
-import kotlinx.android.synthetic.main.sm_place_bottom_sheet.*
 import kotlinx.android.synthetic.main.sm_search_panel.*
 
 /**
@@ -50,7 +48,6 @@ import kotlinx.android.synthetic.main.sm_search_panel.*
 open class SoramitsuMapFragment : Fragment(R.layout.sm_fragment_map_soramitsu) {
 
     private lateinit var viewModel: SoramitsuMapViewModel
-    private lateinit var placeInformationBottomSheetBehavior: BottomSheetBehavior<ConstraintLayout>
     private lateinit var searchPanelBottomSheetBehavior: BottomSheetBehavior<ConstraintLayout>
 
     private val inputMethodService: InputMethodManager?
@@ -92,6 +89,8 @@ open class SoramitsuMapFragment : Fragment(R.layout.sm_fragment_map_soramitsu) {
             longitude = place.position.longitude
         )
         viewModel.onExtendedPlaceInfoRequested(placePosition)
+
+        PlaceFragment().show(parentFragmentManager, "Place")
     }
 
     protected fun retryGetPlacesRequest() {
@@ -138,7 +137,6 @@ open class SoramitsuMapFragment : Fragment(R.layout.sm_fragment_map_soramitsu) {
         soramitsuMapView.getMapAsync { onMapReady(it) }
 
         initSearchPanel()
-        initPlaceInformationPanel()
 
         showFiltersButton.setOnClickListener { CategoriesFragment().show(parentFragmentManager, "Categories") }
 
@@ -253,15 +251,13 @@ open class SoramitsuMapFragment : Fragment(R.layout.sm_fragment_map_soramitsu) {
             }
 
             viewModel.placeSelected().observe(viewLifecycleOwner, Observer { selectedPlace ->
-                inputMethodService?.hideSoftInputFromWindow(
-                    placesWithSearchTextInputEditText.windowToken, 0
-                )
+                val buttonsVisibility = if (selectedPlace == null) View.VISIBLE else View.GONE
+                zoomButtonsPanel.visibility = buttonsVisibility
+                findMeButton.visibility = buttonsVisibility
+                showFiltersButton.visibility = buttonsVisibility
+                searchPanelBottomSheet.visibility = buttonsVisibility
 
-                if (selectedPlace != null) {
-                    placeInformationBottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
-                    bindBottomSheetWithPlace(selectedPlace)
-                }
-
+                inputMethodService?.hideSoftInputFromWindow(placesWithSearchTextInputEditText.windowToken, 0)
                 highlightSelectedPlace()
             })
 
@@ -286,6 +282,7 @@ open class SoramitsuMapFragment : Fragment(R.layout.sm_fragment_map_soramitsu) {
                             longitude = marker.position.longitude
                         )
                         viewModel.onExtendedPlaceInfoRequested(placePoint)
+                        PlaceFragment().show(parentFragmentManager, "Place")
                     }
 
                     true
@@ -414,94 +411,6 @@ open class SoramitsuMapFragment : Fragment(R.layout.sm_fragment_map_soramitsu) {
         val defaultLocationButton = soramitsuMapView.findViewById<View>(defaultFindMeButtonResId)
         defaultLocationButton.visibility = View.GONE
         defaultLocationButton?.callOnClick()
-    }
-
-    private fun bindBottomSheetWithPlace(place: Place) {
-        // header info
-        placeListItem.bind(place)
-
-        // additional info
-        additionalInfoMobilePhone.visibility =
-            if (place.phone.isEmpty()) View.GONE else View.VISIBLE
-        additionalInfoWebsite.visibility =
-            if (place.website.isEmpty()) View.GONE else View.VISIBLE
-        additionalInfoFacebook.visibility =
-            if (place.facebook.isEmpty()) View.GONE else View.VISIBLE
-        additionalInfoAddress.visibility =
-            if (place.address.isEmpty()) View.GONE else View.VISIBLE
-
-        additionalInfoMobilePhone.text = place.phone
-        additionalInfoWebsite.text = place.website
-        additionalInfoFacebook.text = "facebook.com/${place.facebook}"
-        additionalInfoAddress.text = place.address
-
-        additionalInfoMobilePhone.setOnClickListener {
-            startActivity(Intent(Intent.ACTION_DIAL).apply {
-                data = Uri.parse("tel:${place.phone}")
-            })
-        }
-
-        additionalInfoWebsite.setOnClickListener {
-            startActivity(Intent(Intent.ACTION_VIEW).apply {
-                data = Uri.parse(place.website)
-            })
-        }
-
-        additionalInfoFacebook.setOnClickListener {
-            val facebookIntent = Intent(Intent.ACTION_VIEW).apply {
-                data = Uri.parse("facebook://facebook.com/${place.facebook}")
-            }
-            if (facebookIntent.resolveActivity(requireActivity().packageManager) != null) {
-                startActivity(facebookIntent)
-            } else {
-                startActivity(Intent(Intent.ACTION_VIEW).apply {
-                    data = Uri.parse("https://facebook.com/${place.facebook}")
-                })
-            }
-        }
-
-        additionalInfoAddress.setOnClickListener {
-            startActivity(Intent(Intent.ACTION_VIEW).apply {
-                data = Uri.parse("geo:0,0?q=${Uri.encode(place.address)}")
-                `package` = "com.google.android.apps.maps"
-            })
-        }
-
-        closePlaceInfoButton.setOnClickListener {
-            placeInformationBottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
-        }
-    }
-
-    private fun initPlaceInformationPanel() {
-        placeInformationBottomSheetBehavior = BottomSheetBehavior.from(placeBottomSheet)
-        placeInformationBottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
-        placeInformationBottomSheetBehavior.isHideable = true
-        placeInformationBottomSheetBehavior.onStateChanged { newState ->
-            when (newState) {
-                BottomSheetBehavior.STATE_HIDDEN -> {
-                    // show back categories bottom sheet
-                    searchPanelBottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
-                    searchPanelBottomSheetBehavior.isHideable = false
-
-                    closePlaceInfoButton.visibility = View.GONE
-                    zoomButtonsPanel.visibility = View.VISIBLE
-                    findMeButton.visibility = View.VISIBLE
-                    showFiltersButton.visibility = View.VISIBLE
-
-                    viewModel.onPlaceSelected(null)
-                }
-                else -> {
-                    // hide categories bottom sheet to prevent touch events propagation
-                    searchPanelBottomSheetBehavior.isHideable = true
-                    searchPanelBottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
-
-                    closePlaceInfoButton.visibility = View.VISIBLE
-                    zoomButtonsPanel.visibility = View.GONE
-                    findMeButton.visibility = View.GONE
-                    showFiltersButton.visibility = View.GONE
-                }
-            }
-        }
     }
 
     private fun initSearchPanel() {
