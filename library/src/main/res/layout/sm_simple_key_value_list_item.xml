@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/placeBottomSheet"
+    android:paddingStart="56dp"
+    android:paddingEnd="16dp"
+    android:paddingTop="10dp"
+    android:paddingBottom="10dp"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+
+    <TextView
+        android:id="@+id/keyTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        tools:text="Mon-Thu"
+        />
+
+    <TextView
+        android:id="@+id/valueTextView"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:gravity="end"
+        app:layout_constraintBaseline_toBaselineOf="@id/keyTextView"
+        app:layout_constraintStart_toEndOf="@id/keyTextView"
+        app:layout_constraintEnd_toEndOf="parent"
+        tools:text="6:30 AM- 8:30 PM"
+        />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

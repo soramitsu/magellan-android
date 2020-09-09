@@ -1,9 +1,7 @@
 package jp.co.soramitsu.map.data
 
-import jp.co.soramitsu.map.model.Category
-import jp.co.soramitsu.map.model.Cluster
-import jp.co.soramitsu.map.model.GeoPoint
-import jp.co.soramitsu.map.model.Place
+import jp.co.soramitsu.map.model.*
+import java.util.*
 
 internal class DemoPlacesRepository : PlacesRepository {
     override fun getCategories(): List<Category> = listOf(
@@ -28,12 +26,56 @@ internal class DemoPlacesRepository : PlacesRepository {
         requestParams: RequestParams
     ): Pair<List<Place>, List<Cluster>> {
         val places = (Places.merchants + Places.banks + Places.agents).mapIndexed { index, place ->
-            place.copy(id = index.toString())
+            val schedule = if (index % 2 == 0) {
+                Schedule(open24 = true)
+            } else {
+                Schedule(
+                    workingDays = listOf(
+                        WorkDay(
+                            weekDay = Calendar.MONDAY,
+                            from = Time(5, 0),
+                            to = Time(20, 0),
+                            launchTimeFrom = Time(7, 0),
+                            launchTimeTo = Time(17, 0)
+                        ),
+                        WorkDay(
+                            weekDay = Calendar.TUESDAY,
+                            from = Time(5, 0),
+                            to = Time(20, 0),
+                            launchTimeFrom = Time(7, 0),
+                            launchTimeTo = Time(17, 0)
+                        ),
+                        WorkDay(
+                            weekDay = Calendar.WEDNESDAY,
+                            from = Time(5, 0),
+                            to = Time(20, 0),
+                            launchTimeFrom = Time(7, 0),
+                            launchTimeTo = Time(17, 0)
+                        ),
+                        WorkDay(
+                            weekDay = Calendar.THURSDAY,
+                            from = Time(5, 0),
+                            to = Time(20, 0),
+                            launchTimeFrom = Time(7, 0),
+                            launchTimeTo = Time(17, 0)
+                        ),
+                        WorkDay(
+                            weekDay = Calendar.FRIDAY,
+                            from = Time(5, 0),
+                            to = Time(20, 0)
+                        )
+                    )
+                )
+            }
+            place.copy(
+                id = index.toString(),
+                schedule = schedule
+            )
         }.subList(5, 30)
         val clusters = listOf(
             Cluster(GeoPoint(places[0].position.latitude, places[0].position.longitude), 3),
-            Cluster(GeoPoint(places[0].position.latitude, places[0].position.longitude), 30),
-            Cluster(GeoPoint(places[0].position.latitude, places[0].position.longitude), 99)
+            Cluster(GeoPoint(places[1].position.latitude, places[1].position.longitude), 30),
+            Cluster(GeoPoint(places[2].position.latitude, places[2].position.longitude), 99)
         )
         return Pair(places, clusters)
     }
