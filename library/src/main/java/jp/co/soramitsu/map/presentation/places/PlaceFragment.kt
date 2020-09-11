@@ -302,7 +302,7 @@ internal class PlaceFragment : BottomSheetDialogFragment() {
                     placeIsWorkingNowTextView.text = spannableString
                 }
                 else -> {
-                    val closed = resources.getString(R.string.sm_close)
+                    val closed = resources.getString(R.string.sm_closed)
                     val openTime = dateFormat.format(Date(workDay.from.inMilliseconds()))
                     val till = resources.getString(R.string.sm_till, openTime)
                     val colorAccent = requireContext().colorFromTheme(R.attr.colorAccent)
