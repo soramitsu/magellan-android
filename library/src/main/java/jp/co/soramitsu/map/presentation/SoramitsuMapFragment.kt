@@ -217,6 +217,7 @@ open class SoramitsuMapFragment : Fragment(R.layout.sm_fragment_map_soramitsu) {
 
             googleMap.uiSettings.apply {
                 isZoomGesturesEnabled = true
+                isRotateGesturesEnabled = false
                 isCompassEnabled = true
                 isMyLocationButtonEnabled = true
             }

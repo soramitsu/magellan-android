@@ -16,10 +16,20 @@
         <item quantity="other">(%d reviews)</item>
     </plurals>
 
-    <string name="sm_open_till">Open till %1$s</string>
-    <string name="sm_closed_till">Closed till %1$s</string>
-    <string name="sm_open_now">Open now</string>
-    <string name="sm_closed_now">Closed now</string>
+    <string name="sm_open">Open</string>
+    <string name="sm_launch_time">Launch time</string>
+    <string name="sm_closed">Closed</string>
+    <string name="sm_till">till %1$s</string>
+    <string name="sm_24_hours">24 hours</string>
+
+    <string name="sm_sun">Sun</string>
+    <string name="sm_mon">Mon</string>
+    <string name="sm_tue">Tue</string>
+    <string name="sm_wed">Wed</string>
+    <string name="sm_thu">Thu</string>
+    <string name="sm_fri">Fri</string>
+    <string name="sm_sat">Sat</string>
+
     <string name="sm_information">Information</string>
     <string name="sm_mobile_phone">Mobile phone</string>
     <string name="sm_website">Website</string>

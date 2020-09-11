@@ -5,9 +5,9 @@
     android:id="@+id/placeBottomSheet"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:background="@null"
     android:clickable="true"
     android:focusable="true"
-    android:background="@null"
     app:behavior_hideable="true"
     app:behavior_peekHeight="?sm_placeBottomSheetPeekHeight"
     app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior">
@@ -112,16 +112,16 @@
         app:constraint_referenced_ids="placeReviewsTextView,placeRatingTextView,placeRatingBar" />
 
     <TextView
-        android:id="@+id/placeWorkTimeTextView"
+        android:id="@+id/placeIsWorkingNowTextView"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginHorizontal="20dp"
+        android:layout_marginHorizontal="16dp"
         android:layout_marginVertical="8dp"
-        android:text="@string/sm_undefined_schedule"
         android:visibility="gone"
         app:layout_constraintStart_toStartOf="@id/placeBottomBarrier"
         app:layout_constraintTop_toBottomOf="@id/placeBottomBarrier"
-        tools:text="Open till 8:30pm" />
+        tools:text="Open till 8:30pm"
+        tools:visibility="visible" />
 
     <TextView
         android:layout_width="wrap_content"
@@ -129,7 +129,7 @@
         android:layout_marginHorizontal="20dp"
         android:textAppearance="?attr/sm_distanceTextAppearance"
         android:visibility="gone"
-        app:layout_constraintBaseline_toBaselineOf="@id/placeWorkTimeTextView"
+        app:layout_constraintBaseline_toBaselineOf="@id/placeIsWorkingNowTextView"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/placeBottomBarrier"
         tools:text="0.03km" />
@@ -142,18 +142,18 @@
         android:padding="16dp"
         android:text="@string/sm_information"
         android:textAppearance="?sm_placeInfoTitleTextAppearance"
-        app:layout_constraintTop_toBottomOf="@id/placeWorkTimeTextView" />
+        app:layout_constraintTop_toBottomOf="@id/placeIsWorkingNowTextView" />
 
     <TextView
         android:id="@+id/additionalInfoMobilePhone"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="?selectableItemBackground"
-        android:drawableStart="@drawable/sm_ic_call"
         android:drawablePadding="16dp"
         android:gravity="center_vertical"
         android:padding="16dp"
         android:textAppearance="@style/SM.TextAppearance.Soramitsu.MaterialComponents.Body2"
+        app:drawableStartCompat="@drawable/sm_ic_call"
         app:layout_constraintTop_toBottomOf="@id/additionalInfoTitle"
         tools:text="+855 98 333 395" />
 
@@ -171,11 +171,11 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="?selectableItemBackground"
-        android:drawableStart="@drawable/sm_ic_network_24dp"
         android:drawablePadding="16dp"
         android:gravity="center_vertical"
         android:padding="16dp"
         android:textAppearance="@style/SM.TextAppearance.Soramitsu.MaterialComponents.Body2"
+        app:drawableStartCompat="@drawable/sm_ic_network_24dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/additionalInfoMobilePhone"
         tools:text="www.degree.com" />
@@ -194,11 +194,11 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="?selectableItemBackground"
-        android:drawableStart="@drawable/sm_ic_open"
         android:drawablePadding="16dp"
         android:gravity="center_vertical"
         android:padding="16dp"
         android:textAppearance="@style/SM.TextAppearance.Soramitsu.MaterialComponents.Body2"
+        app:drawableStartCompat="@drawable/sm_ic_open"
         app:layout_constraintTop_toBottomOf="@id/additionalInfoWebsite"
         tools:text="fb.com/95DegreesCoffee" />
 
@@ -216,13 +216,13 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="?selectableItemBackground"
-        android:drawableStart="@drawable/sm_ic_direction_24dp"
         android:drawablePadding="16dp"
         android:ellipsize="end"
         android:gravity="center_vertical"
         android:maxLines="1"
         android:padding="16dp"
         android:textAppearance="@style/SM.TextAppearance.Soramitsu.MaterialComponents.Body2"
+        app:drawableStartCompat="@drawable/sm_ic_direction_24dp"
         app:layout_constraintTop_toBottomOf="@id/additionalInfoFacebook"
         tools:text="#34A, St 240 Sangkat Chak Tomuk, Phnom Penh 12207, Cambodia" />
 
@@ -240,15 +240,24 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="?selectableItemBackground"
-        android:drawableStart="@drawable/sm_ic_clock"
         android:drawablePadding="16dp"
         android:gravity="center_vertical"
         android:padding="16dp"
         android:textAppearance="@style/SM.TextAppearance.Soramitsu.MaterialComponents.Body2"
-        android:visibility="gone"
+        app:drawableStartCompat="@drawable/sm_ic_clock"
         app:layout_constraintTop_toBottomOf="@id/additionalInfoAddress"
         tools:text="Daily 6:30 AM — 8:30 PM"
         tools:visibility="visible" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/additionalInfoOpenHoursDetails"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        app:layout_constraintTop_toBottomOf="@id/additionalInfoOpenHours"
+        tools:listitem="@layout/sm_simple_key_value_list_item"
+        tools:itemCount="3"
+        />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
