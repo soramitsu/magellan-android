@@ -1,23 +1,26 @@
 package jp.co.soramitsu.map.presentation.places
 
+import android.app.Dialog
 import android.content.DialogInterface
 import android.content.Intent
 import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
-import android.os.Handler
 import android.text.SpannableStringBuilder
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.text.color
+import androidx.core.view.doOnLayout
 import androidx.core.widget.TextViewCompat
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import jp.co.soramitsu.map.R
 import jp.co.soramitsu.map.ext.colorFromTheme
+import jp.co.soramitsu.map.ext.dimenFromTheme
 import jp.co.soramitsu.map.model.Place
 import jp.co.soramitsu.map.model.Schedule
 import jp.co.soramitsu.map.model.Time
@@ -45,6 +48,12 @@ internal class PlaceFragment : BottomSheetDialogFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        view.doOnLayout {
+            val parent = (view.parent as? View)
+            parent?.setBackgroundColor(Color.TRANSPARENT)
+            dialog?.window?.setDimAmount(0f)
+        }
+
         additionalInfoOpenHoursDetails.layoutManager = LinearLayoutManager(context)
         additionalInfoOpenHoursDetails.adapter = detailedScheduleAdapter
 
@@ -59,15 +68,14 @@ internal class PlaceFragment : BottomSheetDialogFragment() {
         }
     }
 
-    override fun onResume() {
-        super.onResume()
-
-        Handler().postDelayed({
-            val parent = (view?.parent as? View)
-            parent?.setBackgroundColor(Color.TRANSPARENT)
-
-            dialog?.window?.setDimAmount(0f)
-        }, 50)
+    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
+        val dialog = super.onCreateDialog(savedInstanceState)
+        dialog.setOnShowListener {
+            val bottomSheetDialog = dialog as BottomSheetDialog
+            val peekHeight = dialog.context.dimenFromTheme(R.attr.sm_placeBottomSheetPeekHeight)
+            bottomSheetDialog.behavior.peekHeight = peekHeight
+        }
+        return dialog
     }
 
     override fun onDismiss(dialog: DialogInterface) {
