@@ -46,6 +46,12 @@ internal fun Context.colorFromTheme(@AttrRes attributeRes: Int): Int {
     return outValue.data
 }
 
+internal fun Context.dimenFromTheme(@AttrRes attributeRes: Int): Int {
+    val outValue = TypedValue()
+    theme.resolveAttribute(attributeRes, outValue, true)
+    return outValue.getDimension(resources.displayMetrics).toInt()
+}
+
 internal fun View.selectableItemBackground() {
     val outValue = TypedValue()
     context.theme.resolveAttribute(android.R.attr.selectableItemBackground, outValue, true)
