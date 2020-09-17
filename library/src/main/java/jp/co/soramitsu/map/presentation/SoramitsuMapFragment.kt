@@ -5,9 +5,13 @@ import android.content.Context
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.Canvas
+import android.graphics.Rect
 import android.os.Bundle
 import android.os.Handler
+import android.util.TypedValue
 import android.view.View
+import android.view.ViewGroup
+import android.view.ViewTreeObserver
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import androidx.annotation.DrawableRes
@@ -72,6 +76,29 @@ open class SoramitsuMapFragment : Fragment(R.layout.sm_fragment_map_soramitsu) {
             ),
             zoom = zoom
         )
+    }
+
+    private val keyboardListener = object : ViewTreeObserver.OnGlobalLayoutListener {
+
+        private var keyboardShown = false
+        private val rect = Rect()
+
+        override fun onGlobalLayout() {
+            val contentView = activity?.findViewById<ViewGroup>(android.R.id.content)
+            contentView?.let { view ->
+                view.getWindowVisibleDisplayFrame(rect)
+                val diff = view.height - (rect.bottom - rect.top)
+                val threshold = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 100f, resources.displayMetrics)
+                val shownNow = diff >= threshold
+                if (shownNow == keyboardShown) return
+
+                keyboardShown = shownNow
+
+                if (keyboardShown) {
+                    searchPanelBottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
+                }
+            }
+        }
     }
 
     private val markers = mutableListOf<Marker>()
@@ -155,11 +182,7 @@ open class SoramitsuMapFragment : Fragment(R.layout.sm_fragment_map_soramitsu) {
             }
         }
 
-        placesWithSearchTextInputEditText.setOnFocusChangeListener { _, hasFocus ->
-            if (hasFocus) {
-                searchPanelBottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
-            }
-        }
+        view.viewTreeObserver.addOnGlobalLayoutListener(keyboardListener)
         placesWithSearchTextInputEditText.setOnEditorActionListener { v, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_SEARCH) {
                 inputMethodService?.hideSoftInputFromWindow(v.windowToken, 0)
@@ -209,6 +232,7 @@ open class SoramitsuMapFragment : Fragment(R.layout.sm_fragment_map_soramitsu) {
     override fun onDestroyView() {
         super.onDestroyView()
         soramitsuMapView.onDestroy()
+        view?.viewTreeObserver?.removeOnGlobalLayoutListener(keyboardListener)
     }
 
     private fun onMapReady(map: GoogleMap?) {
@@ -436,8 +460,7 @@ open class SoramitsuMapFragment : Fragment(R.layout.sm_fragment_map_soramitsu) {
 
         ViewCompat.setOnApplyWindowInsetsListener(searchPanelBottomSheet) { _, insets ->
             val statusBarHeight = insets.systemWindowInsetTop
-            val topOffset = (statusBarHeight * 1.15f).toInt()
-            searchPanelBottomSheetBehavior.setExpandedOffset(topOffset)
+            searchPanelBottomSheetBehavior.expandedOffset = (statusBarHeight * 1.15f).toInt()
 
             insets.consumeSystemWindowInsets()
         }
