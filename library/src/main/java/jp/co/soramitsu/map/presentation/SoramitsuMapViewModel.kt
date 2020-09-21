@@ -35,6 +35,8 @@ internal class SoramitsuMapViewModel(
         set(value) {
             field = value
 
+            _searchQuery.value = value.query
+
             updateScreen()
         }
 
@@ -44,6 +46,12 @@ internal class SoramitsuMapViewModel(
 
             updateScreen()
         }
+
+    /**
+     * Used to sync fake search field on the map screen and search fragment's search query input field
+     */
+    private val _searchQuery = MutableLiveData<String>("")
+    val searchQuery: LiveData<String> = _searchQuery
 
     fun viewState(): LiveData<SoramitsuMapViewState> = viewState
     fun placeSelected(): LiveData<Place?> = selectedPlaceSingleLiveEvent

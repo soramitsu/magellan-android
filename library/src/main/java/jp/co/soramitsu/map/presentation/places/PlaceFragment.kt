@@ -186,8 +186,7 @@ internal class PlaceFragment : BottomSheetDialogFragment() {
                 val toTime = dateFormat.format(Date(today.to.inMilliseconds()))
                 val scheduleAsString = resources.getString(R.string.sm_daily_interval, fromTime, toTime)
 
-                val haveLaunchTime = schedule.workingDays[0].launchTimeFrom != null
-                        && schedule.workingDays[0].launchTimeTo != null
+                val haveLaunchTime = today.launchTimeFrom != null && today.launchTimeTo != null
                 if (haveLaunchTime) {
                     val launchFromTime =
                         dateFormat.format(Date(today.launchTimeFrom!!.inMilliseconds()))
