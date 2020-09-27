@@ -5,32 +5,24 @@ import android.content.Context
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.Canvas
-import android.graphics.Rect
 import android.os.Bundle
 import android.os.Handler
-import android.util.TypedValue
+import android.view.MotionEvent
 import android.view.View
-import android.view.ViewGroup
-import android.view.ViewTreeObserver
-import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import androidx.annotation.DrawableRes
-import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.content.ContextCompat.getSystemService
-import androidx.core.view.ViewCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.model.BitmapDescriptor
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
-import com.google.android.material.bottomsheet.BottomSheetBehavior
 import jp.co.soramitsu.map.R
 import jp.co.soramitsu.map.SoramitsuMapLibraryConfig
 import jp.co.soramitsu.map.data.MapParams
@@ -41,9 +33,8 @@ import jp.co.soramitsu.map.model.GeoPoint
 import jp.co.soramitsu.map.model.Place
 import jp.co.soramitsu.map.presentation.categories.CategoriesFragment
 import jp.co.soramitsu.map.presentation.places.PlaceFragment
-import jp.co.soramitsu.map.presentation.places.PlacesSearchResultsAdapter
+import jp.co.soramitsu.map.presentation.search.SearchBottomSheetFragment
 import kotlinx.android.synthetic.main.sm_fragment_map_soramitsu.*
-import kotlinx.android.synthetic.main.sm_search_panel.*
 
 /**
  * Used fragment as a base class because Maps module have to minimize
@@ -52,7 +43,6 @@ import kotlinx.android.synthetic.main.sm_search_panel.*
 open class SoramitsuMapFragment : Fragment(R.layout.sm_fragment_map_soramitsu) {
 
     private lateinit var viewModel: SoramitsuMapViewModel
-    private lateinit var searchPanelBottomSheetBehavior: BottomSheetBehavior<ConstraintLayout>
 
     private val inputMethodService: InputMethodManager?
         get() = context?.let { context ->
@@ -78,29 +68,6 @@ open class SoramitsuMapFragment : Fragment(R.layout.sm_fragment_map_soramitsu) {
         )
     }
 
-    private val keyboardListener = object : ViewTreeObserver.OnGlobalLayoutListener {
-
-        private var keyboardShown = false
-        private val rect = Rect()
-
-        override fun onGlobalLayout() {
-            val contentView = activity?.findViewById<ViewGroup>(android.R.id.content)
-            contentView?.let { view ->
-                view.getWindowVisibleDisplayFrame(rect)
-                val diff = view.height - (rect.bottom - rect.top)
-                val threshold = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 100f, resources.displayMetrics)
-                val shownNow = diff >= threshold
-                if (shownNow == keyboardShown) return
-
-                keyboardShown = shownNow
-
-                if (keyboardShown) {
-                    searchPanelBottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
-                }
-            }
-        }
-    }
-
     private val markers = mutableListOf<Marker>()
     private val clusters = mutableListOf<Marker>()
 
@@ -108,17 +75,6 @@ open class SoramitsuMapFragment : Fragment(R.layout.sm_fragment_map_soramitsu) {
     // behavior using delay() before request and cancelling corresponding job
     private val handler = Handler()
     private var onMapScrollStopCallback: Runnable? = null
-
-    private val placesAdapter = PlacesSearchResultsAdapter { place ->
-        viewModel.onPlaceSelected(place)
-        val placePosition = GeoPoint(
-            latitude = place.position.latitude,
-            longitude = place.position.longitude
-        )
-        viewModel.onExtendedPlaceInfoRequested(placePosition)
-
-        PlaceFragment().show(parentFragmentManager, "Place")
-    }
 
     protected fun retryGetPlacesRequest() {
         googleMap?.let { googleMap ->
@@ -182,18 +138,6 @@ open class SoramitsuMapFragment : Fragment(R.layout.sm_fragment_map_soramitsu) {
             }
         }
 
-        view.viewTreeObserver.addOnGlobalLayoutListener(keyboardListener)
-        placesWithSearchTextInputEditText.setOnEditorActionListener { v, actionId, _ ->
-            if (actionId == EditorInfo.IME_ACTION_SEARCH) {
-                inputMethodService?.hideSoftInputFromWindow(v.windowToken, 0)
-
-                val searchText = placesWithSearchTextInputEditText.text?.toString().orEmpty()
-                viewModel.requestParams = viewModel.requestParams.copy(query = searchText)
-            }
-
-            true
-        }
-
         zoomOutButton.setOnClickListener {
             googleMap?.let { googleMap ->
                 googleMap.animateCamera(
@@ -232,7 +176,6 @@ open class SoramitsuMapFragment : Fragment(R.layout.sm_fragment_map_soramitsu) {
     override fun onDestroyView() {
         super.onDestroyView()
         soramitsuMapView.onDestroy()
-        view?.viewTreeObserver?.removeOnGlobalLayoutListener(keyboardListener)
     }
 
     private fun onMapReady(map: GoogleMap?) {
@@ -280,9 +223,8 @@ open class SoramitsuMapFragment : Fragment(R.layout.sm_fragment_map_soramitsu) {
                 zoomButtonsPanel.visibility = buttonsVisibility
                 findMeButton.visibility = buttonsVisibility
                 showFiltersButton.visibility = buttonsVisibility
-                searchPanelBottomSheet.visibility = buttonsVisibility
+                searchPanelFakeBottomSheet.visibility = buttonsVisibility
 
-                inputMethodService?.hideSoftInputFromWindow(placesWithSearchTextInputEditText.windowToken, 0)
                 highlightSelectedPlace()
             })
 
@@ -312,11 +254,13 @@ open class SoramitsuMapFragment : Fragment(R.layout.sm_fragment_map_soramitsu) {
 
                     true
                 }
-
-                placesAdapter.update(viewState.places)
             })
 
             viewModel.mapParams = getMapParams(googleMap)
+
+            viewModel.searchQuery.observe(viewLifecycleOwner, Observer { query ->
+                searchOnFragmentInputEditText.setText(query)
+            })
         }
     }
 
@@ -439,62 +383,24 @@ open class SoramitsuMapFragment : Fragment(R.layout.sm_fragment_map_soramitsu) {
     }
 
     private fun initSearchPanel() {
-        placesRecyclerView.adapter = placesAdapter
-        placesRecyclerView.layoutManager = LinearLayoutManager(context)
-
-        searchPanelBottomSheetBehavior = BottomSheetBehavior.from(searchPanelBottomSheet)
-        searchPanelBottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
-        searchPanelBottomSheetBehavior.isHideable = false
-        searchPanelBottomSheetBehavior.isFitToContents = false
-        searchPanelBottomSheetBehavior.halfExpandedRatio = 0.0001f
-        searchPanelBottomSheetBehavior.onStateChanged { newState ->
-            if (newState == BottomSheetBehavior.STATE_HALF_EXPANDED) {
-                searchPanelBottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
-            }
-
-            if (searchPanelBottomSheetBehavior.state == BottomSheetBehavior.STATE_COLLAPSED) {
-                inputMethodService?.hideSoftInputFromWindow(placesWithSearchTextInputEditText.windowToken, 0)
-                placesWithSearchTextInputEditText.clearFocus()
-            }
+        // show fullscreen search fragment when user try to enter search query
+        searchOnFragmentInputEditText.setOnClickListener {
+            SearchBottomSheetFragment().show(parentFragmentManager, "SearchBottomSheetFragment")
         }
 
-        ViewCompat.setOnApplyWindowInsetsListener(searchPanelBottomSheet) { _, insets ->
-            val statusBarHeight = insets.systemWindowInsetTop
-            searchPanelBottomSheetBehavior.expandedOffset = (statusBarHeight * 1.15f).toInt()
-
-            insets.consumeSystemWindowInsets()
+        // clear edit text button click handler
+        placesWithSearchTextInputLayout.setEndIconOnClickListener { v ->
+            searchOnFragmentInputEditText.text = null
+            viewModel.requestParams = viewModel.requestParams.copy(query = "")
         }
 
-        placesWithSearchTextInputEditText.setOnEditorActionListener { v, actionId, _ ->
-            if (actionId == EditorInfo.IME_ACTION_SEARCH) {
-                inputMethodService?.hideSoftInputFromWindow(v.windowToken, 0)
-
-                val searchText = placesWithSearchTextInputEditText.text?.toString().orEmpty()
-                viewModel.requestParams = viewModel.requestParams.copy(query = searchText)
+        searchOnFragmentInputEditText.setOnTouchListener { v, event ->
+            if (event?.action == MotionEvent.ACTION_DOWN) {
+                v.performClick()
             }
 
             true
         }
-
-        placesWithSearchTextInputLayout.setEndIconOnClickListener { v ->
-            placesWithSearchTextInputEditText.text = null
-            inputMethodService?.hideSoftInputFromWindow(v.windowToken, 0)
-            viewModel.requestParams = viewModel.requestParams.copy(query = "")
-        }
-    }
-
-    /**
-     * Just a syntax sugar to hide onSlide method from bottom sheet state change callbacks
-     */
-    private fun <T : View> BottomSheetBehavior<T>.onStateChanged(stateChangeHandler: (Int) -> Unit) {
-        this.addBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback() {
-            override fun onSlide(bottomSheet: View, slideOffset: Float) {
-            }
-
-            override fun onStateChanged(bottomSheet: View, newState: Int) {
-                stateChangeHandler.invoke(newState)
-            }
-        })
     }
 
     data class MarkerTagData(
