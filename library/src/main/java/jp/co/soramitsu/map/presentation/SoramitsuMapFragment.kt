@@ -164,7 +164,6 @@ open class SoramitsuMapFragment : Fragment(R.layout.sm_fragment_map_soramitsu) {
         super.onPause()
         soramitsuMapView.onPause()
 
-        inputMethodService?.hideSoftInputFromWindow(view?.windowToken, 0)
         handler.removeCallbacksAndMessages(null)
     }
 
@@ -216,6 +215,8 @@ open class SoramitsuMapFragment : Fragment(R.layout.sm_fragment_map_soramitsu) {
                     )
                 }
                 onMapScrollStopCallback?.let { handler.postDelayed(it, 500) }
+
+                activity?.onUserInteraction()
             }
 
             viewModel.placeSelected().observe(viewLifecycleOwner, Observer { selectedPlace ->
@@ -226,6 +227,8 @@ open class SoramitsuMapFragment : Fragment(R.layout.sm_fragment_map_soramitsu) {
                 searchPanelFakeBottomSheet.visibility = buttonsVisibility
 
                 highlightSelectedPlace()
+
+                activity?.onUserInteraction()
             })
 
             viewModel.viewState().observe(viewLifecycleOwner, Observer { viewState ->
@@ -351,6 +354,8 @@ open class SoramitsuMapFragment : Fragment(R.layout.sm_fragment_map_soramitsu) {
     }
 
     private fun onFindMeButtonClicked(googleMap: GoogleMap) {
+        activity?.onUserInteraction()
+
         // check permission and request when not granted. When permissions will
         // be granted, this method will be called again
         val fineLocationPermissionGranted = ActivityCompat.checkSelfPermission(
@@ -385,17 +390,23 @@ open class SoramitsuMapFragment : Fragment(R.layout.sm_fragment_map_soramitsu) {
     private fun initSearchPanel() {
         // show fullscreen search fragment when user try to enter search query
         searchOnFragmentInputEditText.setOnClickListener {
+            activity?.onUserInteraction()
+
             SearchBottomSheetFragment().show(parentFragmentManager, "SearchBottomSheetFragment")
         }
 
         // clear edit text button click handler
         placesWithSearchTextInputLayout.setEndIconOnClickListener { v ->
+            activity?.onUserInteraction()
+
             searchOnFragmentInputEditText.text = null
             viewModel.requestParams = viewModel.requestParams.copy(query = "")
         }
 
         searchOnFragmentInputEditText.setOnTouchListener { v, event ->
             if (event?.action == MotionEvent.ACTION_DOWN) {
+                activity?.onUserInteraction()
+
                 v.performClick()
             }
 
