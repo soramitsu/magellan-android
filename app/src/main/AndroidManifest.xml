@@ -11,6 +11,7 @@
         android:theme="@style/AppTheme">
         <activity
             android:name=".MainActivity"
+            android:windowSoftInputMode="adjustResize"
             android:theme="@style/MainMenuActivityStyle">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

@@ -1,19 +1,18 @@
 package jp.co.soramitsu.map.presentation.search
 
 import android.app.Dialog
-import android.content.DialogInterface
 import android.graphics.Color
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
-import android.view.inputmethod.InputMethodManager
-import androidx.core.content.ContextCompat
 import androidx.core.view.doOnLayout
+import androidx.core.widget.doOnTextChanged
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
@@ -32,11 +31,6 @@ import kotlinx.android.synthetic.main.sm_search_panel.*
 class SearchBottomSheetFragment : BottomSheetDialogFragment() {
 
     private lateinit var viewModel: SoramitsuMapViewModel
-
-    private val inputMethodService: InputMethodManager?
-        get() = context?.let { context ->
-            ContextCompat.getSystemService(context, InputMethodManager::class.java)
-        }
 
     private val placesAdapter = PlacesSearchResultsAdapter { place ->
         viewModel.onPlaceSelected(place)
@@ -75,12 +69,19 @@ class SearchBottomSheetFragment : BottomSheetDialogFragment() {
         // configure list of places
         placesRecyclerView.adapter = placesAdapter
         placesRecyclerView.layoutManager = LinearLayoutManager(context)
+        placesRecyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                super.onScrolled(recyclerView, dx, dy)
+
+                activity?.onUserInteraction()
+            }
+        })
 
         // search button click handler
         placesWithSearchTextInputEditText.setOnEditorActionListener { v, actionId, _ ->
-            if (actionId == EditorInfo.IME_ACTION_SEARCH) {
-                inputMethodService?.hideSoftInputFromWindow(v.windowToken, 0)
+            activity?.onUserInteraction()
 
+            if (actionId == EditorInfo.IME_ACTION_SEARCH) {
                 val searchText = placesWithSearchTextInputEditText.text?.toString().orEmpty()
                 viewModel.requestParams = viewModel.requestParams.copy(query = searchText)
             }
@@ -90,6 +91,8 @@ class SearchBottomSheetFragment : BottomSheetDialogFragment() {
 
         // clear edit text button click handler
         placesWithSearchTextInputLayout.setEndIconOnClickListener { v ->
+            activity?.onUserInteraction()
+
             placesWithSearchTextInputEditText.text = null
             viewModel.requestParams = viewModel.requestParams.copy(query = "")
         }
@@ -100,11 +103,15 @@ class SearchBottomSheetFragment : BottomSheetDialogFragment() {
         })
 
         placesWithSearchTextInputEditText.setText(viewModel.requestParams.query)
+        placesWithSearchTextInputEditText.doOnTextChanged { _, _, _, _ ->
+            activity?.onUserInteraction()
+        }
     }
 
-    override fun onDismiss(dialog: DialogInterface) {
-        inputMethodService?.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0)
-        super.onDismiss(dialog)
+    override fun onDestroyView() {
+        super.onDestroyView()
+
+        placesRecyclerView.clearOnScrollListeners()
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
@@ -116,10 +123,25 @@ class SearchBottomSheetFragment : BottomSheetDialogFragment() {
             bottomSheetDialog.behavior.skipCollapsed = true
             bottomSheetDialog.behavior.isFitToContents = false
             bottomSheetDialog.behavior.state = BottomSheetBehavior.STATE_EXPANDED
+            bottomSheetDialog.behavior.addBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback() {
+                private var fromExpendedState = false
+
+                override fun onStateChanged(bottomSheet: View, newState: Int) {
+                    if (newState == BottomSheetBehavior.STATE_EXPANDED) {
+                        fromExpendedState = true
+                    }
+                }
+
+                override fun onSlide(bottomSheet: View, slideOffset: Float) {
+                    activity?.onUserInteraction()
+
+                    if (fromExpendedState && slideOffset < .5f) {
+                        dismiss()
+                    }
+                }
+            })
 
             // request focus on search edit text
-            placesWithSearchTextInputEditText.requestFocus()
-            inputMethodService?.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0)
             placesWithSearchTextInputEditText.setSelection(placesWithSearchTextInputEditText.text?.length ?: 0)
         }
         return dialog
