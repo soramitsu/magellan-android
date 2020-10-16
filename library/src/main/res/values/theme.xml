@@ -48,7 +48,7 @@
         <item name="sm_checkIcon">@drawable/sm_ic_check_24dp</item>
 
         <item name="sm_placeBottomSheetBackground">@drawable/sm_rounded_background</item>
-        <item name="sm_placeBottomSheetPeekHeight">234dp</item>
+        <item name="sm_placeBottomSheetPeekHeight">336dp</item>
         <item name="sm_placeTitleTextColor">#000000</item>
 
         <item name="sm_iconColor">@color/sm_icon_color</item>

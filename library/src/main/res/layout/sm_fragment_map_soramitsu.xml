@@ -73,26 +73,15 @@
         android:id="@+id/searchPanelFakeBottomSheet"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
         android:background="?attr/sm_categoriesBottomSheetBackground"
-        android:elevation="12dp"
-        app:behavior_peekHeight="?attr/sm_categoriesBottomSheetPeekHeight"
-        app:layout_behavior="@string/bottom_sheet_behavior">
-
-        <View
-            android:layout_width="?attr/sm_categoriesBottomSheetTopperWidth"
-            android:layout_height="?attr/sm_categoriesBottomSheetTopperHeight"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginTop="8dp"
-            android:background="?attr/sm_categoriesBottomSheetTopperDrawable" />
+        android:elevation="12dp">
 
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/placesWithSearchTextInputLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="24dp"
-            android:layout_marginEnd="16dp"
-            android:layout_marginBottom="24dp"
+            android:layout_margin="16dp"
             android:gravity="center_vertical"
             app:boxBackgroundColor="#F5F5F5"
             app:boxBackgroundMode="filled"

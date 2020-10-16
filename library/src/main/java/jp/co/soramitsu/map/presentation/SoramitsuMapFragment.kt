@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.Canvas
+import android.location.Location
 import android.os.Bundle
 import android.os.Handler
 import android.view.MotionEvent
@@ -17,12 +18,10 @@ import androidx.core.content.ContextCompat.getSystemService
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
-import com.google.android.gms.maps.model.BitmapDescriptor
-import com.google.android.gms.maps.model.BitmapDescriptorFactory
-import com.google.android.gms.maps.model.Marker
-import com.google.android.gms.maps.model.MarkerOptions
+import com.google.android.gms.maps.model.*
 import jp.co.soramitsu.map.R
 import jp.co.soramitsu.map.SoramitsuMapLibraryConfig
 import jp.co.soramitsu.map.data.MapParams
@@ -384,7 +383,17 @@ open class SoramitsuMapFragment : Fragment(R.layout.sm_fragment_map_soramitsu) {
         val defaultFindMeButtonResId = 2
         val defaultLocationButton = soramitsuMapView.findViewById<View>(defaultFindMeButtonResId)
         defaultLocationButton.visibility = View.GONE
-        defaultLocationButton?.callOnClick()
+
+        // get last location from google services
+        LocationServices.getFusedLocationProviderClient(requireContext())
+            .lastLocation
+            .addOnSuccessListener { locationOrNull: Location? ->
+                locationOrNull?.let { location ->
+                    val currentDevicePosition = LatLng(location.latitude, location.longitude)
+                    val cameraUpdate = CameraUpdateFactory.newLatLng(currentDevicePosition)
+                    googleMap.moveCamera(cameraUpdate)
+                }
+            }
     }
 
     private fun initSearchPanel() {
