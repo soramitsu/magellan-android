@@ -48,9 +48,6 @@
     <attr name="sm_placeBottomSheetPeekHeight" format="dimension|reference" />
     <attr name="sm_placeTitleTextColor" format="color|reference" />
 
-    <attr name="sm_placeInfoTitleTextAppearance" format="reference" />
-
-    <attr name="sm_placeViewTitleTextAppearance" format="reference" />
     <attr name="sm_placeViewAddressTextAppearance" format="reference" />
 
     <attr name="sm_closeNowTextAppearance" format="reference" />
@@ -62,4 +59,9 @@
 
     <attr name="sm_categorySelectedItemBackground" format="reference" />
     <attr name="sm_categoriesListHeight" format="dimension|reference" />
+
+    <attr name="sm_textViewStyleBold20" format="reference" />
+    <attr name="sm_textViewStyleSemiBold15" format="reference" />
+    <attr name="sm_textViewStyleRegular15" format="reference" />
+    <attr name="sm_textViewStyleRegular14" format="reference" />
 </resources>
