@@ -48,19 +48,12 @@
         <item name="sm_checkIcon">@drawable/sm_ic_check_24dp</item>
 
         <item name="sm_placeBottomSheetBackground">@drawable/sm_rounded_background</item>
-        <item name="sm_placeBottomSheetPeekHeight">336dp</item>
+        <item name="sm_placeBottomSheetPeekHeight">352dp</item>
         <item name="sm_placeTitleTextColor">#000000</item>
 
         <item name="sm_iconColor">@color/sm_icon_color</item>
         <item name="sm_iconBackgroundColor">@color/sm_icon_background_color</item>
 
-        <item name="sm_placeInfoTitleTextAppearance">
-            @style/SM.TextAppearance.Soramitsu.MaterialComponents.Subtitle2
-        </item>
-
-        <item name="sm_placeViewTitleTextAppearance">
-            @style/SM.TextAppearance.Soramitsu.MaterialComponents.Headline6
-        </item>
         <item name="sm_placeViewAddressTextAppearance">
             @style/SM.TextAppearance.Soramitsu.MaterialComponents.Caption
         </item>
@@ -79,5 +72,10 @@
         <item name="sm_categorySelectedItemBackground">@drawable/sm_selected_item_background</item>
 
         <item name="sm_categoriesListHeight">400dp</item>
+
+        <item name="sm_textViewStyleBold20">@style/SM.Widget.Soramitsu.TextView.Bold20</item>
+        <item name="sm_textViewStyleSemiBold15">@style/SM.Widget.Soramitsu.TextView.SemiBold15</item>
+        <item name="sm_textViewStyleRegular15">@style/SM.Widget.Soramitsu.TextView.Regular15</item>
+        <item name="sm_textViewStyleRegular14">@style/SM.Widget.Soramitsu.TextView.Regular14</item>
     </style>
 </resources>
