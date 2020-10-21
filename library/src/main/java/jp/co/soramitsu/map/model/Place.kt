@@ -1,7 +1,10 @@
 package jp.co.soramitsu.map.model
 
+import java.util.*
+
 data class Place(
     val name: String,
+    val khmerName: String = "",
     val category: Category,
     val position: Position,
     val schedule: Schedule = Schedule(),
@@ -12,4 +15,10 @@ data class Place(
     val address: String = "",
     val reviews: List<Review> = emptyList(),
     val id: String = ""
-)
+) {
+
+    fun localisedName(): String {
+        val useKhmerName = Locale.getDefault().language == "km" && khmerName.isNotBlank()
+        return if (useKhmerName) khmerName else name
+    }
+}

@@ -86,7 +86,7 @@ internal class PlaceFragment : BottomSheetDialogFragment() {
 
     private fun bindBottomSheetWithPlace(place: Place) {
         // header info
-        placeNameTextView.text = place.name
+        placeNameTextView.text = place.localisedName()
 
         val placeAddress = if (place.address.isNotBlank()) {
             resources.getString(R.string.sm_category_address, place.category.name, place.address)
