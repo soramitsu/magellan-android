@@ -30,9 +30,7 @@
 
     <style name="SM.TextAppearance.Soramitsu.MaterialComponents.Body2" parent="TextAppearance.MaterialComponents.Body2" />
 
-    <style name="SM.TextAppearance.Soramitsu.MaterialComponents.Caption" parent="TextAppearance.MaterialComponents.Caption">
-        <item name="android:textSize">13sp</item>
-    </style>
+    <style name="SM.TextAppearance.Soramitsu.MaterialComponents.Caption" parent="TextAppearance.MaterialComponents.Caption" />
 
     <style name="SM.TextAppearance.Soramitsu.MaterialComponents.Subtitle1" parent="TextAppearance.MaterialComponents.Subtitle1" />
 
@@ -45,5 +43,36 @@
     <style name="SM.TextAppearance.Soramitsu.MaterialComponents.Caption.White">
         <item name="android:textColor">@android:color/white</item>
         <item name="android:gravity">center</item>
+    </style>
+
+    <style name="SM.Widget.Soramitsu.TextView.Bold20" parent="Widget.MaterialComponents.TextView">
+        <item name="android:textAppearance">
+            @style/SM.TextAppearance.Soramitsu.MaterialComponents.Headline6
+        </item>
+        <item name="android:textSize">20sp</item>
+        <item name="android:textColor">#2D2926</item>
+    </style>
+
+    <style name="SM.Widget.Soramitsu.TextView.SemiBold15" parent="Widget.MaterialComponents.TextView">
+        <item name="android:textAppearance">
+            @style/SM.TextAppearance.Soramitsu.MaterialComponents.Subtitle2
+        </item>
+        <item name="android:textSize">15sp</item>
+        <item name="android:textColor">#000000</item>
+    </style>
+
+    <style name="SM.Widget.Soramitsu.TextView.Regular15" parent="Widget.MaterialComponents.TextView">
+        <item name="android:textAppearance">
+            @style/SM.TextAppearance.Soramitsu.MaterialComponents.Body1
+        </item>
+        <item name="android:textSize">15sp</item>
+        <item name="android:textColor">#000000</item>
+    </style>
+    <style name="SM.Widget.Soramitsu.TextView.Regular14" parent="Widget.MaterialComponents.TextView">
+        <item name="android:textAppearance">
+            @style/SM.TextAppearance.Soramitsu.MaterialComponents.Caption
+        </item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:textColor">#A1A1A0</item>
     </style>
 </resources>
