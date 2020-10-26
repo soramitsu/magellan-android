@@ -89,9 +89,9 @@ internal class PlaceFragment : BottomSheetDialogFragment() {
         placeNameTextView.text = place.localisedName()
 
         val placeAddress = if (place.address.isNotBlank()) {
-            resources.getString(R.string.sm_category_address, place.category.name, place.address)
+            resources.getString(R.string.sm_category_address, place.category.localisedName(), place.address)
         } else {
-            place.category.name
+            place.category.localisedName()
         }
         placeAddressTextView.text = placeAddress
 
