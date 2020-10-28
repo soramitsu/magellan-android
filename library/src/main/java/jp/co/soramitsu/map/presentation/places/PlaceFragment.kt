@@ -74,6 +74,14 @@ internal class PlaceFragment : BottomSheetDialogFragment() {
             val bottomSheetDialog = dialog as BottomSheetDialog
             val peekHeight = dialog.context.dimenFromTheme(R.attr.sm_placeBottomSheetPeekHeight)
             bottomSheetDialog.behavior.peekHeight = peekHeight
+
+            val touchOutside = dialog.window?.decorView?.findViewById<View>(R.id.touch_outside)
+            touchOutside?.setOnTouchListener { v, event ->
+                activity?.dispatchTouchEvent(event)
+                false
+            }
+
+            dialog.setCanceledOnTouchOutside(false)
         }
         return dialog
     }
