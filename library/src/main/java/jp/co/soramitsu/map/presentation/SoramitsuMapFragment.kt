@@ -251,6 +251,8 @@ open class SoramitsuMapFragment : Fragment(R.layout.sm_fragment_map_soramitsu) {
                             longitude = marker.position.longitude
                         )
                         viewModel.onExtendedPlaceInfoRequested(placePoint)
+
+                        (parentFragmentManager.findFragmentByTag("Place") as? PlaceFragment)?.dismiss()
                         PlaceFragment().show(parentFragmentManager, "Place")
                     }
 
