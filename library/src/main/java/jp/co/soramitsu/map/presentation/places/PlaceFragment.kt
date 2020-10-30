@@ -74,6 +74,14 @@ internal class PlaceFragment : BottomSheetDialogFragment() {
             val bottomSheetDialog = dialog as BottomSheetDialog
             val peekHeight = dialog.context.dimenFromTheme(R.attr.sm_placeBottomSheetPeekHeight)
             bottomSheetDialog.behavior.peekHeight = peekHeight
+
+            val touchOutside = dialog.window?.decorView?.findViewById<View>(R.id.touch_outside)
+            touchOutside?.setOnTouchListener { v, event ->
+                activity?.dispatchTouchEvent(event)
+                false
+            }
+
+            dialog.setCanceledOnTouchOutside(false)
         }
         return dialog
     }
@@ -86,12 +94,12 @@ internal class PlaceFragment : BottomSheetDialogFragment() {
 
     private fun bindBottomSheetWithPlace(place: Place) {
         // header info
-        placeNameTextView.text = place.name
+        placeNameTextView.text = place.localisedName()
 
         val placeAddress = if (place.address.isNotBlank()) {
-            resources.getString(R.string.sm_category_address, place.category.name, place.address)
+            resources.getString(R.string.sm_category_address, place.category.localisedName(), place.address)
         } else {
-            place.category.name
+            place.category.localisedName()
         }
         placeAddressTextView.text = placeAddress
 

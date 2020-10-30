@@ -12,6 +12,27 @@
         <item name="android:windowDrawsSystemBarBackgrounds">true</item>
         <item name="android:statusBarColor">@android:color/transparent</item>
         <item name="android:windowLightStatusBar" tools:targetApi="m">true</item>
+
+        <item name="sm_textViewStyleBold20">@style/SM.Widget.Soramitsu.TextView.Bold20</item>
+        <item name="sm_textViewStyleSemiBold15">@style/SM.Widget.Soramitsu.TextView.SemiBold15</item>
+        <item name="sm_textViewStyleRegular15">@style/SM.Widget.Soramitsu.TextView.Regular15</item>
+        <item name="sm_textViewStyleRegular14">@style/SM.Widget.Soramitsu.TextView.Regular14</item>
+    </style>
+
+    <style name="SM.Widget.Bakong.TextView.Bold20" parent="SM.Widget.Soramitsu.TextView.Bold20">
+        <item name="android:fontFamily">@font/sora_bold</item>
+    </style>
+
+    <style name="SM.Widget.Bakong.TextView.SemiBold15" parent="SM.Widget.Soramitsu.TextView.SemiBold15">
+        <item name="android:fontFamily">@font/sora_semi_bold</item>
+    </style>
+
+    <style name="SM.Widget.Bakong.TextView.Regular15" parent="SM.Widget.Soramitsu.TextView.Regular15">
+        <item name="android:fontFamily">@font/sora_regular</item>
+    </style>
+
+    <style name="SM.Widget.Bakong.TextView.Regular14" parent="SM.Widget.Soramitsu.TextView.Regular14">
+        <item name="android:fontFamily">@font/sora_regular</item>
     </style>
 
     <style name="SM.TextAppearance.Bakong.Headline6" parent="SM.TextAppearance.Soramitsu.MaterialComponents.Headline6">

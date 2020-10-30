@@ -9,18 +9,17 @@
 
     <TextView
         android:id="@+id/searchResultTitle"
+        style="?sm_textViewStyleSemiBold15"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textAppearance="@style/SM.TextAppearance.Soramitsu.MaterialComponents.Subtitle2"
-        android:textSize="15sp"
         app:layout_constraintTop_toTopOf="parent"
         tools:text="First Commercial Bank" />
 
     <TextView
         android:id="@+id/searchResultSubtitle"
+        style="?sm_textViewStyleRegular14"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textAppearance="@style/SM.TextAppearance.Soramitsu.MaterialComponents.Caption"
         app:layout_constraintTop_toBottomOf="@id/searchResultTitle"
         tools:text="Bank · Ulitsa Savushkina, 127а" />
 

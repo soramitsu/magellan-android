@@ -65,7 +65,7 @@ internal class CategoryViewHolder(itemView: View) : RecyclerView.ViewHolder(item
     private val categoryIcon = itemView.findViewById<ImageView>(R.id.categoryIcon)
 
     fun bind(categoryListItem: CategoryListItem) {
-        categoryTextView.text = categoryListItem.category.name
+        categoryTextView.text = categoryListItem.category.localisedName()
         categoryTextView.isSelected = categoryListItem.selected
         val checkIconId = if (categoryListItem.selected) R.drawable.sm_ic_check_24dp else 0
         categoryIcon.setImageResource(iconForCategory(categoryTextView.context, categoryListItem.category))

@@ -1,9 +1,18 @@
 package jp.co.soramitsu.map.model
 
+import java.util.*
+
 data class Category(
     val id: Long,
-    val name: String
+    val name: String,
+    val khmerName: String = ""
 ) {
+
+    fun localisedName(): String {
+        val useKhmerName = Locale.getDefault().language == "km" && khmerName.isNotBlank()
+        return if (useKhmerName) khmerName else name
+    }
+
     companion object {
         val BANK = Category(-1, "Bank")
         val FOOD = Category(-2, "Food")

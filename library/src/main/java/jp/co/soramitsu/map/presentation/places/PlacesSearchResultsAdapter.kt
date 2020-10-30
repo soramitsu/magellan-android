@@ -47,8 +47,8 @@ internal class PlaceViewHolder(placeView: View) : RecyclerView.ViewHolder(placeV
     private val subtite: TextView = placeView.findViewById(R.id.searchResultSubtitle)
 
     fun bind(place: Place) {
-        title.text = place.name
-        subtite.text = "${place.category.name} ${place.address}"
+        title.text = place.localisedName()
+        subtite.text = "${place.category.localisedName()} ${place.address}"
     }
 }
 
