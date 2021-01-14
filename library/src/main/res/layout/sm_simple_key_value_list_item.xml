@@ -13,6 +13,7 @@
 
     <TextView
         android:id="@+id/keyTextView"
+        style="@style/SM.Widget.Soramitsu.TextView.Regular15"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintTop_toTopOf="parent"
@@ -22,6 +23,7 @@
 
     <TextView
         android:id="@+id/valueTextView"
+        style="@style/SM.Widget.Soramitsu.TextView.Regular14"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:gravity="end"
