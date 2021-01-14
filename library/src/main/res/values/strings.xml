@@ -17,7 +17,7 @@
     </plurals>
 
     <string name="sm_open">Open</string>
-    <string name="sm_launch_time">Launch time</string>
+    <string name="sm_lunch_time">Lunch time</string>
     <string name="sm_closed">Closed</string>
     <string name="sm_till">till %1$s</string>
     <string name="sm_24_hours">24 hours</string>
@@ -37,6 +37,11 @@
     <string name="sm_address">Address</string>
     <string name="sm_open_hours">Open hours</string>
     <string name="sm_daily_interval">Daily %1$s – %2$s</string>
+    <string name="sm_working_days_interval">%1$s—%2$s</string>
+    <string name="sm_working_time_interval">%1$s—%2$s</string>
+    <string name="sm_lunch_days_interval">Lunch time (%1$s—%2$s)</string>
+    <string name="sm_lunch_time_single_day">Lunch time (%1$s)</string>
+    <string name="sm_lunch_time_interval">%1$s—%2$s</string>
     <string name="sm_category">Category</string>
     <string name="sm_list_of_places">List of places</string>
     <string name="sm_search_by_name">Search by name</string>
@@ -56,4 +61,6 @@
     <string name="sm_filters">Filters</string>
     <string name="sm_zoom_out">Zoom out</string>
     <string name="sm_zoom_in">Zoom in</string>
+
+    <string name="sm_tech_string_rotation_group_name" translatable="false">rotationGroup</string>
 </resources>

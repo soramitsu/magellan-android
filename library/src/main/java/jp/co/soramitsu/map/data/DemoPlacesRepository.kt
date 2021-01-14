@@ -35,29 +35,29 @@ internal class DemoPlacesRepository : PlacesRepository {
                             weekDay = Calendar.MONDAY,
                             from = Time(5, 0),
                             to = Time(20, 0),
-                            launchTimeFrom = Time(7, 0),
-                            launchTimeTo = Time(17, 0)
+                            lunchTimeFrom = Time(7, 0),
+                            lunchTimeTo = Time(17, 0)
                         ),
                         WorkDay(
                             weekDay = Calendar.TUESDAY,
                             from = Time(5, 0),
                             to = Time(20, 0),
-                            launchTimeFrom = Time(7, 0),
-                            launchTimeTo = Time(17, 0)
+                            lunchTimeFrom = Time(7, 0),
+                            lunchTimeTo = Time(17, 0)
                         ),
                         WorkDay(
                             weekDay = Calendar.WEDNESDAY,
                             from = Time(5, 0),
                             to = Time(20, 0),
-                            launchTimeFrom = Time(7, 0),
-                            launchTimeTo = Time(17, 0)
+                            lunchTimeFrom = Time(7, 0),
+                            lunchTimeTo = Time(17, 0)
                         ),
                         WorkDay(
                             weekDay = Calendar.THURSDAY,
                             from = Time(5, 0),
                             to = Time(20, 0),
-                            launchTimeFrom = Time(7, 0),
-                            launchTimeTo = Time(17, 0)
+                            lunchTimeFrom = Time(7, 0),
+                            lunchTimeTo = Time(17, 0)
                         ),
                         WorkDay(
                             weekDay = Calendar.FRIDAY,
@@ -71,13 +71,13 @@ internal class DemoPlacesRepository : PlacesRepository {
                 id = index.toString(),
                 schedule = schedule
             )
-        }.subList(5, 30)
+        }.subList(5, 9)
         val clusters = listOf(
             Cluster(GeoPoint(places[0].position.latitude, places[0].position.longitude), 3),
             Cluster(GeoPoint(places[1].position.latitude, places[1].position.longitude), 30),
             Cluster(GeoPoint(places[2].position.latitude, places[2].position.longitude), 99)
         )
-        return Pair(places, clusters)
+        return Pair(places, emptyList())
     }
 }
 

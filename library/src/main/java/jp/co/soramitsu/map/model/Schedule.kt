@@ -10,6 +10,6 @@ data class WorkDay(
     val from: Time,
     val to: Time,
 
-    val launchTimeFrom: Time? = null,
-    val launchTimeTo: Time? = null
+    val lunchTimeFrom: Time? = null,
+    val lunchTimeTo: Time? = null
 )

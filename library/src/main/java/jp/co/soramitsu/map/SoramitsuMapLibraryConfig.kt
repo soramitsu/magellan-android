@@ -8,4 +8,6 @@ object SoramitsuMapLibraryConfig {
     var defaultZoom = 10f
     var defaultPosition: Position = Position(11.541789, 104.913587)
     var repository: PlacesRepository = DemoPlacesRepository()
+
+    var enableDetailedSchedule: Boolean = BuildConfig.DEBUG
 }
