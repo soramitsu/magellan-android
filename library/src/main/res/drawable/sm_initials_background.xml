@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="oval">
+
+    <size
+        android:width="@dimen/sm_icon_size"
+        android:height="@dimen/sm_icon_size" />
+
+    <solid android:color="#ECEFF0" />
+
+    <corners android:radius="24dp" />
+
+</shape>

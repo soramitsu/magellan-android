@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/commentViewRoot"
+    android:padding="@dimen/sm_margin_padding_size_medium"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <ImageView
+        android:id="@+id/commentViewAvatar"
+        android:layout_width="@dimen/sm_icon_size"
+        android:layout_height="@dimen/sm_icon_size"
+        android:importantForAccessibility="no"
+        android:visibility="gone"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:src="@tools:sample/avatars"
+        />
+
+    <TextView
+        android:id="@+id/commentViewInitialsTextView"
+        style="@style/SM.Widget.Soramitsu.TextView.SemiBold15"
+        android:layout_width="@dimen/sm_icon_size"
+        android:layout_height="@dimen/sm_icon_size"
+        android:gravity="center"
+        android:textColor="#75787B"
+        android:background="@drawable/sm_initials_background"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="DS"
+        />
+
+    <androidx.constraintlayout.widget.Barrier
+        android:id="@+id/commentViewAvatarRightBorder"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:constraint_referenced_ids="commentViewAvatar, commentViewInitialsTextView"
+        app:barrierDirection="end"
+        />
+
+    <TextView
+        android:id="@+id/commentViewAuthorName"
+        style="@style/SM.Widget.Soramitsu.TextView.Regular15"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/sm_margin_padding_size_medium"
+        app:layout_constraintStart_toEndOf="@id/commentViewAvatarRightBorder"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        tools:text="@tools:sample/full_names"
+        />
+
+    <RatingBar
+        android:id="@+id/commentViewRating"
+        style="@style/Widget.AppCompat.RatingBar.Small"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/sm_margin_padding_size_xsmall"
+        android:isIndicator="true"
+        android:numStars="5"
+        android:progressTint="?sm_ratingBarColor"
+        app:layout_constraintStart_toStartOf="@id/commentViewAuthorName"
+        app:layout_constraintTop_toBottomOf="@id/commentViewAuthorName"
+        tools:rating="3" />
+
+    <TextView
+        android:id="@+id/commentViewCommentDate"
+        style="@style/SM.Widget.Soramitsu.TextView.Regular14"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/sm_margin_padding_size_small"
+        app:layout_constraintStart_toEndOf="@id/commentViewRating"
+        app:layout_constraintBottom_toBottomOf="@id/commentViewRating"
+        tools:text="18 Jan 2021"
+        />
+
+    <androidx.constraintlayout.widget.Barrier
+        android:id="@+id/commentViewBottomBarrier"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:constraint_referenced_ids="commentViewAvatar,commentViewRating,commentViewCommentDate"
+        app:barrierDirection="bottom"
+        />
+
+    <TextView
+        android:id="@+id/commentViewCommentTextView"
+        style="@style/SM.Widget.Soramitsu.TextView.Regular15"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/sm_margin_padding_size_small"
+        android:layout_marginBottom="@dimen/sm_margin_padding_size_small"
+        app:layout_constraintTop_toBottomOf="@id/commentViewBottomBarrier"
+        tools:maxLines="6"
+        tools:text="@tools:sample/lorem/random"
+        />
+</androidx.constraintlayout.widget.ConstraintLayout>

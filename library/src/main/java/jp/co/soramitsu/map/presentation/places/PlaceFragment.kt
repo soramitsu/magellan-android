@@ -8,6 +8,7 @@ import android.graphics.drawable.AnimatedVectorDrawable
 import android.net.Uri
 import android.os.Bundle
 import android.text.SpannableStringBuilder
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -140,6 +141,7 @@ internal class PlaceFragment : BottomSheetDialogFragment() {
 
         bindIsOpenNowField(place.schedule)
         bindFullScheduleField(place.schedule)
+        bindRating(place)
 
         additionalInfoMobilePhone.text = place.phone
         additionalInfoWebsite.text = place.website
@@ -180,6 +182,23 @@ internal class PlaceFragment : BottomSheetDialogFragment() {
 
         closePlaceInfoButton.setOnClickListener {
             dismiss()
+        }
+    }
+
+    private fun bindRating(place: Place) {
+        placeRatingBar.rating = place.rating
+        placeRatingTextView.text = "%.1f".format(place.rating)
+        placeReviewsTextView.text = resources.getQuantityString(
+            R.plurals.sm_reviews_format, place.reviews.size, place.reviews.size
+        )
+
+        reviewView.bind(place.rating, place.reviews)
+        reviewView.setOnShowAllReviewsButtonClickListener {
+            Log.d("Review", "Show all button clicked")
+        }
+
+        reviewView.setOnUserChangeRatingListener { newRating ->
+            Log.d("Review", "User changed rating: $newRating")
         }
     }
 

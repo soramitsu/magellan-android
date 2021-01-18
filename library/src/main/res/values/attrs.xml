@@ -54,7 +54,6 @@
 
     <attr name="sm_ratingBarColor" format="color|reference" />
     <attr name="sm_ratingTextAppearance" format="reference" />
-    <attr name="sm_reviewsTextAppearance" format="reference" />
     <attr name="sm_distanceTextAppearance" format="reference" />
 
     <attr name="sm_categorySelectedItemBackground" format="reference" />
