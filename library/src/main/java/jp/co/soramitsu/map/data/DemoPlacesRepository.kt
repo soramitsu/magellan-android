@@ -67,9 +67,51 @@ internal class DemoPlacesRepository : PlacesRepository {
                     )
                 )
             }
+            val names = listOf(
+                "Ivan Ivanov",
+                "Sergey Sergeev",
+                "Dmitry Dmitriev",
+                "Pert Pertov"
+            )
+            val texts = listOf(
+                "The best latte I’ve had in Phnom Penh, one of the best of any I’ve had elsewhere. Nice ambiance, good decor.",
+                "The best latte I’ve had in Phnom Penh",
+                "The best place",
+                "St. Christopher's Inn is in the best location in all of Berlin. You are within walking distance to the Spree Promenade, Museum Insel and, in the other direction you are within walking distance to the Berlin Hauptbahnhof..."
+            )
             place.copy(
                 id = index.toString(),
-                schedule = schedule
+                schedule = schedule,
+                rating = 3.5f,
+                reviews = listOf(
+                    Review(
+                        author = Author(
+                            name = names.random(),
+                            user = true
+                        ),
+                        rating = 2f,
+                        date = Date().time,
+                        text = texts.random()
+                    ),
+                    Review(
+                        author = Author(
+                            name = names.random(),
+                            user = false
+                        ),
+                        rating = 5f,
+                        date = Date().time,
+                        text = texts.random()
+                    ),
+                    Review(
+                        author = Author(
+                            name = names.random(),
+                            user = false
+                        ),
+                        rating = 4f,
+                        date = Date().time,
+                        text = texts.random()
+                    )
+                )
             )
         }.subList(5, 9)
         val clusters = listOf(

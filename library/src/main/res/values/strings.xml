@@ -63,4 +63,14 @@
     <string name="sm_zoom_in">Zoom in</string>
 
     <string name="sm_tech_string_rotation_group_name" translatable="false">rotationGroup</string>
+    <string name="sm_review_summary">Review summary</string>
+    <string name="sm_rate_this_place">Rate this place</string>
+    <string name="sm_reviews">Reviews</string>
+    <string name="sm_show_all_reviews">Show all reviews</string>
+    <string name="sm_edit_comment_button">Edit comment button</string>
+
+    <plurals name="sm_reviews_format">
+        <item quantity="one">(%1$d review)</item>
+        <item quantity="other">(%1$d reviews)</item>
+    </plurals>
 </resources>

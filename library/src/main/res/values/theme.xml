@@ -62,9 +62,6 @@
         <item name="sm_ratingTextAppearance">
             @style/SM.TextAppearance.Soramitsu.MaterialComponents.Body2
         </item>
-        <item name="sm_reviewsTextAppearance">
-            @style/SM.TextAppearance.Soramitsu.MaterialComponents.Caption
-        </item>
         <item name="sm_distanceTextAppearance">
             @style/SM.TextAppearance.Soramitsu.MaterialComponents.Caption
         </item>
