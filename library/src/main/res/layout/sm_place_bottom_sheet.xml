@@ -271,7 +271,7 @@
                 tools:visibility="visible"
                 />
 
-            <jp.co.soramitsu.map.presentation.places.ReviewView
+            <jp.co.soramitsu.map.presentation.review.ReviewView
                 android:id="@+id/reviewView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

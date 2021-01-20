@@ -32,6 +32,8 @@ import jp.co.soramitsu.map.model.Time
 import jp.co.soramitsu.map.model.WorkDay
 import jp.co.soramitsu.map.presentation.SoramitsuMapFragment
 import jp.co.soramitsu.map.presentation.SoramitsuMapViewModel
+import jp.co.soramitsu.map.presentation.review.EditReviewFragment
+import jp.co.soramitsu.map.presentation.review.ReviewFragment
 import kotlinx.android.synthetic.main.sm_place_bottom_sheet.*
 import java.text.SimpleDateFormat
 import java.util.*
@@ -74,6 +76,19 @@ internal class PlaceFragment : BottomSheetDialogFragment() {
             viewModel.placeSelected().value?.let { place -> bindBottomSheetWithPlace(place) }
             viewModel.placeSelected().observe(viewLifecycleOwner, Observer { place ->
                 place?.let { bindBottomSheetWithPlace(place) }
+            })
+            viewModel.uploadReviewInProgress().observe(viewLifecycleOwner, Observer { placeUpdateInProgress ->
+                reviewView.showUploadingReviewIndicator(placeUpdateInProgress)
+            })
+            viewModel.editPlaceReviewClicked().observe(viewLifecycleOwner, Observer { place ->
+                val userReview = place.reviews.find { review -> review.author.user }
+                val initialRating = userReview?.rating ?: place.rating
+                ReviewFragment().withArguments(
+                    placeId = place.id,
+                    placeName = place.name,
+                    comment = userReview?.text.orEmpty(),
+                    initialRating = initialRating.toInt()
+                ).show(parentFragmentManager, "AddPlaceReviewFragment")
             })
         }
     }
@@ -195,10 +210,23 @@ internal class PlaceFragment : BottomSheetDialogFragment() {
         reviewView.bind(place.rating, place.reviews)
         reviewView.setOnShowAllReviewsButtonClickListener {
             Log.d("Review", "Show all button clicked")
+            activity?.onUserInteraction()
+        }
+
+        reviewView.setOnEditUserCommentClickListener {
+            activity?.onUserInteraction()
+            EditReviewFragment().show(parentFragmentManager, "EditReviewMenu")
         }
 
         reviewView.setOnUserChangeRatingListener { newRating ->
-            Log.d("Review", "User changed rating: $newRating")
+            activity?.onUserInteraction()
+            viewModel.placeSelected().value?.let { place ->
+                ReviewFragment().withArguments(
+                    placeId = place.id,
+                    placeName = place.name,
+                    initialRating = newRating
+                ).show(parentFragmentManager, "AddPlaceReviewFragment")
+            }
         }
     }
 

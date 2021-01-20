@@ -25,11 +25,21 @@ internal class SoramitsuMapViewModel(
 
     private val viewState: MutableLiveData<SoramitsuMapViewState> = MutableLiveData()
     private val selectedPlaceSingleLiveEvent: MutableLiveData<Place?> = MutableLiveData()
+    private val uploadReviewInProgress: SingleLiveEvent<Boolean> = SingleLiveEvent()
+
+    private val editPlaceReview: SingleLiveEvent<Place> = SingleLiveEvent()
+    private val deletePlaceReview: SingleLiveEvent<Place> = SingleLiveEvent()
 
     private val currentState: SoramitsuMapViewState
         get() = viewState.value!!
 
     private var loadAllPlacesAndClustersJob: Job? = null
+
+    private var selectedPlace: Place? = null
+        set(value) {
+            field = value
+            selectedPlaceSingleLiveEvent.value = value
+        }
 
     var requestParams = RequestParams("", emptyList())
         set(value) {
@@ -53,6 +63,8 @@ internal class SoramitsuMapViewModel(
     private val _searchQuery = MutableLiveData<String>("")
     val searchQuery: LiveData<String> = _searchQuery
 
+    fun uploadReviewInProgress(): LiveData<Boolean> = uploadReviewInProgress
+    fun editPlaceReviewClicked(): LiveData<Place> = editPlaceReview
     fun viewState(): LiveData<SoramitsuMapViewState> = viewState
     fun placeSelected(): LiveData<Place?> = selectedPlaceSingleLiveEvent
 
@@ -65,7 +77,33 @@ internal class SoramitsuMapViewModel(
     }
 
     fun onPlaceSelected(place: Place?) {
-        selectedPlaceSingleLiveEvent.value = place
+        selectedPlace = place
+    }
+
+    fun onEditReviewClicked() {
+        editPlaceReview.value = selectedPlace
+    }
+
+    fun onDeleteReviewClicked() {
+        selectedPlace?.let { outdatedPlace ->
+            viewModelScope.launch(mainThreadDispatcher) {
+                uploadReviewInProgress.value = true
+                val updatedPlace = deleteReview(outdatedPlace)
+                uploadReviewInProgress.value = false
+                selectedPlace = updatedPlace
+            }
+        }
+    }
+
+    fun onPlaceReviewAdded() {
+        selectedPlace?.let { outdatedPlace ->
+            viewModelScope.launch(mainThreadDispatcher) {
+                uploadReviewInProgress.value = true
+                val updatedPlace = loadPlaceInfo(outdatedPlace)
+                uploadReviewInProgress.value = false
+                selectedPlace = updatedPlace
+            }
+        }
     }
 
     fun onExtendedPlaceInfoRequested(placePosition: GeoPoint) =
@@ -75,11 +113,9 @@ internal class SoramitsuMapViewModel(
                         it.position.longitude == placePosition.longitude
             }
             if (place != null) {
-                selectedPlaceSingleLiveEvent.value = place
-
+                selectedPlace = place
                 val placeWithFullInfo = loadPlaceInfo(place)
-
-                selectedPlaceSingleLiveEvent.value = placeWithFullInfo
+                selectedPlace = placeWithFullInfo
             }
         }
 
@@ -95,6 +131,17 @@ internal class SoramitsuMapViewModel(
 
     private suspend fun loadPlaceInfo(place: Place): Place = withContext(backgroundDispatcher) {
         try {
+            placesRepository.getPlaceInfo(place)
+        } catch (exception: Exception) {
+            Log.w("Network", exception)
+            place
+        }
+    }
+
+    private suspend fun deleteReview(place: Place): Place = withContext(backgroundDispatcher) {
+        try {
+            val userReview = place.reviews.find { review -> review.author.user }
+            userReview?.let { placesRepository.deleteReview(userReview, place) }
             placesRepository.getPlaceInfo(place)
         } catch (exception: Exception) {
             Log.w("Network", exception)

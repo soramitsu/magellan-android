@@ -68,6 +68,10 @@
     <string name="sm_reviews">Reviews</string>
     <string name="sm_show_all_reviews">Show all reviews</string>
     <string name="sm_edit_comment_button">Edit comment button</string>
+    <string name="sm_share_details_of_your_experience">Share details of your experience</string>
+    <string name="sm_post">Post</string>
+    <string name="sm_edit_review">Edit review</string>
+    <string name="sm_delete">Delete</string>
 
     <plurals name="sm_reviews_format">
         <item quantity="one">(%1$d review)</item>

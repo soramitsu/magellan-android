@@ -121,11 +121,23 @@
         app:layout_constraintEnd_toEndOf="@id/commentViewRoot"
         />
 
+    <ProgressBar
+        android:id="@+id/reviewAndSummaryUploadUserCommentProgressBar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/sm_margin_padding_size_medium"
+        android:visibility="gone"
+        app:layout_constraintTop_toBottomOf="@id/reviewAndSummaryRatingBottomBarrier"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        />
+
     <androidx.constraintlayout.widget.Barrier
         android:id="@+id/reviewAndSummarySummaryBottomBarrier"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:constraint_referenced_ids="commentViewRoot, reviewAndSummaryRateThisPlaceFlow, reviewAndSummaryRateThisPlaceBackground"
+        app:constraint_referenced_ids="commentViewRoot, reviewAndSummaryRateThisPlaceFlow, reviewAndSummaryRateThisPlaceBackground, reviewAndSummaryUploadUserCommentProgressBar"
+        app:barrierAllowsGoneWidgets="true"
         app:barrierDirection="bottom"
         />
 

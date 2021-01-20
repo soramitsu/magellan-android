@@ -4,28 +4,9 @@ import jp.co.soramitsu.map.model.*
 import java.util.*
 
 internal class DemoPlacesRepository : PlacesRepository {
-    override fun getCategories(): List<Category> = listOf(
-        Category.BANK,
-        Category.FOOD,
-        Category.SERVICES,
-        Category.SUPERMARKETS,
-        Category.PHARMACY,
-        Category.ENTERTAINMENT,
-        Category.EDUCATION,
-        Category.OTHER
-    )
 
-    override fun getPlaceInfo(place: Place): Place {
-        val allPlaces = Places.merchants + Places.banks + Places.agents
-        val foundPlace = allPlaces.find { it.id == place.id }
-        return foundPlace ?: place
-    }
-
-    override fun getAllPlaces(
-        mapParams: MapParams,
-        requestParams: RequestParams
-    ): Pair<List<Place>, List<Cluster>> {
-        val places = (Places.merchants + Places.banks + Places.agents).mapIndexed { index, place ->
+    private val places: MutableList<Place> =
+        (Places.merchants + Places.banks + Places.agents).mapIndexed { index, place ->
             val schedule = if (index % 2 == 0) {
                 Schedule(open24 = true)
             } else {
@@ -87,7 +68,7 @@ internal class DemoPlacesRepository : PlacesRepository {
                     Review(
                         author = Author(
                             name = names.random(),
-                            user = true
+                            user = false
                         ),
                         rating = 2f,
                         date = Date().time,
@@ -113,13 +94,59 @@ internal class DemoPlacesRepository : PlacesRepository {
                     )
                 )
             )
-        }.subList(5, 9)
+        }.subList(5, 9).toMutableList()
+
+    override fun getCategories(): List<Category> = listOf(
+        Category.BANK,
+        Category.FOOD,
+        Category.SERVICES,
+        Category.SUPERMARKETS,
+        Category.PHARMACY,
+        Category.ENTERTAINMENT,
+        Category.EDUCATION,
+        Category.OTHER
+    )
+
+    override fun getPlaceInfo(place: Place): Place = places.find { it.id == place.id } ?: place
+
+    override fun getAllPlaces(
+        mapParams: MapParams,
+        requestParams: RequestParams
+    ): Pair<List<Place>, List<Cluster>> {
         val clusters = listOf(
             Cluster(GeoPoint(places[0].position.latitude, places[0].position.longitude), 3),
             Cluster(GeoPoint(places[1].position.latitude, places[1].position.longitude), 30),
             Cluster(GeoPoint(places[2].position.latitude, places[2].position.longitude), 99)
         )
         return Pair(places, emptyList())
+    }
+
+    override fun updatePlaceRating(placeId: String, newRating: Int, text: String) {
+        val placeIdx = places.indexOfFirst { place ->  place.id == placeId }
+        val review = places[placeIdx].reviews.find { review -> review.author.user }
+        review?.let {
+            places[placeIdx] = places[placeIdx].copy(
+                reviews = places[placeIdx].reviews - review
+            )
+        }
+        places[placeIdx] = places[placeIdx].copy(
+            reviews = places[placeIdx].reviews + Review(
+                rating = newRating.toFloat(),
+                date = Date().time,
+                text = text,
+                author = Author(
+                    name = "User Name",
+                    user = true
+                )
+            )
+        )
+    }
+
+    override fun deleteReview(userReview: Review, place: Place) {
+        val placeIdx = places.indexOfFirst { it.id == place.id }
+        places[placeIdx] = places[placeIdx].copy(
+            reviews = places[placeIdx].reviews - userReview
+        )
     }
 }
 
