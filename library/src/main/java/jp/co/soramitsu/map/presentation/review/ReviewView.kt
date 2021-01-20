@@ -55,7 +55,12 @@ class ReviewView @JvmOverloads constructor(
             reviewAndSummaryReviewSection.visibility = View.GONE
         } else {
             reviewAndSummaryReviewSection.visibility = View.VISIBLE
-            reviewsAdapter.setItems(reviews.take(MAXIMAL_NUMBER_OF_COMMENTS))
+            val nonUserReviews = reviews
+                .take(MAXIMAL_NUMBER_OF_COMMENTS)
+                .toMutableList()
+                .apply { remove(userReview) }
+                .toList()
+            reviewsAdapter.setItems(nonUserReviews)
         }
 
         reviewAndSummaryRateThisPlaceRatingBar.setOnRatingBarChangeListener { _, newRating, fromUser ->

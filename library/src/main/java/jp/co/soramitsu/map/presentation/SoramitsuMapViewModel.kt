@@ -28,7 +28,6 @@ internal class SoramitsuMapViewModel(
     private val uploadReviewInProgress: SingleLiveEvent<Boolean> = SingleLiveEvent()
 
     private val editPlaceReview: SingleLiveEvent<Place> = SingleLiveEvent()
-    private val deletePlaceReview: SingleLiveEvent<Place> = SingleLiveEvent()
 
     private val currentState: SoramitsuMapViewState
         get() = viewState.value!!

@@ -48,7 +48,7 @@
         android:layout_marginStart="@dimen/sm_margin_padding_size_medium"
         app:layout_constraintStart_toEndOf="@id/commentViewAvatarRightBorder"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/commentViewEditComment"
         tools:text="@tools:sample/full_names"
         />
 
@@ -95,4 +95,18 @@
         tools:maxLines="6"
         tools:text="@tools:sample/lorem/random"
         />
+
+    <ImageButton
+        android:id="@+id/commentViewEditComment"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:contentDescription="@string/sm_edit_comment_button"
+        android:visibility="gone"
+        style="@style/Widget.AppCompat.ActionButton"
+        android:src="@drawable/sm_ic_more_vert_24"
+        app:layout_constraintTop_toTopOf="@id/commentViewRoot"
+        app:layout_constraintEnd_toEndOf="@id/commentViewRoot"
+        tools:visibility="visible"
+        />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

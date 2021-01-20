@@ -18,6 +18,12 @@ internal class ReviewsAdapter : RecyclerView.Adapter<ReviewsAdapter.ReviewViewHo
 
     private val items: MutableList<Review> = mutableListOf()
 
+    private var onEditCommentButtonClickListener: (Review) -> Unit = {}
+
+    fun setOnEditCommentButtonClickListener(onEditCommentButtonClickListener: (Review) -> Unit) {
+        this.onEditCommentButtonClickListener = onEditCommentButtonClickListener
+    }
+
     fun setItems(newItems: List<Review>) {
         val diffResult = DiffUtil.calculateDiff(DiffUtilCallback(items, newItems))
         items.clear()
@@ -28,7 +34,12 @@ internal class ReviewsAdapter : RecyclerView.Adapter<ReviewsAdapter.ReviewViewHo
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ReviewViewHolder {
         return ReviewViewHolder(
             LayoutInflater.from(parent.context).inflate(R.layout.sm_comment_view, parent, false)
-        )
+        ).also { viewHolder ->
+            viewHolder.editCommentButton.setOnClickListener {
+                val userReview = items[viewHolder.adapterPosition]
+                onEditCommentButtonClickListener.invoke(userReview)
+            }
+        }
     }
 
     override fun onBindViewHolder(holder: ReviewViewHolder, position: Int) {
@@ -37,13 +48,14 @@ internal class ReviewsAdapter : RecyclerView.Adapter<ReviewsAdapter.ReviewViewHo
 
     override fun getItemCount(): Int = items.size
 
-    internal class ReviewViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+    internal inner class ReviewViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         private val avatarImageView: ImageView = itemView.findViewById(R.id.commentViewAvatar)
         private val initialsTextView: TextView = itemView.findViewById(R.id.commentViewInitialsTextView)
         private val reviewerNameTextView: TextView = itemView.findViewById(R.id.commentViewAuthorName)
         private val ratingView: RatingBar = itemView.findViewById(R.id.commentViewRating)
         private val reviewDateTextView: TextView = itemView.findViewById(R.id.commentViewCommentDate)
         private val reviewTextView: TextView = itemView.findViewById(R.id.commentViewCommentTextView)
+        internal val editCommentButton: View = itemView.findViewById(R.id.commentViewEditComment)
 
         private val simpleDataFormat = SimpleDateFormat(DATE_FORMAT, Locale.getDefault())
 
@@ -52,6 +64,8 @@ internal class ReviewsAdapter : RecyclerView.Adapter<ReviewsAdapter.ReviewViewHo
             ratingView.rating = review.rating
             reviewDateTextView.text = simpleDataFormat.format(Date(review.date))
             reviewTextView.text = review.text
+
+            editCommentButton.visibility = if (review.author.user) View.VISIBLE else View.GONE
 
             initialsTextView.text = InitialsExtractor.extract(review.author.name)
         }
