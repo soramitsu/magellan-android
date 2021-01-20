@@ -1,4 +1,4 @@
-package jp.co.soramitsu.map.presentation.places
+package jp.co.soramitsu.map.presentation
 
 internal class InitialsExtractor {
 

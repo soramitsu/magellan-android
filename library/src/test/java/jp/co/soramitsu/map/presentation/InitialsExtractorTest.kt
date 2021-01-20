@@ -1,4 +1,4 @@
-package jp.co.soramitsu.map.presentation.places
+package jp.co.soramitsu.map.presentation
 
 import com.google.common.truth.Truth.assertThat
 import org.junit.Test

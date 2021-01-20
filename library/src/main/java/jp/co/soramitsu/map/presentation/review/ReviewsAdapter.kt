@@ -1,4 +1,4 @@
-package jp.co.soramitsu.map.presentation.places
+package jp.co.soramitsu.map.presentation.review
 
 import android.view.LayoutInflater
 import android.view.View
@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import jp.co.soramitsu.map.R
 import jp.co.soramitsu.map.model.Review
+import jp.co.soramitsu.map.presentation.InitialsExtractor
 import java.text.SimpleDateFormat
 import java.util.*
 
