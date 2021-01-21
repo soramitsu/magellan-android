@@ -1,32 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<jp.co.soramitsu.map.presentation.categories.CategoryTextView
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    style="?sm_textViewStyleRegular15"
+    android:id="@+id/categoryTextView"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:minHeight="64dp"
     android:background="?selectableItemBackground"
-    android:orientation="horizontal"
-    android:paddingHorizontal="16dp"
-    android:paddingVertical="8dp">
-
-    <ImageView
-        android:id="@+id/categoryIcon"
-        android:layout_width="@dimen/sm_icon_size"
-        android:layout_height="@dimen/sm_icon_size"
-        android:layout_gravity="center_vertical"
-        android:background="@drawable/sm_icon_background"
-        android:importantForAccessibility="no"
-        android:scaleType="centerInside"
-        android:src="@drawable/sm_ic_deposit" />
-
-    <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/categoryNameTextView"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_vertical"
-        android:layout_marginStart="64dp"
-        android:textAppearance="@style/SM.TextAppearance.Soramitsu.MaterialComponents.Body1"
-        tools:drawableEnd="?sm_checkIcon"
-        tools:text="Top up places" />
-
-</FrameLayout>
+    android:drawablePadding="@dimen/sm_margin_padding_size_medium"
+    android:gravity="center_vertical"
+    android:paddingStart="@dimen/sm_margin_padding_size_medium"
+    android:paddingTop="@dimen/sm_margin_padding_size_small"
+    android:paddingEnd="@dimen/sm_margin_padding_size_medium"
+    android:paddingBottom="@dimen/sm_margin_padding_size_small"
+    tools:drawableStart="@drawable/sm_ic_supermarket_circle_44"
+    tools:text="Supermarket" />

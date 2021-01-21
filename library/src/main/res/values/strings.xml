@@ -89,6 +89,7 @@
     <string name="sm_working_hours">Working hours</string>
     <string name="sm_add_schedule">Add schedule</string>
     <string name="sm_create_and_send_for_review">Create and send for review</string>
+    <string name="sm_choose_category">Choose category</string>
 
     <plurals name="sm_reviews_format">
         <item quantity="one">(%1$d review)</item>
