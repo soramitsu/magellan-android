@@ -8,7 +8,6 @@ import android.graphics.drawable.AnimatedVectorDrawable
 import android.net.Uri
 import android.os.Bundle
 import android.text.SpannableStringBuilder
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -34,6 +33,7 @@ import jp.co.soramitsu.map.presentation.SoramitsuMapFragment
 import jp.co.soramitsu.map.presentation.SoramitsuMapViewModel
 import jp.co.soramitsu.map.presentation.review.EditReviewFragment
 import jp.co.soramitsu.map.presentation.review.ReviewFragment
+import jp.co.soramitsu.map.presentation.review.ReviewListFragment
 import kotlinx.android.synthetic.main.sm_place_bottom_sheet.*
 import java.text.SimpleDateFormat
 import java.util.*
@@ -77,9 +77,10 @@ internal class PlaceFragment : BottomSheetDialogFragment() {
             viewModel.placeSelected().observe(viewLifecycleOwner, Observer { place ->
                 place?.let { bindBottomSheetWithPlace(place) }
             })
-            viewModel.uploadReviewInProgress().observe(viewLifecycleOwner, Observer { placeUpdateInProgress ->
-                reviewView.showUploadingReviewIndicator(placeUpdateInProgress)
-            })
+            viewModel.uploadReviewInProgress()
+                .observe(viewLifecycleOwner, Observer { placeUpdateInProgress ->
+                    reviewView.showUploadingReviewIndicator(placeUpdateInProgress)
+                })
             viewModel.editPlaceReviewClicked().observe(viewLifecycleOwner, Observer { place ->
                 val userReview = place.reviews.find { review -> review.author.user }
                 val initialRating = userReview?.rating ?: place.rating
@@ -209,8 +210,8 @@ internal class PlaceFragment : BottomSheetDialogFragment() {
 
         reviewView.bind(place.rating, place.reviews)
         reviewView.setOnShowAllReviewsButtonClickListener {
-            Log.d("Review", "Show all button clicked")
             activity?.onUserInteraction()
+            ReviewListFragment().show(parentFragmentManager, "ReviewListBottomSheetFragment")
         }
 
         reviewView.setOnEditUserCommentClickListener {

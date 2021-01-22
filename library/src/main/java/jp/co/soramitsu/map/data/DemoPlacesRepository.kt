@@ -148,6 +148,10 @@ internal class DemoPlacesRepository : PlacesRepository {
             reviews = places[placeIdx].reviews - userReview
         )
     }
+
+    override fun getPlaceReviews(placeId: String): List<Review> {
+        return places.find { it.id == placeId }?.reviews.orEmpty()
+    }
 }
 
 /**
