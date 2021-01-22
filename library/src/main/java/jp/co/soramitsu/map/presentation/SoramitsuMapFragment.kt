@@ -5,9 +5,11 @@ import android.content.Context
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.Canvas
+import android.location.Geocoder
 import android.location.Location
 import android.os.Bundle
 import android.os.Handler
+import android.util.Log
 import android.view.MotionEvent
 import android.view.View
 import android.view.inputmethod.InputMethodManager
@@ -30,8 +32,10 @@ import jp.co.soramitsu.map.ext.getResourceIdForAttr
 import jp.co.soramitsu.map.model.Category
 import jp.co.soramitsu.map.model.GeoPoint
 import jp.co.soramitsu.map.model.Place
+import jp.co.soramitsu.map.model.Position
 import jp.co.soramitsu.map.presentation.categories.CategoriesFragment
 import jp.co.soramitsu.map.presentation.places.PlaceFragment
+import jp.co.soramitsu.map.presentation.places.add.AddPlaceFragment
 import jp.co.soramitsu.map.presentation.search.SearchBottomSheetFragment
 import kotlinx.android.synthetic.main.sm_fragment_map_soramitsu.*
 
@@ -42,11 +46,6 @@ import kotlinx.android.synthetic.main.sm_fragment_map_soramitsu.*
 open class SoramitsuMapFragment : Fragment(R.layout.sm_fragment_map_soramitsu) {
 
     private lateinit var viewModel: SoramitsuMapViewModel
-
-    private val inputMethodService: InputMethodManager?
-        get() = context?.let { context ->
-            getSystemService(context, InputMethodManager::class.java)
-        }
 
     private var googleMap: GoogleMap? = null
 
@@ -265,6 +264,11 @@ open class SoramitsuMapFragment : Fragment(R.layout.sm_fragment_map_soramitsu) {
             viewModel.searchQuery.observe(viewLifecycleOwner, Observer { query ->
                 searchOnFragmentInputEditText.setText(query)
             })
+
+            googleMap.setOnMapClickListener { position ->
+                viewModel.onMapClickedAtPosition(Position(position.latitude, position.longitude))
+                AddPlaceFragment().withPosition(position).show(parentFragmentManager, "AddPlaceFragment")
+            }
         }
     }
 

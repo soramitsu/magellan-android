@@ -6,7 +6,13 @@
 
     <application>
         <activity
-            android:name="jp.co.soramitsu.map.presentation.GoogleMapActivity"
+            android:name=".presentation.GoogleMapActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/SM.Soramistu.Map.BaseTheme"
+            />
+
+        <activity
+            android:name=".presentation.places.add.ProposePlaceActivity"
             android:screenOrientation="portrait"
             android:theme="@style/SM.Soramistu.Map.BaseTheme"
             />
