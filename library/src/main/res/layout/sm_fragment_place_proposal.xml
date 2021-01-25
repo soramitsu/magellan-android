@@ -15,6 +15,7 @@
         app:layout_constraintTop_toTopOf="parent">
 
         <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:navigationIcon="@drawable/sm_ic_arrow_back_24">
@@ -55,6 +56,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:textAppearance="@style/SM.TextAppearance.Soramitsu.MaterialComponents.Body1"
+                    android:maxLines="1"
+                    android:inputType="textCapWords"
                     android:hint="@string/sm_name"
                     tools:text="Body shop"
                     />
@@ -69,18 +72,24 @@
                 android:layout_marginTop="@dimen/sm_margin_padding_size_medium"
                 android:drawablePadding="@dimen/sm_margin_padding_size_medium"
                 android:gravity="center_vertical"
-                android:padding="@dimen/sm_margin_padding_size_medium"
+                android:paddingStart="@dimen/sm_margin_padding_size_medium"
+                android:paddingEnd="@dimen/sm_margin_padding_size_medium"
+                android:paddingTop="@dimen/sm_margin_padding_size_small"
+                android:paddingBottom="@dimen/sm_margin_padding_size_small"
                 app:drawableStartCompat="@drawable/sm_ic_location_circle_44"
                 tools:text="Street 3, Phnom Penh, Cambodia" />
 
-            <TextView
+            <jp.co.soramitsu.map.presentation.categories.CategoryTextView
                 android:id="@+id/categoryTextView"
                 style="?sm_textViewStyleRegular15"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:drawablePadding="@dimen/sm_margin_padding_size_medium"
                 android:gravity="center_vertical"
-                android:padding="@dimen/sm_margin_padding_size_medium"
+                android:paddingStart="@dimen/sm_margin_padding_size_medium"
+                android:paddingEnd="@dimen/sm_margin_padding_size_medium"
+                android:paddingTop="@dimen/sm_margin_padding_size_small"
+                android:paddingBottom="@dimen/sm_margin_padding_size_small"
                 tools:drawableStartCompat="@drawable/sm_ic_supermarket_circle_44"
                 tools:text="Supermarket" />
 

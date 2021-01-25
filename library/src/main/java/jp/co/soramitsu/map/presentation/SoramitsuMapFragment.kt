@@ -267,6 +267,8 @@ open class SoramitsuMapFragment : Fragment(R.layout.sm_fragment_map_soramitsu) {
 
             googleMap.setOnMapClickListener { position ->
                 viewModel.onMapClickedAtPosition(Position(position.latitude, position.longitude))
+
+                (parentFragmentManager.findFragmentByTag("Place") as? PlaceFragment)?.dismiss()
                 AddPlaceFragment().withPosition(position).show(parentFragmentManager, "AddPlaceFragment")
             }
         }
