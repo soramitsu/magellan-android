@@ -9,10 +9,7 @@ import jp.co.soramitsu.map.SoramitsuMapLibraryConfig
 import jp.co.soramitsu.map.data.MapParams
 import jp.co.soramitsu.map.data.PlacesRepository
 import jp.co.soramitsu.map.data.RequestParams
-import jp.co.soramitsu.map.model.Category
-import jp.co.soramitsu.map.model.Cluster
-import jp.co.soramitsu.map.model.GeoPoint
-import jp.co.soramitsu.map.model.Place
+import jp.co.soramitsu.map.model.*
 import jp.co.soramitsu.map.presentation.categories.CategoryListItem
 import jp.co.soramitsu.map.presentation.lifycycle.SingleLiveEvent
 import kotlinx.coroutines.*
@@ -205,6 +202,12 @@ internal class SoramitsuMapViewModel(
         }
     }
 
+    fun onMapClickedAtPosition(position: Position) {
+        viewState.value = viewState.value?.copy(
+            dropPinPosition = position
+        )
+    }
+
     init {
         viewState.value = SoramitsuMapViewState()
     }
@@ -212,6 +215,7 @@ internal class SoramitsuMapViewModel(
 
 internal data class SoramitsuMapViewState(
     val places: List<Place> = emptyList(),
+    val dropPinPosition: Position? = null,
     val clusters: List<Cluster> = emptyList(),
     val enableResetButton: Boolean = false,
     val categories: List<CategoryListItem> = emptyList()
