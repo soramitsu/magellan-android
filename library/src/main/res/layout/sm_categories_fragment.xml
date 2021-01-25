@@ -49,6 +49,6 @@
         android:nestedScrollingEnabled="true"
         app:layout_constraintHeight_max="?sm_categoriesListHeight"
         app:layout_constraintTop_toBottomOf="@id/titleTextView"
-        tools:listitem="@layout/sm_category_list_item" />
+        tools:listitem="@layout/sm_category_list_item_selectable" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
