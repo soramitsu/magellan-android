@@ -30,7 +30,13 @@ internal class ReviewListViewModel(
     private suspend fun loadAllReviews(placeId: String) = withContext(backgroundDispatcher) {
         try {
             val reviews = placesRepository.getPlaceReviews(placeId).popUserReviewOnTop()
-            ReviewListViewState.Content(reviews)
+            if (reviews.isEmpty()) {
+                ReviewListViewState.NoReviewsYet
+            } else if (reviews[0].author.user) {
+                ReviewListViewState.ContentWithUserReview(reviews)
+            } else  {
+                ReviewListViewState.ContentWithoutUserReview(reviews)
+            }
         } catch(exception: Exception) {
             ReviewListViewState.Error(exception)
         }
@@ -45,7 +51,8 @@ internal class ReviewListViewModel(
     internal sealed class ReviewListViewState {
         object Loading : ReviewListViewState()
         data class Error(val exception: Exception) : ReviewListViewState()
-        data class Content(val reviews: List<Review>): ReviewListViewState()
+        data class ContentWithUserReview(val reviews: List<Review>): ReviewListViewState()
+        data class ContentWithoutUserReview(val reviews: List<Review>): ReviewListViewState()
         object NoReviewsYet: ReviewListViewState()
     }
 }

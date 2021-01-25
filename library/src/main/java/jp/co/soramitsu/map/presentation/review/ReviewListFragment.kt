@@ -42,8 +42,6 @@ internal class ReviewListFragment : BottomSheetDialogFragment() {
         val dialog = super.onCreateDialog(savedInstanceState)
         dialog.setOnShowListener {
             val bottomSheetDialog = dialog as BottomSheetDialog
-            bottomSheetDialog.behavior.isHideable = false
-            bottomSheetDialog.behavior.skipCollapsed = true
             bottomSheetDialog.behavior.isFitToContents = false
             bottomSheetDialog.behavior.state = BottomSheetBehavior.STATE_EXPANDED
         }
@@ -78,9 +76,13 @@ internal class ReviewListFragment : BottomSheetDialogFragment() {
             sharedViewModel?.onEditReviewClicked()
         }
 
-        sharedViewModel?.placeSelected()?.value?.id?.let { placeId ->
-            viewModel.reloadReviews(placeId)
+        reviewsAdapter.setOnEditCommentButtonClickListener {
+            EditReviewFragment().show(parentFragmentManager, "EditReviewMenu")
         }
+
+        sharedViewModel?.placeSelected()?.observe(viewLifecycleOwner, Observer { place ->
+            place?.let { viewModel.reloadReviews(place.id) }
+        })
     }
 
     private fun renderViewState(viewState: ReviewListViewModel.ReviewListViewState) =
@@ -90,6 +92,7 @@ internal class ReviewListFragment : BottomSheetDialogFragment() {
                 reviewsRecyclerView.visibility = View.GONE
                 noReviewsYet.visibility = View.GONE
                 retryFlow.visibility = View.GONE
+                ratePlaceButton.visibility = View.GONE
             }
 
             is ReviewListViewModel.ReviewListViewState.Error -> {
@@ -97,13 +100,25 @@ internal class ReviewListFragment : BottomSheetDialogFragment() {
                 reviewsRecyclerView.visibility = View.GONE
                 noReviewsYet.visibility = View.GONE
                 retryFlow.visibility = View.VISIBLE
+                ratePlaceButton.visibility = View.GONE
             }
 
-            is ReviewListViewModel.ReviewListViewState.Content -> {
+            is ReviewListViewModel.ReviewListViewState.ContentWithoutUserReview -> {
                 progressBar.visibility = View.GONE
                 reviewsRecyclerView.visibility = View.VISIBLE
                 noReviewsYet.visibility = View.GONE
                 retryFlow.visibility = View.GONE
+                ratePlaceButton.visibility = View.VISIBLE
+
+                reviewsAdapter.setItems(viewState.reviews)
+            }
+
+            is ReviewListViewModel.ReviewListViewState.ContentWithUserReview -> {
+                progressBar.visibility = View.GONE
+                reviewsRecyclerView.visibility = View.VISIBLE
+                noReviewsYet.visibility = View.GONE
+                retryFlow.visibility = View.GONE
+                ratePlaceButton.visibility = View.GONE
 
                 reviewsAdapter.setItems(viewState.reviews)
             }
@@ -113,6 +128,7 @@ internal class ReviewListFragment : BottomSheetDialogFragment() {
                 reviewsRecyclerView.visibility = View.GONE
                 noReviewsYet.visibility = View.VISIBLE
                 retryFlow.visibility = View.GONE
+                ratePlaceButton.visibility = View.VISIBLE
             }
         }
 }
