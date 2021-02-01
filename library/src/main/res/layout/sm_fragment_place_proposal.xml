@@ -21,12 +21,11 @@
             app:navigationIcon="@drawable/sm_ic_arrow_back_24">
 
             <TextView
+                style="?sm_textViewStyleSemiBold15"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:text="@string/sm_add_a_place"
-                style="?sm_textViewStyleSemiBold15"
-                />
+                android:text="@string/sm_add_a_place" />
         </com.google.android.material.appbar.MaterialToolbar>
 
     </com.google.android.material.appbar.AppBarLayout>
@@ -55,12 +54,11 @@
                     android:id="@+id/placeNameEditText"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:textAppearance="@style/SM.TextAppearance.Soramitsu.MaterialComponents.Body1"
-                    android:maxLines="1"
-                    android:inputType="textCapWords"
                     android:hint="@string/sm_name"
-                    tools:text="Body shop"
-                    />
+                    android:inputType="textCapWords"
+                    android:maxLines="1"
+                    android:textAppearance="@style/SM.TextAppearance.Soramitsu.MaterialComponents.Body1"
+                    tools:text="Body shop" />
 
             </com.google.android.material.textfield.TextInputLayout>
 
@@ -73,8 +71,8 @@
                 android:drawablePadding="@dimen/sm_margin_padding_size_medium"
                 android:gravity="center_vertical"
                 android:paddingStart="@dimen/sm_margin_padding_size_medium"
-                android:paddingEnd="@dimen/sm_margin_padding_size_medium"
                 android:paddingTop="@dimen/sm_margin_padding_size_small"
+                android:paddingEnd="@dimen/sm_margin_padding_size_medium"
                 android:paddingBottom="@dimen/sm_margin_padding_size_small"
                 app:drawableStartCompat="@drawable/sm_ic_location_circle_44"
                 tools:text="Street 3, Phnom Penh, Cambodia" />
@@ -87,8 +85,8 @@
                 android:drawablePadding="@dimen/sm_margin_padding_size_medium"
                 android:gravity="center_vertical"
                 android:paddingStart="@dimen/sm_margin_padding_size_medium"
-                android:paddingEnd="@dimen/sm_margin_padding_size_medium"
                 android:paddingTop="@dimen/sm_margin_padding_size_small"
+                android:paddingEnd="@dimen/sm_margin_padding_size_medium"
                 android:paddingBottom="@dimen/sm_margin_padding_size_small"
                 tools:drawableStartCompat="@drawable/sm_ic_supermarket_circle_44"
                 tools:text="Supermarket" />
@@ -114,8 +112,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="@string/sm_phone_number"
-                    android:maxLines="1"
                     android:inputType="phone"
+                    android:maxLines="1"
                     tools:text="+777 787 656 45 67" />
 
             </com.google.android.material.textfield.TextInputLayout>
@@ -134,8 +132,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="@string/sm_website"
-                    android:maxLines="1"
                     android:inputType="textUri"
+                    android:maxLines="1"
                     tools:text="www.bodyshop.com" />
 
             </com.google.android.material.textfield.TextInputLayout>
@@ -154,8 +152,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="@string/sm_facebook"
-                    android:maxLines="1"
                     android:inputType="textUri"
+                    android:maxLines="1"
                     tools:text="Facebook.com/bodyshop" />
 
             </com.google.android.material.textfield.TextInputLayout>
@@ -181,11 +179,26 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/sm_margin_padding_size_small"
+                android:background="?selectableItemBackground"
                 android:drawablePadding="@dimen/sm_margin_padding_size_medium"
                 android:gravity="center_vertical"
                 android:padding="@dimen/sm_margin_padding_size_medium"
                 android:text="@string/sm_add_logo_image"
                 app:drawableStartCompat="@drawable/sm_ic_location_circle_44" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/logoRecyclerView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/sm_margin_padding_size_small"
+                android:orientation="horizontal"
+                android:paddingStart="@dimen/sm_margin_padding_size_small"
+                android:paddingEnd="@dimen/sm_margin_padding_size_small"
+                android:visibility="gone"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                tools:itemCount="2"
+                tools:listitem="@layout/sm_removable_image_list_item_56"
+                tools:visibility="visible" />
 
             <TextView
                 style="?sm_textViewStyleSemiBold15"
@@ -208,11 +221,26 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/sm_margin_padding_size_small"
+                android:background="?selectableItemBackground"
                 android:drawablePadding="@dimen/sm_margin_padding_size_medium"
                 android:gravity="center_vertical"
                 android:padding="@dimen/sm_margin_padding_size_medium"
                 android:text="@string/sm_add_photo"
                 app:drawableStartCompat="@drawable/sm_ic_insert_photo_circle_44" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/photosRecyclerView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/sm_margin_padding_size_small"
+                android:orientation="horizontal"
+                android:paddingStart="@dimen/sm_margin_padding_size_small"
+                android:paddingEnd="@dimen/sm_margin_padding_size_small"
+                android:visibility="gone"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                tools:itemCount="4"
+                tools:listitem="@layout/sm_removable_image_list_item_56"
+                tools:visibility="visible" />
 
             <TextView
                 style="?sm_textViewStyleSemiBold15"
@@ -241,10 +269,9 @@
         style="@style/SM.Widget.Soramitsu.MaterialComponents.Button.Accent"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="@dimen/sm_margin_padding_size_medium"
-        android:text="@string/sm_create_and_send_for_review"
         android:layout_gravity="bottom"
-        />
+        android:layout_margin="@dimen/sm_margin_padding_size_medium"
+        android:text="@string/sm_create_and_send_for_review" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
 

@@ -90,6 +90,13 @@
     <string name="sm_add_schedule">Add schedule</string>
     <string name="sm_create_and_send_for_review">Create and send for review</string>
     <string name="sm_choose_category">Choose category</string>
+    <string name="sm_choose_from_galery">Choose from galery</string>
+    <string name="sm_remove_logo">Remove logo</string>
+
+    <plurals name="sm_select_number_of_photos">
+        <item quantity="one">Select %1$d photo</item>
+        <item quantity="other">Select %1$d photos</item>
+    </plurals>
 
     <plurals name="sm_reviews_format">
         <item quantity="one">(%1$d review)</item>
