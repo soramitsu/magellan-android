@@ -30,6 +30,14 @@
     <string name="sm_fri">Fri</string>
     <string name="sm_sat">Sat</string>
 
+    <string name="sm_sun_short">S</string>
+    <string name="sm_mon_short">M</string>
+    <string name="sm_tue_short">T</string>
+    <string name="sm_wed_short">W</string>
+    <string name="sm_thu_short">T</string>
+    <string name="sm_fri_short">F</string>
+    <string name="sm_sat_short">S</string>
+
     <string name="sm_information">Information</string>
     <string name="sm_mobile_phone">Mobile phone</string>
     <string name="sm_website">Website</string>
@@ -97,6 +105,14 @@
         <item quantity="one">Select %1$d photo</item>
         <item quantity="other">Select %1$d photos</item>
     </plurals>
+
+    <string name="sm_open_24_hours">Open 24 hours</string>
+    <string name="sm_open_time">Open time</string>
+    <string name="sm_close_time">Close time</string>
+    <string name="sm_from">From</string>
+    <string name="sm_to">To</string>
+    <string name="sm_save">Save</string>
+    <string name="sm_add_opening_hours">Add opening hours %1$s</string>
 
     <plurals name="sm_reviews_format">
         <item quantity="one">(%1$d review)</item>

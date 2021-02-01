@@ -11,8 +11,11 @@ import com.google.android.gms.maps.model.LatLng
 import jp.co.soramitsu.map.R
 import jp.co.soramitsu.map.presentation.places.add.image.PhotoFragment
 import jp.co.soramitsu.map.presentation.places.add.image.PhotoShower
+import jp.co.soramitsu.map.presentation.places.add.schedule.AddScheduleFragment
+import jp.co.soramitsu.map.presentation.places.add.schedule.ScheduleFragmentHost
 
-class ProposePlaceActivity : AppCompatActivity(R.layout.sm_activity_place_proposal), PhotoShower {
+class ProposePlaceActivity
+    : AppCompatActivity(R.layout.sm_activity_place_proposal), PhotoShower, ScheduleFragmentHost {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -29,6 +32,14 @@ class ProposePlaceActivity : AppCompatActivity(R.layout.sm_activity_place_propos
                 .replace(R.id.container, fragment)
                 .commit()
         }
+    }
+
+    @ExperimentalStdlibApi
+    override fun showScheduleFragment() {
+        supportFragmentManager.beginTransaction()
+            .replace(R.id.container, AddScheduleFragment(), "ScheduleFragment")
+            .addToBackStack(null)
+            .commit()
     }
 
     companion object {

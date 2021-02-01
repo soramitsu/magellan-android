@@ -256,6 +256,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:drawablePadding="@dimen/sm_margin_padding_size_medium"
+                android:background="?selectableItemBackground"
                 android:gravity="center_vertical"
                 android:padding="@dimen/sm_margin_padding_size_medium"
                 android:text="@string/sm_add_schedule"

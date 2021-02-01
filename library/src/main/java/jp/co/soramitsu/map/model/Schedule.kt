@@ -1,6 +1,6 @@
 package jp.co.soramitsu.map.model
 
-class Schedule(
+data class Schedule(
     val workingDays: List<WorkDay> = emptyList(),
     val open24: Boolean = false
 )

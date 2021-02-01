@@ -11,6 +11,7 @@ import com.google.android.gms.maps.model.LatLng
 import jp.co.soramitsu.map.R
 import jp.co.soramitsu.map.model.Category
 import jp.co.soramitsu.map.presentation.places.add.image.*
+import jp.co.soramitsu.map.presentation.places.add.schedule.ScheduleFragmentHost
 import kotlinx.android.synthetic.main.sm_fragment_place_proposal.*
 
 class PlaceProposalFragment : Fragment(R.layout.sm_fragment_place_proposal),
@@ -32,6 +33,10 @@ class PlaceProposalFragment : Fragment(R.layout.sm_fragment_place_proposal),
         toolbar.setNavigationOnClickListener { activity?.onBackPressed() }
 
         addressTextView.text = requireArguments().getString(EXTRA_ADDRESS)
+
+        addScheduleTextView.setOnClickListener {
+            (activity as? ScheduleFragmentHost)?.showScheduleFragment()
+        }
 
         categoryTextView.setOnClickListener {
             SelectPlaceCategoryFragment().show(childFragmentManager, "SelectCategoryFragment")

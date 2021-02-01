@@ -146,3 +146,41 @@ fun ContentResolver.images(baseUri: Uri): List<Pair<Uri, Long>> {
     }
     return galleryImageUrls
 }
+
+/**
+ * Will convert list of days into list of days intervals. Ordered days from D_start to D_finish
+ * will be packed into interval ```[D_start, D_finish]```.
+ *
+ *
+ * For example:
+ * ```
+ * Sunday, Monday, Tuesday, Friday -> ([Sunday, Tuesday], [Friday-Friday])
+ * ```
+ *
+ * @param locale -- used to determinate a first day of the week
+ */
+fun List<DayOfWeek>.intervals(locale: Locale = Locale.getDefault()): List<Pair<DayOfWeek, DayOfWeek>> {
+    if (this.isEmpty()) return emptyList()
+
+    val firstDayOfWeek = WeekFields.of(locale).firstDayOfWeek
+    val weekdaysOrderedInLocale = IntRange(0, 6)
+        .map { firstDayOfWeek.plus(it.toLong()) }
+        .filter { it in this }
+
+
+    var firstIntervalStart = firstDayOfWeek
+    while (firstIntervalStart !in this) firstIntervalStart = firstIntervalStart.plus(1)
+
+    val intervals = mutableListOf<Pair<DayOfWeek, DayOfWeek>>()
+    intervals.add(firstIntervalStart to firstIntervalStart)
+    weekdaysOrderedInLocale.drop(1).forEach { dayOfWeek ->
+        if (intervals.last().second.plus(1) == dayOfWeek) {
+            val currentInterval = intervals.removeLast()
+            intervals.add(currentInterval.copy(second = dayOfWeek))
+        } else {
+            intervals.add(dayOfWeek to dayOfWeek)
+        }
+    }
+
+    return intervals
+}

@@ -8,8 +8,7 @@
 
     <View
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        />
+        android:layout_height="match_parent" />
 
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/appbar"
@@ -52,16 +51,11 @@
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/commentInputLayout"
+        style="@style/SM.Widget.Soramitsu.TextInputLayout.FilledBox"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="@dimen/sm_margin_padding_size_medium"
         android:layout_marginTop="@dimen/sm_margin_padding_size_small"
-        app:boxBackgroundColor="#F5F7F8"
-        app:endIconMode="clear_text"
-        app:hintAnimationEnabled="true"
-        app:hintEnabled="true"
-        app:hintTextAppearance="@style/SM.TextAppearance.Soramitsu.MaterialComponents.Body2"
-        app:hintTextColor="#A1A1A0"
         app:layout_constraintTop_toBottomOf="@id/placeRatingBar">
 
         <com.google.android.material.textfield.TextInputEditText
