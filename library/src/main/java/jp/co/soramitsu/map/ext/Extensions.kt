@@ -1,6 +1,10 @@
 package jp.co.soramitsu.map.ext
 
+import android.content.ContentResolver
+import android.content.ContentUris
 import android.content.Context
+import android.net.Uri
+import android.provider.MediaStore
 import android.util.TypedValue
 import android.view.View
 import androidx.annotation.AttrRes
@@ -125,4 +129,20 @@ internal fun Schedule.asIntervals(
         }
     }
     return result
+}
+
+fun ContentResolver.images(baseUri: Uri): List<Pair<Uri, Long>> {
+    val galleryImageUrls = mutableListOf<Pair<Uri, Long>>()
+    val columns = arrayOf(MediaStore.Images.Media._ID, MediaStore.Images.Media.DATE_ADDED)
+    val orderBy = MediaStore.Images.Media.DATE_ADDED
+    query(baseUri, columns, null, null, "$orderBy DESC")?.use { cursor ->
+        val idColumn = cursor.getColumnIndex(MediaStore.Images.Media._ID)
+        val dateAddedColumn = cursor.getColumnIndex(MediaStore.Images.Media.DATE_ADDED)
+        while (cursor.moveToNext()) {
+            val imageFullUri = ContentUris.withAppendedId(baseUri, cursor.getLong(idColumn))
+            val dateAdded = cursor.getLong(dateAddedColumn)
+            galleryImageUrls.add(Pair(imageFullUri, dateAdded))
+        }
+    }
+    return galleryImageUrls
 }
