@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.View
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
 import com.bumptech.glide.Glide
 import com.bumptech.glide.RequestManager
 import com.google.android.gms.maps.model.LatLng
@@ -12,6 +13,7 @@ import jp.co.soramitsu.map.R
 import jp.co.soramitsu.map.model.Category
 import jp.co.soramitsu.map.presentation.places.add.image.*
 import jp.co.soramitsu.map.presentation.places.add.schedule.ScheduleFragmentHost
+import jp.co.soramitsu.map.presentation.places.add.schedule.ScheduleViewModel
 import kotlinx.android.synthetic.main.sm_fragment_place_proposal.*
 
 class PlaceProposalFragment : Fragment(R.layout.sm_fragment_place_proposal),
@@ -20,6 +22,10 @@ class PlaceProposalFragment : Fragment(R.layout.sm_fragment_place_proposal),
     private lateinit var logoAdapter: RemovableImagesAdapter
     private lateinit var photosAdapter: RemovableImagesAdapter
 
+    // shared between PlaceProposalFragment and AddScheduleFragment to
+    // apply schedule changes and display them to user
+    private lateinit var scheduleViewModel: ScheduleViewModel
+
     private val requestManager: RequestManager?
         get() = try {
             Glide.with(this)
@@ -27,14 +33,28 @@ class PlaceProposalFragment : Fragment(R.layout.sm_fragment_place_proposal),
             null
         }
 
+    @ExperimentalStdlibApi
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        scheduleViewModel = ViewModelProvider(
+            requireActivity(),
+            ViewModelProvider.NewInstanceFactory()
+        )[ScheduleViewModel::class.java]
+
+        scheduleViewModel.schedule.observe(viewLifecycleOwner) { schedule ->
+            scheduleSection.schedule = schedule
+        }
 
         toolbar.setNavigationOnClickListener { activity?.onBackPressed() }
 
         addressTextView.text = requireArguments().getString(EXTRA_ADDRESS)
 
-        addScheduleTextView.setOnClickListener {
+        scheduleSection.setOnAddButtonClickListener {
+            (activity as? ScheduleFragmentHost)?.showScheduleFragment()
+        }
+
+        scheduleSection.setOnChangeScheduleButtonClickListener {
             (activity as? ScheduleFragmentHost)?.showScheduleFragment()
         }
 

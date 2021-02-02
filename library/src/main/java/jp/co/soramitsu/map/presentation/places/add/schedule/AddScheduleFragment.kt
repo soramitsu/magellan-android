@@ -17,6 +17,8 @@ import kotlinx.android.synthetic.main.sm_fragment_add_schedule.*
 @ExperimentalStdlibApi
 class AddScheduleFragment : Fragment(R.layout.sm_fragment_add_schedule) {
 
+    // shared between PlaceProposalFragment and AddScheduleFragment to
+    // apply schedule changes and display them to user
     private lateinit var scheduleViewModel: ScheduleViewModel
 
     private var currentScheduleSection: ScheduleSectionView? = null
@@ -39,7 +41,7 @@ class AddScheduleFragment : Fragment(R.layout.sm_fragment_add_schedule) {
         super.onViewCreated(view, savedInstanceState)
 
         scheduleViewModel = ViewModelProvider(
-            this,
+            requireActivity(),
             ViewModelProvider.NewInstanceFactory()
         )[ScheduleViewModel::class.java]
 

@@ -113,6 +113,7 @@
     <string name="sm_to">To</string>
     <string name="sm_save">Save</string>
     <string name="sm_add_opening_hours">Add opening hours %1$s</string>
+    <string name="sm_change_schedule">Change schedule</string>
 
     <plurals name="sm_reviews_format">
         <item quantity="one">(%1$d review)</item>
