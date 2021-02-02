@@ -1,0 +1,202 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    tools:parentTag="androidx.constraintlayout.widget.ConstraintLayout">
+
+    <View
+        android:id="@+id/topSeparator"
+        android:layout_width="match_parent"
+        android:layout_height="4dp"
+        android:background="#ECEFF0"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <HorizontalScrollView
+        android:id="@+id/weekChipGroupHorizontalScroll"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:scrollbars="none"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <com.google.android.material.chip.ChipGroup
+            android:id="@+id/weekChipGroup"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:padding="@dimen/sm_margin_padding_size_medium"
+            app:chipSpacing="0dp"
+            app:itemSpacing="0dp"
+            app:singleLine="true">
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/weekday1"
+                style="@style/SM.Widget.Soramitsu.MaterialComponents.Chip.Choice"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                tools:text="S" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/weekday2"
+                style="@style/SM.Widget.Soramitsu.MaterialComponents.Chip.Choice"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                tools:text="M" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/weekday3"
+                style="@style/SM.Widget.Soramitsu.MaterialComponents.Chip.Choice"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                tools:text="T" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/weekday4"
+                style="@style/SM.Widget.Soramitsu.MaterialComponents.Chip.Choice"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                tools:text="W" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/weekday5"
+                style="@style/SM.Widget.Soramitsu.MaterialComponents.Chip.Choice"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                tools:text="T" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/weekday6"
+                style="@style/SM.Widget.Soramitsu.MaterialComponents.Chip.Choice"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                tools:text="F" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/weekday7"
+                style="@style/SM.Widget.Soramitsu.MaterialComponents.Chip.Choice"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                tools:text="S" />
+
+        </com.google.android.material.chip.ChipGroup>
+    </HorizontalScrollView>
+
+    <com.google.android.material.switchmaterial.SwitchMaterial
+        android:id="@+id/open24HoursSwitch"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="@dimen/sm_margin_padding_size_medium"
+        android:text="@string/sm_open_24_hours"
+        app:layout_constraintTop_toBottomOf="@id/weekChipGroupHorizontalScroll"
+        app:thumbTint="@android:color/white"
+        app:trackTint="@color/sm_thum_color" />
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/openFromTextInputLayout"
+        style="@style/SM.Widget.Soramitsu.TextInputLayout.FilledBox"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/openFromEditText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/sm_open_time"
+            android:textAppearance="@style/SM.TextAppearance.Soramitsu.MaterialComponents.Body1" />
+
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/closeAtTextInputLayout"
+        style="@style/SM.Widget.Soramitsu.TextInputLayout.FilledBox"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/closeAtEditText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/sm_close_time"
+            android:textAppearance="@style/SM.TextAppearance.Soramitsu.MaterialComponents.Body1" />
+
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <androidx.constraintlayout.helper.widget.Flow
+        android:id="@+id/openHoursFlow"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingStart="@dimen/sm_margin_padding_size_medium"
+        android:paddingTop="@dimen/sm_margin_padding_size_small"
+        android:paddingEnd="@dimen/sm_margin_padding_size_medium"
+        android:paddingBottom="@dimen/sm_margin_padding_size_small"
+        app:constraint_referenced_ids="openFromTextInputLayout,closeAtTextInputLayout"
+        app:flow_horizontalGap="@dimen/sm_margin_padding_size_medium"
+        app:layout_constraintTop_toBottomOf="@id/open24HoursSwitch" />
+
+    <com.google.android.material.switchmaterial.SwitchMaterial
+        android:id="@+id/lunchTimeSwitch"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="@dimen/sm_margin_padding_size_medium"
+        android:text="@string/sm_lunch_time"
+        app:layout_constraintTop_toBottomOf="@id/openHoursFlow"
+        app:thumbTint="@android:color/white"
+        app:trackTint="@color/sm_thum_color" />
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/lunchFromTextInputLayout"
+        style="@style/SM.Widget.Soramitsu.TextInputLayout.FilledBox"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/lunchFromEditText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/sm_from"
+            android:textAppearance="@style/SM.TextAppearance.Soramitsu.MaterialComponents.Body1" />
+
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/lunchToTextInputLayout"
+        style="@style/SM.Widget.Soramitsu.TextInputLayout.FilledBox"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/lunchToEditText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/sm_to"
+            android:textAppearance="@style/SM.TextAppearance.Soramitsu.MaterialComponents.Body1" />
+
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <androidx.constraintlayout.helper.widget.Flow
+        android:id="@+id/lunchHoursFlow"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingStart="@dimen/sm_margin_padding_size_medium"
+        android:paddingTop="@dimen/sm_margin_padding_size_small"
+        android:paddingEnd="@dimen/sm_margin_padding_size_medium"
+        android:paddingBottom="@dimen/sm_margin_padding_size_small"
+        android:visibility="gone"
+        app:constraint_referenced_ids="lunchFromTextInputLayout,lunchToTextInputLayout"
+        app:flow_horizontalGap="@dimen/sm_margin_padding_size_medium"
+        app:layout_constraintTop_toBottomOf="@id/lunchTimeSwitch"
+        tools:visibility="visible" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/deleteButton"
+        style="@style/SM.Widget.Soramitsu.MaterialComponents.Button.TextButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/sm_delete"
+        android:visibility="gone"
+        app:icon="@drawable/sm_ic_delete_circle_44_red"
+        app:layout_constraintTop_toBottomOf="@id/lunchHoursFlow"
+        tools:visibility="visible" />
+
+</merge>

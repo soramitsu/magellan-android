@@ -5,6 +5,7 @@ import jp.co.soramitsu.map.model.Schedule
 import jp.co.soramitsu.map.model.Time
 import jp.co.soramitsu.map.model.WorkDay
 import org.junit.Test
+import java.time.DayOfWeek
 import java.util.*
 
 @ExperimentalStdlibApi
@@ -360,5 +361,87 @@ class ExtensionsKtTest {
                 sunday to sunday
             )
         )
+    }
+
+    @Test
+    fun `from monday to friday`() {
+        val intervals = listOf(
+            DayOfWeek.MONDAY,
+            DayOfWeek.TUESDAY,
+            DayOfWeek.WEDNESDAY,
+            DayOfWeek.THURSDAY,
+            DayOfWeek.FRIDAY
+        ).intervals(Locale.UK)
+
+        assertThat(intervals).isEqualTo(listOf(DayOfWeek.MONDAY to DayOfWeek.FRIDAY))
+    }
+
+    @Test
+    fun `from sunday to friday (US)`() {
+        val intervals = listOf(
+            DayOfWeek.SUNDAY,
+            DayOfWeek.MONDAY,
+            DayOfWeek.TUESDAY,
+            DayOfWeek.WEDNESDAY,
+            DayOfWeek.THURSDAY,
+            DayOfWeek.FRIDAY
+        ).intervals(Locale.US)
+
+        assertThat(intervals).isEqualTo(listOf(DayOfWeek.SUNDAY to DayOfWeek.FRIDAY))
+    }
+
+    @Test
+    fun `from sunday to friday (UK)`() {
+        val intervals = listOf(
+            DayOfWeek.SUNDAY,
+            DayOfWeek.MONDAY,
+            DayOfWeek.TUESDAY,
+            DayOfWeek.WEDNESDAY,
+            DayOfWeek.THURSDAY,
+            DayOfWeek.FRIDAY
+        ).intervals(Locale.UK)
+
+        assertThat(intervals).isEqualTo(
+            listOf(
+                DayOfWeek.MONDAY to DayOfWeek.FRIDAY,
+                DayOfWeek.SUNDAY to DayOfWeek.SUNDAY
+            )
+        )
+    }
+
+    @Test
+    fun `empty interval`() {
+        val intervals = listOf<DayOfWeek>().intervals(Locale.UK)
+        assertThat(intervals).isEmpty()
+    }
+
+    @Test
+    fun `multiple intervals`() {
+        val intervals = listOf(
+            DayOfWeek.MONDAY,
+            DayOfWeek.WEDNESDAY,
+            DayOfWeek.THURSDAY,
+            DayOfWeek.FRIDAY
+        ).intervals(Locale.UK)
+
+        assertThat(intervals).isEqualTo(listOf(
+            DayOfWeek.MONDAY to DayOfWeek.MONDAY,
+            DayOfWeek.WEDNESDAY to DayOfWeek.FRIDAY
+        ))
+    }
+
+    @Test
+    fun `wrong order`() {
+        val intervals = listOf(
+            DayOfWeek.THURSDAY,
+            DayOfWeek.WEDNESDAY,
+            DayOfWeek.MONDAY,
+            DayOfWeek.FRIDAY
+        ).intervals(Locale.UK)
+
+        assertThat(intervals).isEqualTo(listOf(
+            DayOfWeek.MONDAY to DayOfWeek.MONDAY,
+            DayOfWeek.WEDNESDAY to DayOfWeek.FRIDAY
+        ))
     }
 }

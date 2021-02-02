@@ -52,6 +52,7 @@ dependencies {
     // ViewModelScope
     implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:2.2.0"
 
+    testImplementation "android.arch.core:core-testing:1.1.1"
     testImplementation "com.google.truth:truth:1.1"
     testImplementation 'junit:junit:4.13.1'
 }

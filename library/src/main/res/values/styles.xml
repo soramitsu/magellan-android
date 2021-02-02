@@ -7,6 +7,8 @@
     </style>
 
     <style name="SM.Widget.Soramitsu.TextInputLayout.FilledBox" parent="Widget.MaterialComponents.TextInputLayout.FilledBox">
+        <item name="boxStrokeWidth">0dp</item>
+        <item name="boxStrokeWidthFocused">0dp</item>
         <item name="boxBackgroundColor">#F5F7F8</item>
         <item name="endIconMode">clear_text</item>
         <item name="hintAnimationEnabled">true</item>
@@ -124,5 +126,12 @@
         <item name="android:textSize">14sp</item>
         <item name="android:textColor">#A1A1A0</item>
         <item name="android:fontFamily">@font/sora_regular</item>
+    </style>
+
+    <style name="SM.Widget.Soramitsu.MaterialComponents.Chip.Choice" parent="Widget.MaterialComponents.Chip.Choice">
+        <item name="chipStrokeColor">#E2E4E6</item>
+        <item name="chipStrokeWidth">1dp</item>
+        <item name="chipBackgroundColor">@color/sm_chip_background_color</item>
+        <item name="android:textColor">@color/sm_chip_text_color</item>
     </style>
 </resources>
