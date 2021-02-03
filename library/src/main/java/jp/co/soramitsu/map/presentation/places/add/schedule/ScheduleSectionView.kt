@@ -15,8 +15,10 @@ import kotlinx.android.synthetic.main.sm_add_schedule_section_view.view.*
 import java.time.DayOfWeek
 import java.time.LocalDateTime
 import java.time.Month
+import java.time.format.DateTimeFormatter
 import java.time.format.DateTimeFormatterBuilder
 import java.time.format.DateTimeParseException
+import java.time.format.FormatStyle
 import java.time.temporal.ChronoField
 import java.time.temporal.WeekFields
 import java.util.*
@@ -34,42 +36,22 @@ class ScheduleSectionView @JvmOverloads constructor(
     private var onRemoveButtonClickListener: () -> Unit = { }
     private var onWorkingDaysSelected: () -> Unit = { }
 
-    private val timeFormatter = DateTimeFormatterBuilder()
-        .appendValue(ChronoField.HOUR_OF_DAY, 2)
-        .appendLiteral(':')
-        .appendValue(ChronoField.MINUTE_OF_HOUR, 2)
-        .toFormatter()
-
-    val unselected: List<WorkDay>
-        get() = weekdaysChips
-            .filter { it.isEnabled && !it.isChecked }
-            .map { chip ->
-                val dayOfWeek = chip.tag as DayOfWeek
-                WorkDay(
-                    weekDay = dayOfWeek.asJavaCalendarValue(),
-                    from = Time.NOT_SET,
-                    to = Time.NOT_SET,
-                    lunchTimeFrom = Time.NOT_SET,
-                    lunchTimeTo = Time.NOT_SET,
-                )
-            }
-
     val selectedDays: List<WorkDay>
         get() {
             val is24Hours = open24HoursSwitch.isChecked
             val from = if (is24Hours) {
                 Time(0, 0)
             } else {
-                localTimeStringToCoreTime(openFromEditText.text.toString())
+                TimeUtils.parseTime(openFromEditText.text.toString())
             }
             val to = if (is24Hours) {
                 Time(23, 59)
             } else {
-                localTimeStringToCoreTime(closeAtEditText.text.toString())
+                TimeUtils.parseTime(closeAtEditText.text.toString())
             }
 
-            val lunchTimeFrom = localTimeStringToCoreTime(lunchFromEditText.text.toString())
-            val lunchTimeTo = localTimeStringToCoreTime(lunchToEditText.text.toString())
+            val lunchTimeFrom = TimeUtils.parseTime(lunchFromEditText.text.toString())
+            val lunchTimeTo = TimeUtils.parseTime(lunchToEditText.text.toString())
             return weekdaysChips.filter { it.isChecked }.map { chip ->
                 val dayOfWeek = chip.tag as DayOfWeek
                 WorkDay(
@@ -115,16 +97,16 @@ class ScheduleSectionView @JvmOverloads constructor(
         val from = if (is24Hours) {
             Time(0, 0)
         } else {
-            localTimeStringToCoreTime(openFromEditText.text.toString())
+            TimeUtils.parseTime(openFromEditText.text.toString())
         }
         val to = if (is24Hours) {
             Time(23, 59)
         } else {
-            localTimeStringToCoreTime(closeAtEditText.text.toString())
+            TimeUtils.parseTime(closeAtEditText.text.toString())
         }
 
-        val lunchTimeFrom = localTimeStringToCoreTime(lunchFromEditText.text.toString())
-        val lunchTimeTo = localTimeStringToCoreTime(lunchToEditText.text.toString())
+        val lunchTimeFrom = TimeUtils.parseTime(lunchFromEditText.text.toString())
+        val lunchTimeTo = TimeUtils.parseTime(lunchToEditText.text.toString())
 
         val daysMap = mutableMapOf<DayOfWeek, SelectionState>()
         weekdaysChips
@@ -156,19 +138,19 @@ class ScheduleSectionView @JvmOverloads constructor(
         tag = sectionData.id
 
         if (fromTime != Time.NOT_SET) {
-            openFromEditText.setText(formatTime(fromTime.hour, fromTime.minute))
+            openFromEditText.setText(TimeUtils.formatTime(fromTime.hour, fromTime.minute))
         }
 
         if (toTime != Time.NOT_SET) {
-            closeAtEditText.setText(formatTime(toTime.hour, toTime.minute))
+            closeAtEditText.setText(TimeUtils.formatTime(toTime.hour, toTime.minute))
         }
 
         if (lunchFromTime != Time.NOT_SET) {
-            lunchFromEditText.setText(formatTime(lunchFromTime.hour, lunchFromTime.minute))
+            lunchFromEditText.setText(TimeUtils.formatTime(lunchFromTime.hour, lunchFromTime.minute))
         }
 
         if (lunchToTime != Time.NOT_SET) {
-            lunchToEditText.setText(formatTime(lunchToTime.hour, lunchToTime.minute))
+            lunchToEditText.setText(TimeUtils.formatTime(lunchToTime.hour, lunchToTime.minute))
         }
 
         daysMap
@@ -213,29 +195,17 @@ class ScheduleSectionView @JvmOverloads constructor(
         }
     }
 
-    private fun formatTime(hour: Int, minute: Int): String {
-        return LocalDateTime.of(1, Month.JANUARY, 1, hour, minute).format(timeFormatter)
-    }
-
     private fun initTimeField(editText: EditText) {
         editText.setOnFocusChangeListener { v, hasFocus ->
             v.clearFocus()
             if (hasFocus) {
                 val onTimeSetListener = TimePickerDialog.OnTimeSetListener { _, hourOfDay, minute ->
-                    editText.setText(formatTime(hourOfDay, minute))
+                    editText.setText(TimeUtils.formatTime(hourOfDay, minute))
                 }
                 TimePickerDialog(context, onTimeSetListener, 0, 0, is24HourFormat(context)).show()
             }
         }
     }
-
-    private fun localTimeStringToCoreTime(localTimeString: String): Time =
-        try {
-            val localDateTime = LocalDateTime.parse(localTimeString)
-            Time(hour = localDateTime.hour, minute = localDateTime.minute)
-        } catch (exception: DateTimeParseException) {
-            Time.NOT_SET
-        }
 
     init {
         View.inflate(context, R.layout.sm_add_schedule_section_view, this)

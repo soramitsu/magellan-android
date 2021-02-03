@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <TextView
+        android:id="@+id/workingHoursTitle"
+        style="?sm_textViewStyleSemiBold15"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/sm_margin_padding_size_medium"
+        android:padding="@dimen/sm_margin_padding_size_medium"
+        android:text="@string/sm_working_hours"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/workingHoursRecyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        app:layout_constraintTop_toBottomOf="@id/workingHoursTitle"
+        tools:itemCount="3"
+        tools:listitem="@layout/sm_simple_key_value_list_item_vertical" />
+
+    <TextView
+        android:id="@+id/changeScheduleTextView"
+        style="?sm_textViewStyleRegular15"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?selectableItemBackground"
+        android:drawablePadding="@dimen/sm_margin_padding_size_medium"
+        android:gravity="center_vertical"
+        android:padding="@dimen/sm_margin_padding_size_medium"
+        android:text="@string/sm_change_schedule"
+        app:drawableStartCompat="@drawable/sm_ic_calendar_today_circle_44"
+        app:layout_constraintTop_toBottomOf="@id/workingHoursRecyclerView" />
+
+    <TextView
+        android:id="@+id/addScheduleTextView"
+        style="?sm_textViewStyleRegular15"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?selectableItemBackground"
+        android:drawablePadding="@dimen/sm_margin_padding_size_medium"
+        android:gravity="center_vertical"
+        android:padding="@dimen/sm_margin_padding_size_medium"
+        android:text="@string/sm_add_schedule"
+        android:visibility="gone"
+        app:drawableStartCompat="@drawable/sm_ic_insert_photo_circle_44"
+        app:layout_constraintTop_toBottomOf="@id/workingHoursRecyclerView" />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

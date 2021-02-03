@@ -31,6 +31,8 @@ import jp.co.soramitsu.map.model.Time
 import jp.co.soramitsu.map.model.WorkDay
 import jp.co.soramitsu.map.presentation.SoramitsuMapFragment
 import jp.co.soramitsu.map.presentation.SoramitsuMapViewModel
+import jp.co.soramitsu.map.presentation.places.add.schedule.generateLaunchTimeFields
+import jp.co.soramitsu.map.presentation.places.add.schedule.generateWorkingDaysFields
 import jp.co.soramitsu.map.presentation.review.EditReviewFragment
 import jp.co.soramitsu.map.presentation.review.ReviewFragment
 import jp.co.soramitsu.map.presentation.review.ReviewListFragment
@@ -309,101 +311,12 @@ internal class PlaceFragment : BottomSheetDialogFragment() {
                     animatedArrowDownToUp.start()
                     additionalInfoOpenHoursDetails.visibility = View.VISIBLE
 
-                    val workingScheduleAsPairsList = generateWorkingDaysFields(schedule)
-                    val lunchScheduleAsPairsList = generateLaunchTimeFields(schedule)
+                    val workingScheduleAsPairsList = schedule.generateWorkingDaysFields(requireContext())
+                    val lunchScheduleAsPairsList = schedule.generateLaunchTimeFields(requireContext())
                     detailedScheduleAdapter.update(workingScheduleAsPairsList + lunchScheduleAsPairsList)
                 }
             }
         }
-    }
-
-    @ExperimentalStdlibApi
-    private fun generateWorkingDaysFields(schedule: Schedule): List<Pair<String, String>> {
-        return schedule.asIntervals().map { interval ->
-            val workDay = interval.first
-            val workingInterval = workDay.from != Time.NOT_SET
-                    && workDay.to != Time.NOT_SET
-
-            // 6am - 9pm
-            val workingTimeInterval = if (workingInterval) {
-                val fromTime = dateFormat.format(Date(workDay.from.inMilliseconds()))
-                val toTime = dateFormat.format(Date(workDay.to.inMilliseconds()))
-                resources.getString(R.string.sm_working_time_interval, fromTime, toTime)
-            } else {
-                resources.getString(R.string.sm_closed)
-            }
-
-            val singleDayInterval = interval.first == interval.second
-            if (singleDayInterval) {
-                // sun
-                Pair(calendarDayAsString(workDay.weekDay), workingTimeInterval)
-            } else {
-                // sun - fri
-                val fromDay = calendarDayAsString(interval.first.weekDay)
-                val toDay = calendarDayAsString(interval.second.weekDay)
-                val workingDaysInterval = resources.getString(
-                    R.string.sm_working_days_interval, fromDay, toDay
-                )
-                Pair(workingDaysInterval, workingTimeInterval)
-            }
-        }
-    }
-
-    @ExperimentalStdlibApi
-    private fun generateLaunchTimeFields(schedule: Schedule): List<Pair<String, String>> = schedule
-        .asIntervals { workDay1, workDay2 ->
-            workDay1.lunchTimeFrom == workDay2.lunchTimeFrom &&
-                    workDay1.lunchTimeTo == workDay2.lunchTimeTo
-        }
-        .filter { interval ->
-            interval.first.lunchTimeFrom != null
-                    && interval.first.lunchTimeFrom != Time.NOT_SET
-                    && interval.first.lunchTimeTo != null
-                    && interval.first.lunchTimeTo != Time.NOT_SET
-                    && interval.second.lunchTimeFrom != null
-                    && interval.second.lunchTimeFrom != Time.NOT_SET
-                    && interval.second.lunchTimeTo != null
-                    && interval.second.lunchTimeTo != Time.NOT_SET
-        }
-        .map { interval ->
-            val firstDay = interval.first
-            val lastDay = interval.second
-            val fromTime =
-                dateFormat.format(Date(firstDay.lunchTimeFrom!!.inMilliseconds()))
-            val toTime =
-                dateFormat.format(Date(firstDay.lunchTimeTo!!.inMilliseconds()))
-            // 6am - 9pm
-            val launchTimeString = resources.getString(
-                R.string.sm_lunch_time_interval,
-                fromTime,
-                toTime
-            )
-            if (firstDay == lastDay) {
-                // lunch time (mon)
-                val lunchTimeSingleDay = resources.getString(
-                    R.string.sm_lunch_time_single_day, firstDay
-                )
-                Pair(lunchTimeSingleDay, launchTimeString)
-            } else {
-                // lunch time (mon-fri)
-                val lunchDaysInterval = resources.getString(
-                    R.string.sm_lunch_days_interval,
-                    calendarDayAsString(firstDay.weekDay),
-                    calendarDayAsString(lastDay.weekDay)
-                )
-                Pair(lunchDaysInterval, launchTimeString)
-            }
-        }
-
-    private fun calendarDayAsString(calendarDay: Int) = when (calendarDay) {
-        Calendar.SUNDAY -> getString(R.string.sm_sun)
-        Calendar.MONDAY -> getString(R.string.sm_mon)
-        Calendar.TUESDAY -> getString(R.string.sm_tue)
-        Calendar.WEDNESDAY -> getString(R.string.sm_wed)
-        Calendar.THURSDAY -> getString(R.string.sm_thu)
-        Calendar.FRIDAY -> getString(R.string.sm_fri)
-        Calendar.SATURDAY -> getString(R.string.sm_sat)
-        else -> ""
     }
 
     private fun Schedule.isStableDailySchedule(): Boolean {

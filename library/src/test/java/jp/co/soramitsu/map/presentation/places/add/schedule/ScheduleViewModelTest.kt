@@ -119,8 +119,9 @@ class ScheduleViewModelTest {
             )
         }
 
-        assertThat(viewModel.schedule.open24).isFalse()
-        assertThat(viewModel.schedule.workingDays).isEqualTo(
+        val schedule = viewModel.schedule.value
+        assertThat(schedule?.open24).isFalse()
+        assertThat(schedule?.workingDays).isEqualTo(
             listOf(
                 workDay(Calendar.SUNDAY),
                 workDay(Calendar.MONDAY),

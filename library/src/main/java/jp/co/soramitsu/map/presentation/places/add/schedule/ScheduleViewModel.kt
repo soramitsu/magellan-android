@@ -14,19 +14,8 @@ class ScheduleViewModel(
     private val logFun: (String) -> Unit = { if (BuildConfig.DEBUG) Log.d("Schedule", it) }
 ) : ViewModel() {
 
-    val schedule: Schedule
-        get() {
-            val sections = _sections.value
-            val open24Hours = sections?.all {
-                // all working days start from 00:00 and finishes at 23:59
-                it.fromTime == Time.NOT_SET && it.toTime == Time.NOT_SET ||
-                        it.fromTime == Time(0, 0) && it.toTime == Time(23, 59)
-            } ?: false
-            return Schedule(
-                open24 = open24Hours,
-                workingDays = sections?.map { it.toWorkDays() }?.flatten().orEmpty()
-            )
-        }
+    private val _schedule = MutableLiveData<Schedule>()
+    val schedule: LiveData<Schedule> = _schedule
 
     private val _sections = MutableLiveData(listOf(SectionData(SectionData.nextId++)))
     val sections: LiveData<List<SectionData>> = _sections
@@ -46,6 +35,7 @@ class ScheduleViewModel(
         logSections()
 
         applySectionChanges(lastSectionData)
+        emitNewSchedule()
 
         logFun.invoke("After add")
         logSections()
@@ -93,6 +83,19 @@ class ScheduleViewModel(
 
         logFun.invoke("After remove")
         logSections()
+    }
+    fun emitNewSchedule() {
+        val sections = _sections.value
+        val open24Hours = sections?.all {
+            // all working days start from 00:00 and finishes at 23:59
+            it.fromTime == Time.NOT_SET && it.toTime == Time.NOT_SET ||
+                    it.fromTime == Time(0, 0) && it.toTime == Time(23, 59)
+        } ?: false
+        val newSchedule = Schedule(
+            open24 = open24Hours,
+            workingDays = sections?.map { it.toWorkDays() }?.flatten().orEmpty()
+        )
+        _schedule.value = newSchedule
     }
 
     private fun SectionData.toWorkDays(): List<WorkDay> = daysMap

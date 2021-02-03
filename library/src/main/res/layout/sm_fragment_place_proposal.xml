@@ -40,7 +40,7 @@
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:paddingTop="@dimen/sm_margin_padding_size_medium"
-            android:paddingBottom="64dp">
+            android:paddingBottom="@dimen/sm_margin_padding_size_medium">
 
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/placeNameTextInputLayout"
@@ -242,25 +242,10 @@
                 tools:listitem="@layout/sm_removable_image_list_item_56"
                 tools:visibility="visible" />
 
-            <TextView
-                style="?sm_textViewStyleSemiBold15"
+            <jp.co.soramitsu.map.presentation.places.add.ScheduleSectionView
+                android:id="@+id/scheduleSection"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/sm_margin_padding_size_medium"
-                android:padding="@dimen/sm_margin_padding_size_medium"
-                android:text="@string/sm_working_hours" />
-
-            <TextView
-                android:id="@+id/addScheduleTextView"
-                style="?sm_textViewStyleRegular15"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:drawablePadding="@dimen/sm_margin_padding_size_medium"
-                android:background="?selectableItemBackground"
-                android:gravity="center_vertical"
-                android:padding="@dimen/sm_margin_padding_size_medium"
-                android:text="@string/sm_add_schedule"
-                app:drawableStartCompat="@drawable/sm_ic_insert_photo_circle_44" />
+                android:layout_height="wrap_content" />
 
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
@@ -272,7 +257,8 @@
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
         android:layout_margin="@dimen/sm_margin_padding_size_medium"
-        android:text="@string/sm_create_and_send_for_review" />
+        android:text="@string/sm_create_and_send_for_review"
+        app:layout_behavior="com.google.android.material.behavior.HideBottomViewOnScrollBehavior" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
