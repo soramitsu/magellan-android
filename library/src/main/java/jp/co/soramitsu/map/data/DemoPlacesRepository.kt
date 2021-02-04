@@ -152,6 +152,10 @@ internal class DemoPlacesRepository : PlacesRepository {
     override fun getPlaceReviews(placeId: String): List<Review> {
         return places.find { it.id == placeId }?.reviews.orEmpty()
     }
+
+    override fun add(place: Place) {
+        places.add(place)
+    }
 }
 
 /**
