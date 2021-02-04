@@ -21,6 +21,7 @@ class RemovableImagesAdapter(private val requestManager: RequestManager) :
     private var removeImageClickListener: (Uri) -> Unit = {}
     private var buttonClickListener: (Int) -> Unit = {}
 
+    var enabled: Boolean = true
     val items: List<RemovableImageListItem> = _items
 
     fun setOnImageSelectedListener(imageSelectionListener: (Uri) -> Unit) {
@@ -56,14 +57,18 @@ class RemovableImagesAdapter(private val requestManager: RequestManager) :
             R.layout.sm_removable_image_list_item_56 ->
                 BaseViewHolder.ImageViewHolder(requestManager, view).also { viewHolder ->
                     view.setOnClickListener {
-                        val idx = viewHolder.adapterPosition
-                        val imageData = items[idx] as RemovableImageListItem.Image
-                        imageSelectionListener.invoke(imageData.imageUri)
+                        if (enabled) {
+                            val idx = viewHolder.adapterPosition
+                            val imageData = items[idx] as RemovableImageListItem.Image
+                            imageSelectionListener.invoke(imageData.imageUri)
+                        }
                     }
                     viewHolder.removeButton.setOnClickListener {
-                        val idx = viewHolder.adapterPosition
-                        val imageData = items[idx] as RemovableImageListItem.Image
-                        removeImageClickListener.invoke(imageData.imageUri)
+                        if (enabled) {
+                            val idx = viewHolder.adapterPosition
+                            val imageData = items[idx] as RemovableImageListItem.Image
+                            removeImageClickListener.invoke(imageData.imageUri)
+                        }
                     }
                 }
             R.layout.sm_image_button_list_item_56 ->

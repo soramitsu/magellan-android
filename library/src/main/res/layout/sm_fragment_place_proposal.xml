@@ -128,7 +128,7 @@
                 android:layout_marginEnd="@dimen/sm_margin_padding_size_medium">
 
                 <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/websiteTditText"
+                    android:id="@+id/websiteEditText"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="@string/sm_website"
@@ -249,6 +249,15 @@
 
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
+
+    <ProgressBar
+        android:id="@+id/progressBar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:visibility="gone"
+        tools:visibility="visible"
+        />
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/createAndSendForReviewButton"

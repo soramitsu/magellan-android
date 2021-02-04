@@ -114,6 +114,10 @@
     <string name="sm_save">Save</string>
     <string name="sm_add_opening_hours">Add opening hours %1$s</string>
     <string name="sm_change_schedule">Change schedule</string>
+    <string name="sm_failed_to_upload_place_info">Failed to upload place info</string>
+    <string name="sm_invalid_field_value">Invalid field value</string>
+    <string name="sm_your_request_is_being_processed">Your request is being processed</string>
+    <string name="sm_we_will_check_the_information_and_notify_you_when_the_place_is_published">We will check the information and notify you when the place is published</string>
 
     <plurals name="sm_reviews_format">
         <item quantity="one">(%1$d review)</item>

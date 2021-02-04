@@ -15,6 +15,10 @@ import kotlinx.android.synthetic.main.sm_add_place_fragment.*
 
 class AddPlaceFragment : BottomSheetDialogFragment() {
 
+    interface Listener {
+        fun onAddPlaceButtonClick(position: LatLng, address: String)
+    }
+
     private val position: LatLng get() = requireArguments().getParcelable<LatLng>(EXTRA_POSITION) as LatLng
 
     override fun onCreateView(
@@ -42,10 +46,8 @@ class AddPlaceFragment : BottomSheetDialogFragment() {
         addressTextView.visibility = if (address.isEmpty()) View.GONE else View.VISIBLE
 
         addPlaceButton.setOnClickListener {
-            context?.let { context ->
-                val intent = ProposePlaceActivity.createLaunchIntent(context, position, address)
-                context.startActivity(intent)
-            }
+            (targetFragment as? Listener)?.onAddPlaceButtonClick(position, address)
+            dismiss()
         }
     }
 

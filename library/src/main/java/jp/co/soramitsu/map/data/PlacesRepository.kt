@@ -16,6 +16,7 @@ interface PlacesRepository {
     fun updatePlaceRating(placeId: String, newRating: Int, comment: String)
     fun deleteReview(userReview: Review, place: Place)
     fun getPlaceReviews(placeId: String): List<Review>
+    fun add(place: Place)
 }
 
 data class MapParams(
