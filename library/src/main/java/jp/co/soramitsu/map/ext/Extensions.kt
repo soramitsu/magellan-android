@@ -3,14 +3,19 @@ package jp.co.soramitsu.map.ext
 import android.content.ContentResolver
 import android.content.ContentUris
 import android.content.Context
+import android.location.Geocoder
 import android.net.Uri
 import android.provider.MediaStore
+import android.util.Log
 import android.util.TypedValue
 import android.view.View
 import androidx.annotation.AttrRes
 import androidx.annotation.ColorInt
 import com.google.android.gms.maps.model.LatLng
+import jp.co.soramitsu.map.BuildConfig
 import jp.co.soramitsu.map.model.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import java.time.DayOfWeek
 import java.time.temporal.WeekFields
 import java.util.*
@@ -184,3 +189,20 @@ fun List<DayOfWeek>.intervals(locale: Locale = Locale.getDefault()): List<Pair<D
 
     return intervals
 }
+
+suspend fun Position.addressString(
+    context: Context,
+    logFun: (Exception) -> Unit = { if (BuildConfig.DEBUG) Log.w("Geocoder", it) }
+): String = withContext(Dispatchers.IO) {
+    try {
+        val geocoder = Geocoder(context)
+        val addresses = geocoder.getFromLocation(latitude, longitude, 1)
+        val haveAddress = addresses.isNotEmpty() && addresses[0].maxAddressLineIndex >= 0
+        if (haveAddress) addresses[0].getAddressLine(0) else ""
+    } catch (exception: Exception) {
+        logFun.invoke(exception)
+        ""
+    }
+}
+
+fun LatLng.toPosition(): Position = Position(latitude, longitude)

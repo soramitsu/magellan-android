@@ -27,6 +27,7 @@ import jp.co.soramitsu.map.SoramitsuMapLibraryConfig
 import jp.co.soramitsu.map.data.MapParams
 import jp.co.soramitsu.map.ext.asLatLng
 import jp.co.soramitsu.map.ext.getResourceIdForAttr
+import jp.co.soramitsu.map.ext.toPosition
 import jp.co.soramitsu.map.model.Category
 import jp.co.soramitsu.map.model.GeoPoint
 import jp.co.soramitsu.map.model.Place
@@ -281,7 +282,7 @@ open class SoramitsuMapFragment : Fragment(R.layout.sm_fragment_map_soramitsu), 
             })
 
             googleMap.setOnMapClickListener { position ->
-                viewModel.onMapClickedAtPosition(Position(position.latitude, position.longitude))
+                viewModel.onMapClickedAtPosition(position.toPosition())
 
                 (parentFragmentManager.findFragmentByTag("Place") as? PlaceFragment)?.dismiss()
 
