@@ -118,6 +118,10 @@
     <string name="sm_invalid_field_value">Invalid field value</string>
     <string name="sm_your_request_is_being_processed">Your request is being processed</string>
     <string name="sm_we_will_check_the_information_and_notify_you_when_the_place_is_published">We will check the information and notify you when the place is published</string>
+    <string name="sm_done">Done</string>
+    <string name="sm_move_the_map_or_enter_the_address_in_the_input_to_choose_the_right_place">Move the map or enter the address in the input to choose the right place</string>
+    <string name="sm_location_on_map">Location on map</string>
+    <string name="sm_close_change_place_position_screen">Close change place position screen</string>
 
     <plurals name="sm_reviews_format">
         <item quantity="one">(%1$d review)</item>

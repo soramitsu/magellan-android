@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <com.google.android.gms.maps.MapView
+        android:id="@+id/mapView"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toTopOf="@id/bottomPanelBackground"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+        android:id="@+id/arrowsImageView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_margin="@dimen/sm_margin_padding_size_medium"
+        android:importantForAccessibility="no"
+        app:layout_constraintBottom_toTopOf="@id/mapPointer"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:srcCompat="@drawable/sm_map_pointer" />
+
+    <ImageView
+        android:id="@+id/arrowView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:importantForAccessibility="no"
+        app:layout_constraintEnd_toEndOf="@id/arrowsImageView"
+        app:layout_constraintStart_toStartOf="@id/arrowsImageView"
+        app:layout_constraintTop_toBottomOf="@id/arrowsImageView"
+        app:srcCompat="@drawable/sm_arrow_drop_down_8" />
+
+    <View
+        android:id="@+id/mapPointer"
+        android:layout_width="4dp"
+        android:layout_height="4dp"
+        android:background="@drawable/sm_black_circle"
+        app:layout_constraintBottom_toBottomOf="@id/mapView"
+        app:layout_constraintEnd_toEndOf="@id/mapView"
+        app:layout_constraintStart_toStartOf="@id/mapView"
+        app:layout_constraintTop_toTopOf="@id/mapView" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/closeScreenButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:contentDescription="@string/sm_close_change_place_position_screen"
+        android:src="@drawable/sm_ic_arrow_back_24"
+        app:backgroundTint="@android:color/white"
+        app:ensureMinTouchTargetSize="true"
+        app:fabSize="mini"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/bottomPanelBackground"
+        app:useCompatPadding="true" />
+
+    <View
+        android:id="@+id/bottomPanelBackground"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:background="@drawable/sm_rounded_background"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toTopOf="@id/topBarrier" />
+
+    <androidx.constraintlayout.widget.Barrier
+        android:id="@+id/topBarrier"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:barrierDirection="top"
+        app:barrierMargin="-8dp"
+        app:constraint_referenced_ids="topperView" />
+
+    <View
+        android:id="@+id/topperView"
+        android:layout_width="?attr/sm_categoriesBottomSheetTopperWidth"
+        android:layout_height="?attr/sm_categoriesBottomSheetTopperHeight"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="@dimen/sm_margin_padding_size_small"
+        android:layout_marginBottom="@dimen/sm_margin_padding_size_small"
+        app:layout_constraintBottom_toTopOf="@id/selectPointTitleTextView"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <TextView
+        android:id="@+id/selectPointTitleTextView"
+        style="?sm_textViewStyleBold20"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/sm_margin_padding_size_small"
+        android:paddingStart="@dimen/sm_margin_padding_size_medium"
+        android:paddingEnd="@dimen/sm_margin_padding_size_medium"
+        android:text="@string/sm_location_on_map"
+        app:layout_constraintBottom_toTopOf="@id/selectPointHintTextView" />
+
+    <TextView
+        android:id="@+id/selectPointHintTextView"
+        style="?sm_textViewStyleRegular14"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/sm_margin_padding_size_medium"
+        android:paddingStart="@dimen/sm_margin_padding_size_medium"
+        android:paddingEnd="@dimen/sm_margin_padding_size_medium"
+        android:text="@string/sm_move_the_map_or_enter_the_address_in_the_input_to_choose_the_right_place"
+        app:layout_constraintBottom_toTopOf="@id/addressTextInputLayout" />
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/addressTextInputLayout"
+        style="@style/SM.Widget.Soramitsu.TextInputLayout.FilledBox"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/sm_margin_padding_size_medium"
+        app:endIconMode="clear_text"
+        app:layout_constraintBottom_toTopOf="@id/doneButton">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/addressEditText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/sm_address"
+            android:inputType="textPostalAddress"
+            android:maxLines="1"
+            android:textAppearance="@style/SM.TextAppearance.Soramitsu.MaterialComponents.Body1"
+            tools:text="298 Street 93, Phnom Penh 12258, Cambodia" />
+
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/doneButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/sm_margin_padding_size_medium"
+        android:insetTop="0dp"
+        android:insetBottom="0dp"
+        android:text="@string/sm_done"
+        android:textAllCaps="false"
+        android:textAppearance="@style/SM.TextAppearance.Soramitsu.MaterialComponents.Headline6"
+        android:textSize="15sp"
+        app:cornerRadius="12dp"
+        app:layout_constraintBottom_toBottomOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

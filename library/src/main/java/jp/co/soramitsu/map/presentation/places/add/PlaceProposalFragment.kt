@@ -5,20 +5,16 @@ import android.net.Uri
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
-import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.bumptech.glide.Glide
 import com.bumptech.glide.RequestManager
-import com.google.android.gms.maps.model.LatLng
 import jp.co.soramitsu.map.R
 import jp.co.soramitsu.map.model.Category
 import jp.co.soramitsu.map.model.Place
-import jp.co.soramitsu.map.model.Position
 import jp.co.soramitsu.map.model.Schedule
 import jp.co.soramitsu.map.presentation.places.add.image.*
-import jp.co.soramitsu.map.presentation.places.add.schedule.ScheduleFragmentHost
-import jp.co.soramitsu.map.presentation.places.add.schedule.ScheduleViewModel
+import jp.co.soramitsu.map.presentation.places.add.schedule.PlaceProposalViewModel
 import kotlinx.android.synthetic.main.sm_fragment_place_proposal.*
 
 class PlaceProposalFragment :
@@ -31,8 +27,8 @@ class PlaceProposalFragment :
 
     // shared between PlaceProposalFragment and AddScheduleFragment to
     // apply schedule changes and display them to user
-    private lateinit var scheduleViewModel: ScheduleViewModel
     private lateinit var addPlaceViewModel: AddPlaceViewModel
+    private lateinit var placeProposalViewModel: PlaceProposalViewModel
 
     private val requestManager: RequestManager?
         get() = try {
@@ -46,24 +42,31 @@ class PlaceProposalFragment :
         super.onViewCreated(view, savedInstanceState)
 
         addPlaceViewModel = ViewModelProvider(this, ViewModelProvider.NewInstanceFactory())[AddPlaceViewModel::class.java]
-        scheduleViewModel = ViewModelProvider(requireActivity(), ViewModelProvider.NewInstanceFactory())[ScheduleViewModel::class.java]
+        placeProposalViewModel = ViewModelProvider(
+            requireActivity(),
+            ViewModelProvider.NewInstanceFactory()
+        )[PlaceProposalViewModel::class.java]
 
         addPlaceViewModel.viewState.observe(viewLifecycleOwner) { viewState -> viewState.render() }
 
-        scheduleViewModel.schedule.observe(viewLifecycleOwner) { schedule ->
+        placeProposalViewModel.schedule.observe(viewLifecycleOwner) { schedule ->
             scheduleSection.schedule = schedule
         }
 
         toolbar.setNavigationOnClickListener { activity?.onBackPressed() }
 
-        addressTextView.text = requireArguments().getString(EXTRA_ADDRESS)
+        addressTextView.text = placeProposalViewModel.address
 
         scheduleSection.setOnAddButtonClickListener {
-            (activity as? ScheduleFragmentHost)?.showScheduleFragment()
+            placeProposalViewModel.onAddScheduleButtonClicked()
         }
 
         scheduleSection.setOnChangeScheduleButtonClickListener {
-            (activity as? ScheduleFragmentHost)?.showScheduleFragment()
+            placeProposalViewModel.onChangeScheduleButtonClicked()
+        }
+
+        addressTextView.setOnClickListener {
+            placeProposalViewModel.onChangeAddressButtonClicked()
         }
 
         categoryTextView.setOnClickListener {
@@ -124,11 +127,7 @@ class PlaceProposalFragment :
             photosRecyclerView.adapter = photosAdapter
 
             createAndSendForReviewButton.setOnClickListener {
-                val latLng = requireNotNull(requireArguments().getParcelable<LatLng>(EXTRA_POSITION))
-                val position = Position(
-                    latitude = latLng.latitude,
-                    longitude = latLng.longitude
-                )
+                val position = placeProposalViewModel.position ?: return@setOnClickListener
                 val place = Place(
                     name = placeNameEditText.text.toString(),
                     category = categoryTextView.category,
@@ -146,13 +145,6 @@ class PlaceProposalFragment :
     override fun onImagesSelected(selectedImages: List<Uri>, imagePickerCode: ImagePickerCode) = when (imagePickerCode) {
         ImagePickerCode.SINGLE_CHOICE -> onLogoSelected(selectedImages.first())
         ImagePickerCode.MULTICHOICE -> onPhotosSelected(selectedImages)
-    }
-
-    fun withParams(position: LatLng, address: String) = this.apply {
-        arguments = bundleOf(
-            EXTRA_POSITION to position,
-            EXTRA_ADDRESS to address
-        )
     }
 
     override fun onCategorySelected(category: Category) {
@@ -249,9 +241,6 @@ class PlaceProposalFragment :
     }
 
     private companion object {
-        private const val EXTRA_POSITION = "jp.co.soramitsu.map.presentation.places.add.Position"
-        private const val EXTRA_ADDRESS = "jp.co.soramitsu.map.presentation.places.add.Address"
-
         private const val ADD_PHOTO_BUTTON = 1
         private const val UPDATE_LOGO_BUTTON = 2
     }
