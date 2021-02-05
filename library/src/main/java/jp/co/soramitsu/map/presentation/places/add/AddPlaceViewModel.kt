@@ -1,27 +1,31 @@
 package jp.co.soramitsu.map.presentation.places.add
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import jp.co.soramitsu.map.BuildConfig
+import jp.co.soramitsu.map.Logger
 import jp.co.soramitsu.map.SoramitsuMapLibraryConfig
 import jp.co.soramitsu.map.data.PlacesRepository
 import jp.co.soramitsu.map.model.Place
+import jp.co.soramitsu.map.presentation.places.add.image.ImageUriToByteArrayConverter
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-class AddPlaceViewModel(
+internal class AddPlaceViewModel(
+    private val imageUriToByteArrayConverter: ImageUriToByteArrayConverter,
     private val placesRepository: PlacesRepository = SoramitsuMapLibraryConfig.repository,
     private val backgroundDispatcher: CoroutineDispatcher = Dispatchers.IO,
-    private val errorLogFun: (Exception) -> Unit = { if (BuildConfig.DEBUG) Log.w("AddPlace", it) }
+    private val logger: Logger = SoramitsuMapLibraryConfig.logger
 ) : ViewModel() {
 
     private val _viewState = MutableLiveData<AddPlaceViewState>()
-    val viewState: LiveData<AddPlaceViewState> = _viewState
+    internal val viewState: LiveData<AddPlaceViewState> = _viewState
+
+    internal var logoUriString: String = ""
+    internal var promoImageUriString: String = ""
 
     fun addPlace(place: Place) {
         viewModelScope.launch {
@@ -34,10 +38,17 @@ class AddPlaceViewModel(
                 }
 
                 _viewState.value = AddPlaceViewState.Loading
-                withContext(backgroundDispatcher) { placesRepository.add(place) }
+                withContext(backgroundDispatcher) {
+                    placesRepository.add(
+                        place.copy(
+                            logo = imageUriToByteArrayConverter.convert(logoUriString),
+                            promoImage = imageUriToByteArrayConverter.convert(promoImageUriString),
+                        )
+                    )
+                }
                 _viewState.value = AddPlaceViewState.Success
             } catch (exception: Exception) {
-                errorLogFun.invoke(exception)
+                logger.log("AddPlace", exception)
                 _viewState.value = AddPlaceViewState.Error(exception)
             }
         }

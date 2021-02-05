@@ -191,6 +191,11 @@ internal class SoramitsuMapViewModel(
             val categoryListItems = allCategories.map { category ->
                 CategoryListItem(category, category.id in requestParams.categoriesIds)
             }
+
+            if (mapParams.topLeft == GeoPoint(0.0, 0.0) && mapParams.bottomRight == GeoPoint(0.0, 0.0)) {
+                return@launch
+            }
+
             val placesAndClusters = getAllPlacesAndClustersSuspend(mapParams, requestParams)
             val clusters = placesAndClusters.second.filter { cluster -> cluster.count > 1 }
             viewState.value = currentState.copy(

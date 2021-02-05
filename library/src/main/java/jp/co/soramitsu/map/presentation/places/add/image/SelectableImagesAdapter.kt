@@ -4,8 +4,8 @@ import android.net.Uri
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.CheckBox
 import android.widget.ImageView
+import androidx.annotation.DrawableRes
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.RequestManager
@@ -55,13 +55,19 @@ class SelectableImagesAdapter(
     ) : RecyclerView.ViewHolder(itemView) {
 
         private val imageView: ImageView = itemView.findViewById(R.id.image)
-        private val checkBox: CheckBox = itemView.findViewById(R.id.checkbox)
+        private val checkIndicator: ImageView = itemView.findViewById(R.id.checkIndicator)
 
         fun bind(selectable: Boolean, imageData: SelectableImage) {
             requestManager.load(imageData.imageUri).into(imageView)
 
-            checkBox.visibility = if (selectable) View.VISIBLE else View.GONE
-            checkBox.isChecked = imageData.selected
+            checkIndicator.visibility = if (selectable) View.VISIBLE else View.GONE
+
+            @DrawableRes val imageRes = if (imageData.selected) {
+                R.drawable.sm_white_circle_checked
+            } else {
+                R.drawable.sm_white_circle
+            }
+            checkIndicator.setImageResource(imageRes)
         }
     }
 

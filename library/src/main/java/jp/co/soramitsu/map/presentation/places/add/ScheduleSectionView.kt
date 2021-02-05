@@ -2,14 +2,13 @@ package jp.co.soramitsu.map.presentation.places.add
 
 import android.content.Context
 import android.util.AttributeSet
-import android.util.Log
 import android.view.View
 import androidx.annotation.LayoutRes
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintSet
 import androidx.transition.TransitionManager
-import jp.co.soramitsu.map.BuildConfig
 import jp.co.soramitsu.map.R
+import jp.co.soramitsu.map.SoramitsuMapLibraryConfig
 import jp.co.soramitsu.map.model.Schedule
 import jp.co.soramitsu.map.presentation.places.DetailedScheduleAdapter
 import jp.co.soramitsu.map.presentation.places.add.schedule.generateLaunchTimeFields
@@ -21,6 +20,8 @@ class ScheduleSectionView @JvmOverloads constructor(
     attributeSet: AttributeSet? = null,
     defaultStyleResId: Int = 0
 ) : ConstraintLayout(context, attributeSet, defaultStyleResId) {
+
+    private val logger = SoramitsuMapLibraryConfig.logger
 
     @ExperimentalStdlibApi
     var schedule: Schedule? = null
@@ -52,7 +53,7 @@ class ScheduleSectionView @JvmOverloads constructor(
     @ExperimentalStdlibApi
     private fun SectionState.render() = when (this) {
         is SectionState.DisplaySchedule -> {
-            log("transition to display schedule")
+            logger.log(TAG, "transition to display schedule")
 
             transitionTo(R.layout.sm_set_working_hours_section_display_schedule_state)
 
@@ -61,7 +62,7 @@ class ScheduleSectionView @JvmOverloads constructor(
             adapter.update(workingScheduleAsPairsList + lunchScheduleAsPairsList)
         }
         SectionState.NoScheduleYet -> {
-            log("transition to schedule not set")
+            logger.log(TAG, "transition to schedule not set")
 
             transitionTo(R.layout.sm_set_working_hours_section_display_schedule_state)
         }
@@ -72,12 +73,6 @@ class ScheduleSectionView @JvmOverloads constructor(
         constraintSet.load(context, targetStateResId)
         TransitionManager.beginDelayedTransition(this)
         constraintSet.applyTo(this)
-    }
-
-    private fun log(message: String) {
-        if (BuildConfig.DEBUG) {
-            Log.d("ScheduleSectionView", message)
-        }
     }
 
     init {
@@ -92,5 +87,9 @@ class ScheduleSectionView @JvmOverloads constructor(
     private sealed class SectionState {
         data class DisplaySchedule(val schedule: Schedule) : SectionState()
         object NoScheduleYet : SectionState()
+    }
+
+    private companion object {
+        private const val TAG = "AddPlace"
     }
 }
