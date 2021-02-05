@@ -121,6 +121,10 @@ internal class DemoPlacesRepository : PlacesRepository {
         return Pair(places, emptyList())
     }
 
+    override fun addReview(placeId: String, newRating: Int, comment: String) {
+        updatePlaceRating(placeId, newRating, comment)
+    }
+
     override fun updatePlaceRating(placeId: String, newRating: Int, text: String) {
         val placeIdx = places.indexOfFirst { place ->  place.id == placeId }
         val review = places[placeIdx].reviews.find { review -> review.author.user }

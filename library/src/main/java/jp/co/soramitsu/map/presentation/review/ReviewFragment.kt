@@ -25,6 +25,7 @@ internal class ReviewFragment : BottomSheetDialogFragment() {
     private val placeName: String get() = requireArguments().getString(EXTRA_PLACE_NAME).orEmpty()
     private val initialRating: Int get() = requireArguments().getInt(EXTRA_INITIAL_RATING, 0)
     private val comment: String get() = requireArguments().getString(EXTRA_COMMENT, "").orEmpty()
+    private val isEdit: Boolean get() = requireArguments().getBoolean(EXTRA_EDIT)
 
     private val viewModel: ReviewViewModel by lazy {
         ViewModelProvider(this, ViewModelProvider.NewInstanceFactory())[ReviewViewModel::class.java]
@@ -68,11 +69,19 @@ internal class ReviewFragment : BottomSheetDialogFragment() {
         commentEditText.setText(comment)
         postButton.setOnClickListener {
             activity?.onUserInteraction()
-            viewModel.addReview(
-                placeId = placeId,
-                rating = placeRatingBar.rating.toInt(),
-                comment = commentEditText.text.toString()
-            )
+            if (isEdit) {
+                viewModel.updateReview(
+                    placeId = placeId,
+                    rating = placeRatingBar.rating.toInt(),
+                    comment = commentEditText.text.toString()
+                )
+            } else {
+                viewModel.addReview(
+                    placeId = placeId,
+                    rating = placeRatingBar.rating.toInt(),
+                    comment = commentEditText.text.toString()
+                )
+            }
         }
 
         commentEditText.doOnTextChanged { text, start, before, count ->
@@ -108,12 +117,13 @@ internal class ReviewFragment : BottomSheetDialogFragment() {
         })
     }
 
-    fun withArguments(placeId: String, placeName: String, initialRating: Int, comment: String = ""): ReviewFragment {
+    fun withArguments(placeId: String, placeName: String, initialRating: Int, edit: Boolean, comment: String = ""): ReviewFragment {
         arguments = bundleOf(
             EXTRA_PLACE_ID to placeId,
             EXTRA_PLACE_NAME to placeName,
             EXTRA_INITIAL_RATING to initialRating,
-            EXTRA_COMMENT to comment
+            EXTRA_COMMENT to comment,
+            EXTRA_EDIT to edit
         )
 
         return this
@@ -124,5 +134,6 @@ internal class ReviewFragment : BottomSheetDialogFragment() {
         private const val EXTRA_PLACE_NAME = "PlaceName"
         private const val EXTRA_INITIAL_RATING = "InitialRating"
         private const val EXTRA_COMMENT = "Comment"
+        private const val EXTRA_EDIT = "Edit"
     }
 }

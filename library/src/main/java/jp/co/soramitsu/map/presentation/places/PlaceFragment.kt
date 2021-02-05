@@ -90,6 +90,7 @@ internal class PlaceFragment : BottomSheetDialogFragment() {
                     placeId = place.id,
                     placeName = place.name,
                     comment = userReview?.text.orEmpty(),
+                    edit = true,
                     initialRating = initialRating.toInt()
                 ).show(parentFragmentManager, "AddPlaceReviewFragment")
             })
@@ -227,7 +228,8 @@ internal class PlaceFragment : BottomSheetDialogFragment() {
                 ReviewFragment().withArguments(
                     placeId = place.id,
                     placeName = place.name,
-                    initialRating = newRating
+                    initialRating = newRating,
+                    edit = false
                 ).show(parentFragmentManager, "AddPlaceReviewFragment")
             }
         }

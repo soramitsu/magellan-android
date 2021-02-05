@@ -66,6 +66,7 @@ class ReviewView @JvmOverloads constructor(
         reviewAndSummaryRateThisPlaceRatingBar.setOnRatingBarChangeListener { _, newRating, fromUser ->
             if (fromUser) {
                 onUserChangeRatingListener.invoke(newRating.toInt())
+                reviewAndSummaryRateThisPlaceRatingBar.rating = 0f
             }
         }
 
