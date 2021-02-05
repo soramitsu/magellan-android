@@ -14,6 +14,7 @@ import androidx.core.view.doOnLayout
 import com.bumptech.glide.Glide
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import jp.co.soramitsu.map.R
+import jp.co.soramitsu.map.SoramitsuMapLibraryConfig
 import jp.co.soramitsu.map.ext.images
 import kotlinx.android.synthetic.main.sm_multichoice_image_picker.*
 import kotlinx.android.synthetic.main.sm_single_choice_image_picker.imagesRecyclerView
@@ -35,17 +36,23 @@ class MultichoiceBottomSheetImagePicker : BottomSheetDialogFragment() {
 
         view.doOnLayout { (view.parent as? View)?.setBackgroundColor(Color.TRANSPARENT) }
 
-        imagesAdapter = SelectableImagesAdapter(Glide.with(this), true)
+        imagesAdapter = SelectableImagesAdapter(Glide.with(this), SoramitsuMapLibraryConfig.enableMultiplePlacePhotos)
         imagesRecyclerView.adapter = imagesAdapter
         imagesAdapter.setOnImageSelectedListener { selectedItem ->
-            val updatedItems = imagesAdapter.items.toMutableList()
-            val updateIdx = updatedItems.indexOf(selectedItem)
-            if (updateIdx >= 0) {
-                updatedItems[updateIdx] = selectedItem.copy(selected = selectedItem.selected.not())
-                imagesAdapter.update(updatedItems)
-            }
+            if (SoramitsuMapLibraryConfig.enableMultiplePlacePhotos) {
+                val updatedItems = imagesAdapter.items.toMutableList()
+                val updateIdx = updatedItems.indexOf(selectedItem)
+                if (updateIdx >= 0) {
+                    updatedItems[updateIdx] = selectedItem.copy(selected = selectedItem.selected.not())
+                    imagesAdapter.update(updatedItems)
+                }
 
-            updateConfirmButtonTitle(updatedItems.count { it.selected })
+                updateConfirmButtonTitle(updatedItems.count { it.selected })
+            } else {
+                val listener = parentFragment as? ImagesSelectionListener
+                listener?.onImagesSelected(listOf(selectedItem.imageUri), ImagePickerCode.MULTICHOICE)
+                dismiss()
+            }
         }
 
         updateConfirmButtonTitle(0)

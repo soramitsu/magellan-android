@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.view.View
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.bumptech.glide.Glide
 import com.bumptech.glide.RequestManager
@@ -41,7 +42,14 @@ class PlaceProposalFragment :
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        addPlaceViewModel = ViewModelProvider(this, ViewModelProvider.NewInstanceFactory())[AddPlaceViewModel::class.java]
+        addPlaceViewModel = ViewModelProvider(
+            this, object : ViewModelProvider.Factory {
+                override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+                    val converter = DefaultImageUriToByteArrayConverter(requireContext().applicationContext)
+                    return AddPlaceViewModel(converter) as T
+                }
+            }
+        )[AddPlaceViewModel::class.java]
         placeProposalViewModel = ViewModelProvider(
             requireActivity(),
             ViewModelProvider.NewInstanceFactory()
@@ -130,6 +138,7 @@ class PlaceProposalFragment :
                 val position = placeProposalViewModel.position ?: return@setOnClickListener
                 val place = Place(
                     name = placeNameEditText.text.toString(),
+                    address = addressTextView.text.toString(),
                     category = categoryTextView.category,
                     position = position,
                     phone = placePhoneNumberEditText.text.toString(),
@@ -160,6 +169,8 @@ class PlaceProposalFragment :
             RemovableImagesAdapter.RemovableImageListItem.Image(logoUri)
         )
         logoAdapter.update(items)
+
+        addPlaceViewModel.logoUriString = logoUri.toString()
     }
 
     private fun onPhotosSelected(selectedImages: List<Uri>) {
@@ -175,6 +186,8 @@ class PlaceProposalFragment :
             RemovableImagesAdapter.RemovableImageListItem.Image(uri)
         }
         photosAdapter.update(buttons + images)
+
+        addPlaceViewModel.promoImageUriString = selectedImages.firstOrNull()?.toString().orEmpty()
     }
 
     private fun showPhoto(sharedView: View, photoUri: Uri) {
@@ -216,7 +229,7 @@ class PlaceProposalFragment :
             progressBar.visibility = View.GONE
             toggleUiAvailability(true)
 
-            when(this.invalidField) {
+            when (this.invalidField) {
                 AddPlaceViewState.ValidationFailed.Field.NAME -> {
                     placeNameTextInputLayout.isErrorEnabled = true
                     placeNameTextInputLayout.error = getString(R.string.sm_invalid_field_value)

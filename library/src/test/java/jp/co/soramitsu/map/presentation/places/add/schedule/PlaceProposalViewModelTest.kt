@@ -2,6 +2,7 @@ package jp.co.soramitsu.map.presentation.places.add.schedule
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.google.common.truth.Truth.assertThat
+import jp.co.soramitsu.map.EmptyLogger
 import jp.co.soramitsu.map.model.Time
 import jp.co.soramitsu.map.model.WorkDay
 import org.junit.Rule
@@ -11,7 +12,7 @@ import java.util.*
 
 class PlaceProposalViewModelTest {
 
-    private val viewModel = PlaceProposalViewModel(logFun = {})
+    private val viewModel = PlaceProposalViewModel(EmptyLogger())
 
     @get:Rule
     val instantTaskExecutorRule = InstantTaskExecutorRule()

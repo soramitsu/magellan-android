@@ -1,10 +1,10 @@
 package jp.co.soramitsu.map.presentation.places.add.schedule
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import jp.co.soramitsu.map.BuildConfig
+import jp.co.soramitsu.map.Logger
+import jp.co.soramitsu.map.SoramitsuMapLibraryConfig
 import jp.co.soramitsu.map.model.Position
 import jp.co.soramitsu.map.model.Schedule
 import jp.co.soramitsu.map.model.Time
@@ -13,7 +13,7 @@ import jp.co.soramitsu.map.presentation.lifycycle.SingleLiveEvent
 import java.time.DayOfWeek
 
 class PlaceProposalViewModel(
-    private val logFun: (String) -> Unit = { if (BuildConfig.DEBUG) Log.d("Schedule", it) }
+    private val logger: Logger = SoramitsuMapLibraryConfig.logger
 ) : ViewModel() {
 
     private val _schedule = MutableLiveData<Schedule>()
@@ -29,29 +29,29 @@ class PlaceProposalViewModel(
     var address: String = ""
 
     fun onSectionChanged(sectionData: SectionData) {
-        logFun.invoke("onSectionChanged")
+        logger.log(TAG, "onSectionChanged")
         logSections()
 
         applySectionChanges(sectionData)
 
-        logFun.invoke("After apply changes")
+        logger.log(TAG, "After apply changes")
         logSections()
     }
 
     fun onSaveButtonClick(lastSectionData: SectionData) {
-        logFun.invoke("Save button click")
+        logger.log(TAG, "Save button click")
         logSections()
 
         applySectionChanges(lastSectionData)
         emitNewSchedule()
 
-        logFun.invoke("After add")
+        logger.log(TAG, "After add")
         logSections()
     }
 
     fun addSection(currentSectionData: SectionData) {
-        logFun.invoke("Add section")
-        logFun.invoke("Current state")
+        logger.log(TAG, "Add section")
+        logger.log(TAG, "Current state")
         logSections()
 
         applySectionChanges(currentSectionData)
@@ -61,13 +61,13 @@ class PlaceProposalViewModel(
 
         _sections.value = sections
 
-        logFun.invoke("After add")
+        logger.log(TAG, "After add")
         logSections()
     }
 
     fun removeSectionWithId(sectionId: Int) {
-        logFun.invoke("Remove section $sectionId")
-        logFun.invoke("Current state")
+        logger.log(TAG, "Remove section $sectionId")
+        logger.log(TAG, "Current state")
         logSections()
 
         _sections.value?.let { value ->
@@ -89,7 +89,7 @@ class PlaceProposalViewModel(
             _sections.value = sections
         }
 
-        logFun.invoke("After remove")
+        logger.log(TAG, "After remove")
         logSections()
     }
 
@@ -125,10 +125,13 @@ class PlaceProposalViewModel(
         }
 
     private fun logSections() {
-        _sections.value?.forEach {
-            logFun.invoke("Section ${it.id}")
-            logFun.invoke(it.daysMap.entries.sortedBy { it.key }.map { it.value }
-                .joinToString(separator = " "))
+        _sections.value?.forEach { section ->
+            logger.log(TAG, "Section ${section.id}")
+            logger.log(TAG, section.daysMap.entries
+                .sortedBy { it.key }
+                .map { it.value }
+                .joinToString(separator = " ")
+            )
         }
     }
 
@@ -168,6 +171,10 @@ class PlaceProposalViewModel(
             }
         }
         return SectionData(SectionData.nextId++, daysMap = daysMap)
+    }
+
+    private companion object {
+        private const val TAG = "Schedule"
     }
 }
 
