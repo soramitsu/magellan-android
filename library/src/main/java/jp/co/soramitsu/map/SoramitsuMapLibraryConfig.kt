@@ -10,4 +10,8 @@ object SoramitsuMapLibraryConfig {
     var repository: PlacesRepository = DemoPlacesRepository()
 
     var enableDetailedSchedule: Boolean = BuildConfig.DEBUG
+
+    var enableMultiplePlacePhotos: Boolean = false
+
+    var logger: Logger = object : Logger { }
 }
