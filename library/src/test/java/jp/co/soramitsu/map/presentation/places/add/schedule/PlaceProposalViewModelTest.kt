@@ -9,9 +9,9 @@ import org.junit.Test
 import java.time.DayOfWeek
 import java.util.*
 
-class ScheduleViewModelTest {
+class PlaceProposalViewModelTest {
 
-    private val viewModel = ScheduleViewModel(logFun = {})
+    private val viewModel = PlaceProposalViewModel(logFun = {})
 
     @get:Rule
     val instantTaskExecutorRule = InstantTaskExecutorRule()

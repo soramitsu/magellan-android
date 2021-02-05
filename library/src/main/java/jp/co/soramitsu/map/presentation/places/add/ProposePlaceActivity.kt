@@ -6,19 +6,31 @@ import android.net.Uri
 import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.ViewModelProvider
 import androidx.transition.*
 import com.google.android.gms.maps.model.LatLng
 import jp.co.soramitsu.map.R
+import jp.co.soramitsu.map.ext.toPosition
+import jp.co.soramitsu.map.model.Position
 import jp.co.soramitsu.map.presentation.places.add.image.PhotoFragment
 import jp.co.soramitsu.map.presentation.places.add.image.PhotoShower
 import jp.co.soramitsu.map.presentation.places.add.schedule.AddScheduleFragment
-import jp.co.soramitsu.map.presentation.places.add.schedule.ScheduleFragmentHost
+import jp.co.soramitsu.map.presentation.places.add.schedule.PlaceProposalViewModel
+import jp.co.soramitsu.map.presentation.places.add.schedule.Screen
 
 class ProposePlaceActivity
-    : AppCompatActivity(R.layout.sm_activity_place_proposal), PhotoShower, ScheduleFragmentHost {
+    : AppCompatActivity(R.layout.sm_activity_place_proposal), PhotoShower {
 
+    private lateinit var placeProposalViewModel: PlaceProposalViewModel
+
+    @ExperimentalStdlibApi
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        placeProposalViewModel = ViewModelProvider(
+            this,
+            ViewModelProvider.NewInstanceFactory()
+        )[PlaceProposalViewModel::class.java]
 
         if (savedInstanceState == null) {
             val position = intent.extras?.getParcelable<LatLng>(EXTRA_POSITION)
@@ -27,19 +39,37 @@ class ProposePlaceActivity
                 return
             }
             val address = intent.extras?.getString(EXTRA_ADDRESS).orEmpty()
-            val fragment = PlaceProposalFragment().withParams(position, address)
+
+            placeProposalViewModel.address = address
+            placeProposalViewModel.position = position.toPosition()
+
             supportFragmentManager.beginTransaction()
-                .replace(R.id.container, fragment)
+                .replace(R.id.container, PlaceProposalFragment(), "PlaceProposalFragment")
                 .commit()
         }
-    }
+        placeProposalViewModel.screen.observe(this) { screen ->
+            when (screen) {
+                 is Screen.PlaceProposal -> {
+                     supportFragmentManager.beginTransaction()
+                         .replace(R.id.container, PlaceProposalFragment(), "PlaceProposalFragment")
+                         .commit()
+                 }
 
-    @ExperimentalStdlibApi
-    override fun showScheduleFragment() {
-        supportFragmentManager.beginTransaction()
-            .replace(R.id.container, AddScheduleFragment(), "ScheduleFragment")
-            .addToBackStack(null)
-            .commit()
+                is Screen.ChangePosition -> {
+                    supportFragmentManager.beginTransaction()
+                        .replace(R.id.container, SelectPointOnMapFragment(), "SelectPointOnMap")
+                        .addToBackStack(null)
+                        .commit()
+                }
+
+                is Screen.AddSchedule -> {
+                    supportFragmentManager.beginTransaction()
+                        .replace(R.id.container, AddScheduleFragment(), "ScheduleFragment")
+                        .addToBackStack(null)
+                        .commit()
+                }
+            }
+        }
     }
 
     companion object {

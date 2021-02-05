@@ -19,19 +19,19 @@ class AddScheduleFragment : Fragment(R.layout.sm_fragment_add_schedule) {
 
     // shared between PlaceProposalFragment and AddScheduleFragment to
     // apply schedule changes and display them to user
-    private lateinit var scheduleViewModel: ScheduleViewModel
+    private lateinit var placeProposalViewModel: PlaceProposalViewModel
 
     private var currentScheduleSection: ScheduleSectionView? = null
         set(value) {
             field = value
             value?.removeButtonVisibility = scheduleLinearLayout.childCount > 1
             value?.setOnRemoveButtonClickListener {
-                scheduleViewModel.removeSectionWithId(value.tag as Int)
+                placeProposalViewModel.removeSectionWithId(value.tag as Int)
                 currentScheduleSection =
                     scheduleLinearLayout.children.last() as? ScheduleSectionView
             }
             value?.setOnWorkingDaysSelected {
-                scheduleViewModel.onSectionChanged(value.getSectionData())
+                placeProposalViewModel.onSectionChanged(value.getSectionData())
                 updateButtonTitle()
             }
         }
@@ -40,12 +40,12 @@ class AddScheduleFragment : Fragment(R.layout.sm_fragment_add_schedule) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        scheduleViewModel = ViewModelProvider(
+        placeProposalViewModel = ViewModelProvider(
             requireActivity(),
             ViewModelProvider.NewInstanceFactory()
-        )[ScheduleViewModel::class.java]
+        )[PlaceProposalViewModel::class.java]
 
-        scheduleViewModel.sections.observe(viewLifecycleOwner) { sections ->
+        placeProposalViewModel.sections.observe(viewLifecycleOwner) { sections ->
             val alreadyPresentedSectionIds: List<Int> = scheduleLinearLayout
                 .children
                 .filterIsInstance(ScheduleSectionView::class.java)
@@ -95,13 +95,13 @@ class AddScheduleFragment : Fragment(R.layout.sm_fragment_add_schedule) {
 
         addScheduleSection.setOnClickListener {
             currentScheduleSection?.getSectionData()?.let { currentSectionData ->
-                scheduleViewModel.addSection(currentSectionData)
+                placeProposalViewModel.addSection(currentSectionData)
             }
         }
 
         saveButton.setOnClickListener {
             currentScheduleSection?.getSectionData()?.let { currentSectionData ->
-                scheduleViewModel.onSaveButtonClick(currentSectionData)
+                placeProposalViewModel.onSaveButtonClick(currentSectionData)
             }
             activity?.onBackPressed()
         }

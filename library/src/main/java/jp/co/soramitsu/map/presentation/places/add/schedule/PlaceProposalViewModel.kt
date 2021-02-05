@@ -5,12 +5,14 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import jp.co.soramitsu.map.BuildConfig
+import jp.co.soramitsu.map.model.Position
 import jp.co.soramitsu.map.model.Schedule
 import jp.co.soramitsu.map.model.Time
 import jp.co.soramitsu.map.model.WorkDay
+import jp.co.soramitsu.map.presentation.lifycycle.SingleLiveEvent
 import java.time.DayOfWeek
 
-class ScheduleViewModel(
+class PlaceProposalViewModel(
     private val logFun: (String) -> Unit = { if (BuildConfig.DEBUG) Log.d("Schedule", it) }
 ) : ViewModel() {
 
@@ -19,6 +21,12 @@ class ScheduleViewModel(
 
     private val _sections = MutableLiveData(listOf(SectionData(SectionData.nextId++)))
     val sections: LiveData<List<SectionData>> = _sections
+
+    private val _screen = SingleLiveEvent<Screen>(Screen.PlaceProposal)
+    internal val screen: LiveData<Screen> = _screen
+
+    var position: Position? = null
+    var address: String = ""
 
     fun onSectionChanged(sectionData: SectionData) {
         logFun.invoke("onSectionChanged")
@@ -84,7 +92,8 @@ class ScheduleViewModel(
         logFun.invoke("After remove")
         logSections()
     }
-    fun emitNewSchedule() {
+
+    private fun emitNewSchedule() {
         val sections = _sections.value
         val open24Hours = sections?.all {
             // all working days start from 00:00 and finishes at 23:59
@@ -97,6 +106,10 @@ class ScheduleViewModel(
         )
         _schedule.value = newSchedule
     }
+
+    fun onAddScheduleButtonClicked() { _screen.value = Screen.AddSchedule }
+    fun onChangeScheduleButtonClicked() { _screen.value = Screen.AddSchedule }
+    fun onChangeAddressButtonClicked() { _screen.value = Screen.ChangePosition }
 
     private fun SectionData.toWorkDays(): List<WorkDay> = daysMap
         .filterValues { it == SelectionState.Selected }
@@ -192,4 +205,10 @@ data class SectionData(
     companion object {
         var nextId: Int = 1
     }
+}
+
+internal sealed class Screen {
+    object PlaceProposal: Screen()
+    object AddSchedule : Screen()
+    object ChangePosition: Screen()
 }
