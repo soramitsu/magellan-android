@@ -20,15 +20,31 @@ internal class ReviewViewModel(
     val viewState: LiveData<ViewState> = _viewState
 
     fun addReview(placeId: String, rating: Int, comment: String) {
+        execute {
+            placesRepository.addReview(
+                placeId = placeId,
+                newRating = rating,
+                comment = comment
+            )
+        }
+    }
+
+    fun updateReview(placeId: String, rating: Int, comment: String) {
+        execute {
+            placesRepository.updatePlaceRating(
+                placeId = placeId,
+                newRating = rating,
+                comment = comment
+            )
+        }
+    }
+
+    private fun execute(block: () -> Unit) {
         viewModelScope.launch {
             _viewState.value = ViewState.Loading
             val viewState = withContext(backgroundDispatcher) {
                 try {
-                    placesRepository.updatePlaceRating(
-                        placeId = placeId,
-                        newRating = rating,
-                        comment = comment
-                    )
+                    block()
                     ViewState.Submitted
                 } catch (exception: Exception) {
                     ViewState.Error

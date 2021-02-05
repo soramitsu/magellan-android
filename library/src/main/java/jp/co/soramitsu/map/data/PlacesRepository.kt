@@ -13,6 +13,7 @@ interface PlacesRepository {
         requestParams: RequestParams
     ): Pair<List<Place>, List<Cluster>>
 
+    fun addReview(placeId: String, newRating: Int, comment: String)
     fun updatePlaceRating(placeId: String, newRating: Int, comment: String)
     fun deleteReview(userReview: Review, place: Place)
     fun getPlaceReviews(placeId: String): List<Review>

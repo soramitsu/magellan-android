@@ -68,11 +68,19 @@ internal class ReviewFragment : BottomSheetDialogFragment() {
         commentEditText.setText(comment)
         postButton.setOnClickListener {
             activity?.onUserInteraction()
-            viewModel.addReview(
-                placeId = placeId,
-                rating = placeRatingBar.rating.toInt(),
-                comment = commentEditText.text.toString()
-            )
+            if (comment.isEmpty()) {
+                viewModel.addReview(
+                    placeId = placeId,
+                    rating = placeRatingBar.rating.toInt(),
+                    comment = commentEditText.text.toString()
+                )
+            } else {
+                viewModel.updateReview(
+                    placeId = placeId,
+                    rating = placeRatingBar.rating.toInt(),
+                    comment = commentEditText.text.toString()
+                )
+            }
         }
 
         commentEditText.doOnTextChanged { text, start, before, count ->
