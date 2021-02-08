@@ -187,6 +187,9 @@ internal class SoramitsuMapViewModel(
     private fun updateScreen() {
         loadAllPlacesAndClustersJob?.cancel()
         loadAllPlacesAndClustersJob = viewModelScope.launch(mainThreadDispatcher) {
+            // throttle last
+            delay(1000)
+
             val allCategories = getAllCategoriesSuspend()
             val categoryListItems = allCategories.map { category ->
                 CategoryListItem(category, category.id in requestParams.categoriesIds)
