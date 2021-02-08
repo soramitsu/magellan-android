@@ -22,7 +22,6 @@ import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import jp.co.soramitsu.map.R
 import jp.co.soramitsu.map.SoramitsuMapLibraryConfig
-import jp.co.soramitsu.map.ext.asIntervals
 import jp.co.soramitsu.map.ext.colorFromTheme
 import jp.co.soramitsu.map.ext.dimenFromTheme
 import jp.co.soramitsu.map.model.Place
@@ -84,13 +83,12 @@ internal class PlaceFragment : BottomSheetDialogFragment() {
                     reviewView.showUploadingReviewIndicator(placeUpdateInProgress)
                 })
             viewModel.editPlaceReviewClicked().observe(viewLifecycleOwner, Observer { place ->
-                val userReview = place.reviews.find { review -> review.author.user }
-                val initialRating = userReview?.rating ?: place.rating
+                val initialRating = place.userReview?.rating ?: place.rating
                 ReviewFragment().withArguments(
                     placeId = place.id,
                     placeName = place.name,
-                    comment = userReview?.text.orEmpty(),
-                    edit = true,
+                    comment = place.userReview?.text.orEmpty(),
+                    edit = place.userReview != null,
                     initialRating = initialRating.toInt()
                 ).show(parentFragmentManager, "AddPlaceReviewFragment")
             })
@@ -139,12 +137,10 @@ internal class PlaceFragment : BottomSheetDialogFragment() {
 
         placeRatingBar.rating = place.rating
         placeRatingTextView.text = place.rating.toString()
-        placeReviewsTextView.text =
-            context?.resources?.getQuantityString(
-                R.plurals.sm_review,
-                place.reviews.size,
-                place.reviews.size
-            )
+        val allReviews = (listOf(place.userReview) + place.otherReviews).filterNotNull()
+        placeReviewsTextView.text = context?.resources?.getQuantityString(
+            R.plurals.sm_review, allReviews.size, allReviews.size
+        )
 
         // additional info
         additionalInfoMobilePhone.visibility =
@@ -207,11 +203,12 @@ internal class PlaceFragment : BottomSheetDialogFragment() {
     private fun bindRating(place: Place) {
         placeRatingBar.rating = place.rating
         placeRatingTextView.text = "%.1f".format(place.rating)
+        val allReviews = (listOf(place.userReview) + place.otherReviews).filterNotNull()
         placeReviewsTextView.text = resources.getQuantityString(
-            R.plurals.sm_reviews_format, place.reviews.size, place.reviews.size
+            R.plurals.sm_reviews_format, allReviews.size, allReviews.size
         )
 
-        reviewView.bind(place.rating, place.reviews)
+        reviewView.bind(place.rating, allReviews)
         reviewView.setOnShowAllReviewsButtonClickListener {
             activity?.onUserInteraction()
             ReviewListFragment().show(parentFragmentManager, "ReviewListBottomSheetFragment")
@@ -229,7 +226,7 @@ internal class PlaceFragment : BottomSheetDialogFragment() {
                     placeId = place.id,
                     placeName = place.name,
                     initialRating = newRating,
-                    edit = false
+                    edit = place.userReview != null
                 ).show(parentFragmentManager, "AddPlaceReviewFragment")
             }
         }
