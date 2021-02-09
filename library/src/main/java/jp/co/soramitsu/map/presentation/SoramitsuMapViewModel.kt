@@ -136,8 +136,7 @@ internal class SoramitsuMapViewModel(
 
     private suspend fun deleteReview(place: Place): Place = withContext(backgroundDispatcher) {
         try {
-            val userReview = place.reviews.find { review -> review.author.user }
-            userReview?.let { placesRepository.deleteReview(userReview, place) }
+            place.userReview?.let { userReview -> placesRepository.deleteReview(userReview, place) }
             placesRepository.getPlaceInfo(place)
         } catch (exception: Exception) {
             Log.w("Network", exception)
@@ -184,6 +183,7 @@ internal class SoramitsuMapViewModel(
             Pair(emptyList<Place>(), emptyList<Cluster>())
         }
     }
+
     private fun updateScreen() {
         loadAllPlacesAndClustersJob?.cancel()
         loadAllPlacesAndClustersJob = viewModelScope.launch(mainThreadDispatcher) {
