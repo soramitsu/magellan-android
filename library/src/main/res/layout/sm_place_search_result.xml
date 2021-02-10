@@ -29,7 +29,6 @@
         app:constraint_referenced_ids="searchResultTitle, searchResultSubtitle"
         app:flow_maxElementsWrap="1"
         app:flow_verticalGap="8dp"
-        app:flow_verticalStyle="packed"
         app:flow_wrapMode="aligned"
         app:layout_constraintTop_toTopOf="parent" />
 

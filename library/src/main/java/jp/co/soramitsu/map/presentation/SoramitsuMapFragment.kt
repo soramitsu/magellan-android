@@ -1,7 +1,9 @@
 package jp.co.soramitsu.map.presentation
 
 import android.Manifest
+import android.app.Activity
 import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.Canvas
@@ -24,11 +26,16 @@ import jp.co.soramitsu.map.SoramitsuMapLibraryConfig
 import jp.co.soramitsu.map.data.MapParams
 import jp.co.soramitsu.map.ext.asLatLng
 import jp.co.soramitsu.map.ext.getResourceIdForAttr
+import jp.co.soramitsu.map.ext.toPosition
 import jp.co.soramitsu.map.model.Category
 import jp.co.soramitsu.map.model.GeoPoint
 import jp.co.soramitsu.map.model.Place
+import jp.co.soramitsu.map.model.Position
 import jp.co.soramitsu.map.presentation.categories.CategoriesFragment
 import jp.co.soramitsu.map.presentation.places.PlaceFragment
+import jp.co.soramitsu.map.presentation.places.add.AddPlaceFragment
+import jp.co.soramitsu.map.presentation.places.add.ProposePlaceActivity
+import jp.co.soramitsu.map.presentation.places.add.RequestSentBottomSheetFragment
 import jp.co.soramitsu.map.presentation.search.SearchBottomSheetFragment
 import kotlinx.android.synthetic.main.sm_fragment_map_soramitsu.*
 
@@ -36,7 +43,7 @@ import kotlinx.android.synthetic.main.sm_fragment_map_soramitsu.*
  * Used fragment as a base class because Maps module have to minimize
  * number of connections with Bakong and its base classes
  */
-open class SoramitsuMapFragment : Fragment(R.layout.sm_fragment_map_soramitsu) {
+open class SoramitsuMapFragment : Fragment(R.layout.sm_fragment_map_soramitsu), AddPlaceFragment.Listener {
 
     private lateinit var viewModel: SoramitsuMapViewModel
 
@@ -161,6 +168,21 @@ open class SoramitsuMapFragment : Fragment(R.layout.sm_fragment_map_soramitsu) {
         soramitsuMapView.onDestroy()
     }
 
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+
+        if (requestCode == REQUEST_CODE_ADD_PLACE && resultCode == Activity.RESULT_OK) {
+            RequestSentBottomSheetFragment().show(parentFragmentManager, "RequestSent")
+        }
+    }
+
+    override fun onAddPlaceButtonClick(position: LatLng, address: String) {
+        context?.let { context ->
+            val intent = ProposePlaceActivity.createLaunchIntent(context, position, address)
+            startActivityForResult(intent, REQUEST_CODE_ADD_PLACE)
+        }
+    }
+
     private fun onMapReady(map: GoogleMap?) {
         map?.let { googleMap ->
             this.googleMap = googleMap
@@ -245,6 +267,16 @@ open class SoramitsuMapFragment : Fragment(R.layout.sm_fragment_map_soramitsu) {
             viewModel.searchQuery.observe(viewLifecycleOwner, Observer { query ->
                 searchOnFragmentInputEditText.setText(query)
             })
+
+            googleMap.setOnMapClickListener { position ->
+                viewModel.onMapClickedAtPosition(position.toPosition())
+
+                (parentFragmentManager.findFragmentByTag("Place") as? PlaceFragment)?.dismiss()
+
+                val addPlaceFragment = AddPlaceFragment().withPosition(position)
+                addPlaceFragment.setTargetFragment(this, REQUEST_CODE_ADD_PLACE)
+                addPlaceFragment.show(parentFragmentManager, "AddPlaceFragment")
+            }
         }
     }
 
@@ -411,6 +443,7 @@ open class SoramitsuMapFragment : Fragment(R.layout.sm_fragment_map_soramitsu) {
     )
 
     companion object {
-        const val LOCATION_REQUEST_CODE = 777
+        private const val LOCATION_REQUEST_CODE = 777
+        private const val REQUEST_CODE_ADD_PLACE = 1
     }
 }

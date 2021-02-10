@@ -6,12 +6,16 @@
     <dimen name="sm_top_rectangle_height">6dp</dimen>
 
     <dimen name="sm_icon_size">44dp</dimen>
+    <dimen name="sm_small_icon_size">24dp</dimen>
 
     <dimen name="sm_cluster_icon_size">36dp</dimen>
 
     <dimen name="sm_margin_padding_size_xxlarge">40dp</dimen>
+    <dimen name="sm_margin_padding_size_large">24dp</dimen>
     <dimen name="sm_margin_padding_size_xmedium">20dp</dimen>
+    <dimen name="sm_margin_padding_size_medium">16dp</dimen>
     <dimen name="sm_margin_padding_size_small">8dp</dimen>
+    <dimen name="sm_margin_padding_size_xsmall">4dp</dimen>
 
     <dimen name="sm_cluster_text_size">14sp</dimen>
 </resources>

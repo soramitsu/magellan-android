@@ -8,6 +8,9 @@
     </style>
 
     <style name="MainMenuActivityStyle" parent="SM.Soramistu.Map.BaseTheme">
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+
         <item name="colorControlNormal">#000000</item>
         <item name="android:windowDrawsSystemBarBackgrounds">true</item>
         <item name="android:statusBarColor">@android:color/transparent</item>

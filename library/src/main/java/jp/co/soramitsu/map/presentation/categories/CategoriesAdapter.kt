@@ -27,7 +27,7 @@ internal class CategoriesAdapter : RecyclerView.Adapter<CategoryViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CategoryViewHolder {
         val inflater = LayoutInflater.from(parent.context)
-        val view = inflater.inflate(R.layout.sm_category_list_item, parent, false)
+        val view = inflater.inflate(R.layout.sm_category_list_item_selectable, parent, false)
         val viewHolder = CategoryViewHolder(view)
         view.setOnClickListener {
             onCategoryClick.invoke(items[viewHolder.adapterPosition].category)

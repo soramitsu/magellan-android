@@ -9,10 +9,7 @@ import jp.co.soramitsu.map.SoramitsuMapLibraryConfig
 import jp.co.soramitsu.map.data.MapParams
 import jp.co.soramitsu.map.data.PlacesRepository
 import jp.co.soramitsu.map.data.RequestParams
-import jp.co.soramitsu.map.model.Category
-import jp.co.soramitsu.map.model.Cluster
-import jp.co.soramitsu.map.model.GeoPoint
-import jp.co.soramitsu.map.model.Place
+import jp.co.soramitsu.map.model.*
 import jp.co.soramitsu.map.presentation.categories.CategoryListItem
 import jp.co.soramitsu.map.presentation.lifycycle.SingleLiveEvent
 import kotlinx.coroutines.*
@@ -25,11 +22,20 @@ internal class SoramitsuMapViewModel(
 
     private val viewState: MutableLiveData<SoramitsuMapViewState> = MutableLiveData()
     private val selectedPlaceSingleLiveEvent: MutableLiveData<Place?> = MutableLiveData()
+    private val uploadReviewInProgress: SingleLiveEvent<Boolean> = SingleLiveEvent()
+
+    private val editPlaceReview: SingleLiveEvent<Place> = SingleLiveEvent()
 
     private val currentState: SoramitsuMapViewState
         get() = viewState.value!!
 
     private var loadAllPlacesAndClustersJob: Job? = null
+
+    private var selectedPlace: Place? = null
+        set(value) {
+            field = value
+            selectedPlaceSingleLiveEvent.value = value
+        }
 
     var requestParams = RequestParams("", emptyList())
         set(value) {
@@ -53,6 +59,8 @@ internal class SoramitsuMapViewModel(
     private val _searchQuery = MutableLiveData<String>("")
     val searchQuery: LiveData<String> = _searchQuery
 
+    fun uploadReviewInProgress(): LiveData<Boolean> = uploadReviewInProgress
+    fun editPlaceReviewClicked(): LiveData<Place> = editPlaceReview
     fun viewState(): LiveData<SoramitsuMapViewState> = viewState
     fun placeSelected(): LiveData<Place?> = selectedPlaceSingleLiveEvent
 
@@ -65,7 +73,33 @@ internal class SoramitsuMapViewModel(
     }
 
     fun onPlaceSelected(place: Place?) {
-        selectedPlaceSingleLiveEvent.value = place
+        selectedPlace = place
+    }
+
+    fun onEditReviewClicked() {
+        editPlaceReview.value = selectedPlace
+    }
+
+    fun onDeleteReviewClicked() {
+        selectedPlace?.let { outdatedPlace ->
+            viewModelScope.launch(mainThreadDispatcher) {
+                uploadReviewInProgress.value = true
+                val updatedPlace = deleteReview(outdatedPlace)
+                uploadReviewInProgress.value = false
+                selectedPlace = updatedPlace
+            }
+        }
+    }
+
+    fun onPlaceReviewAdded() {
+        selectedPlace?.let { outdatedPlace ->
+            viewModelScope.launch(mainThreadDispatcher) {
+                uploadReviewInProgress.value = true
+                val updatedPlace = loadPlaceInfo(outdatedPlace)
+                uploadReviewInProgress.value = false
+                selectedPlace = updatedPlace
+            }
+        }
     }
 
     fun onExtendedPlaceInfoRequested(placePosition: GeoPoint) =
@@ -75,11 +109,9 @@ internal class SoramitsuMapViewModel(
                         it.position.longitude == placePosition.longitude
             }
             if (place != null) {
-                selectedPlaceSingleLiveEvent.value = place
-
+                selectedPlace = place
                 val placeWithFullInfo = loadPlaceInfo(place)
-
-                selectedPlaceSingleLiveEvent.value = placeWithFullInfo
+                selectedPlace = placeWithFullInfo
             }
         }
 
@@ -95,6 +127,16 @@ internal class SoramitsuMapViewModel(
 
     private suspend fun loadPlaceInfo(place: Place): Place = withContext(backgroundDispatcher) {
         try {
+            placesRepository.getPlaceInfo(place)
+        } catch (exception: Exception) {
+            Log.w("Network", exception)
+            place
+        }
+    }
+
+    private suspend fun deleteReview(place: Place): Place = withContext(backgroundDispatcher) {
+        try {
+            place.userReview?.let { userReview -> placesRepository.deleteReview(userReview, place) }
             placesRepository.getPlaceInfo(place)
         } catch (exception: Exception) {
             Log.w("Network", exception)
@@ -141,6 +183,7 @@ internal class SoramitsuMapViewModel(
             Pair(emptyList<Place>(), emptyList<Cluster>())
         }
     }
+
     private fun updateScreen() {
         loadAllPlacesAndClustersJob?.cancel()
         loadAllPlacesAndClustersJob = viewModelScope.launch(mainThreadDispatcher) {
@@ -151,6 +194,11 @@ internal class SoramitsuMapViewModel(
             val categoryListItems = allCategories.map { category ->
                 CategoryListItem(category, category.id in requestParams.categoriesIds)
             }
+
+            if (mapParams.topLeft == GeoPoint(0.0, 0.0) && mapParams.bottomRight == GeoPoint(0.0, 0.0)) {
+                return@launch
+            }
+
             val placesAndClusters = getAllPlacesAndClustersSuspend(mapParams, requestParams)
             val clusters = placesAndClusters.second.filter { cluster -> cluster.count > 1 }
             viewState.value = currentState.copy(
@@ -162,6 +210,12 @@ internal class SoramitsuMapViewModel(
         }
     }
 
+    fun onMapClickedAtPosition(position: Position) {
+        viewState.value = viewState.value?.copy(
+            dropPinPosition = position
+        )
+    }
+
     init {
         viewState.value = SoramitsuMapViewState()
     }
@@ -169,6 +223,7 @@ internal class SoramitsuMapViewModel(
 
 internal data class SoramitsuMapViewState(
     val places: List<Place> = emptyList(),
+    val dropPinPosition: Position? = null,
     val clusters: List<Cluster> = emptyList(),
     val enableResetButton: Boolean = false,
     val categories: List<CategoryListItem> = emptyList()

@@ -1,9 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
 
     <style name="SM.Soramistu.Map.BaseTheme" parent="Theme.MaterialComponents.Light.NoActionBar">
         <item name="colorControlNormal">#000000</item>
         <item name="colorAccent">#D0021B</item>
+
+        <item name="colorPrimary">#d0021b</item>
+        <item name="colorPrimaryDark">#a40000</item>
+
+        <item name="android:statusBarColor">@android:color/white</item>
+        <item name="android:windowLightStatusBar" tools:targetApi="m">true</item>
 
         <!-- Default attribute values -->
         <item name="sm_categoriesBottomSheetPeekHeight">82dp</item>
@@ -61,9 +67,6 @@
         <item name="sm_ratingBarColor">@color/sm_rating_bar</item>
         <item name="sm_ratingTextAppearance">
             @style/SM.TextAppearance.Soramitsu.MaterialComponents.Body2
-        </item>
-        <item name="sm_reviewsTextAppearance">
-            @style/SM.TextAppearance.Soramitsu.MaterialComponents.Caption
         </item>
         <item name="sm_distanceTextAppearance">
             @style/SM.TextAppearance.Soramitsu.MaterialComponents.Caption

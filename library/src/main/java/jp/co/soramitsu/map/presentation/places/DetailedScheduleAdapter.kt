@@ -8,7 +8,9 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import jp.co.soramitsu.map.R
 
-class DetailedScheduleAdapter : RecyclerView.Adapter<DetailedScheduleAdapter.KeyValueViewHolder>() {
+class DetailedScheduleAdapter(
+    private val orientation: Orientation = Orientation.HORIZONTAL
+) : RecyclerView.Adapter<DetailedScheduleAdapter.KeyValueViewHolder>() {
 
     private val items: MutableList<Pair<String, String>> = mutableListOf()
 
@@ -20,9 +22,9 @@ class DetailedScheduleAdapter : RecyclerView.Adapter<DetailedScheduleAdapter.Key
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): KeyValueViewHolder {
-        val itemView = LayoutInflater.from(parent.context)
-            .inflate(R.layout.sm_simple_key_value_list_item, parent, false)
-        return KeyValueViewHolder(itemView)
+        return KeyValueViewHolder(
+            LayoutInflater.from(parent.context).inflate(orientation.layoutResId, parent, false)
+        )
     }
 
     override fun onBindViewHolder(holder: KeyValueViewHolder, position: Int) {
@@ -57,5 +59,10 @@ class DetailedScheduleAdapter : RecyclerView.Adapter<DetailedScheduleAdapter.Key
         override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean =
             itemsBefore[oldItemPosition] == itemsAfter[newItemPosition]
 
+    }
+
+    enum class Orientation(val layoutResId: Int) {
+        HORIZONTAL(R.layout.sm_simple_key_value_list_item),
+        VERTICAL(R.layout.sm_simple_key_value_list_item_vertical)
     }
 }

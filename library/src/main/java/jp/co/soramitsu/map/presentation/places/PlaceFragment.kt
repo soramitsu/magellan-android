@@ -4,12 +4,14 @@ import android.app.Dialog
 import android.content.DialogInterface
 import android.content.Intent
 import android.graphics.Color
+import android.graphics.drawable.AnimatedVectorDrawable
 import android.net.Uri
 import android.os.Bundle
 import android.text.SpannableStringBuilder
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat
 import androidx.core.text.color
 import androidx.core.view.doOnLayout
 import androidx.core.widget.TextViewCompat
@@ -19,6 +21,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import jp.co.soramitsu.map.R
+import jp.co.soramitsu.map.SoramitsuMapLibraryConfig
 import jp.co.soramitsu.map.ext.colorFromTheme
 import jp.co.soramitsu.map.ext.dimenFromTheme
 import jp.co.soramitsu.map.model.Place
@@ -27,6 +30,11 @@ import jp.co.soramitsu.map.model.Time
 import jp.co.soramitsu.map.model.WorkDay
 import jp.co.soramitsu.map.presentation.SoramitsuMapFragment
 import jp.co.soramitsu.map.presentation.SoramitsuMapViewModel
+import jp.co.soramitsu.map.presentation.places.add.schedule.generateLaunchTimeFields
+import jp.co.soramitsu.map.presentation.places.add.schedule.generateWorkingDaysFields
+import jp.co.soramitsu.map.presentation.review.EditReviewFragment
+import jp.co.soramitsu.map.presentation.review.ReviewFragment
+import jp.co.soramitsu.map.presentation.review.ReviewListFragment
 import kotlinx.android.synthetic.main.sm_place_bottom_sheet.*
 import java.text.SimpleDateFormat
 import java.util.*
@@ -41,10 +49,15 @@ internal class PlaceFragment : BottomSheetDialogFragment() {
 
     private val detailedScheduleAdapter = DetailedScheduleAdapter()
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
         return inflater.inflate(R.layout.sm_place_bottom_sheet, container, false)
     }
 
+    @ExperimentalStdlibApi
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -64,6 +77,20 @@ internal class PlaceFragment : BottomSheetDialogFragment() {
             viewModel.placeSelected().value?.let { place -> bindBottomSheetWithPlace(place) }
             viewModel.placeSelected().observe(viewLifecycleOwner, Observer { place ->
                 place?.let { bindBottomSheetWithPlace(place) }
+            })
+            viewModel.uploadReviewInProgress()
+                .observe(viewLifecycleOwner, Observer { placeUpdateInProgress ->
+                    reviewView.showUploadingReviewIndicator(placeUpdateInProgress)
+                })
+            viewModel.editPlaceReviewClicked().observe(viewLifecycleOwner, Observer { place ->
+                val initialRating = place.userReview?.rating ?: place.rating
+                ReviewFragment().withArguments(
+                    placeId = place.id,
+                    placeName = place.name,
+                    comment = place.userReview?.text.orEmpty(),
+                    edit = place.userReview != null,
+                    initialRating = initialRating.toInt()
+                ).show(parentFragmentManager, "AddPlaceReviewFragment")
             })
         }
     }
@@ -92,12 +119,17 @@ internal class PlaceFragment : BottomSheetDialogFragment() {
         viewModel.onPlaceSelected(null)
     }
 
+    @ExperimentalStdlibApi
     private fun bindBottomSheetWithPlace(place: Place) {
         // header info
         placeNameTextView.text = place.localisedName()
 
         val placeAddress = if (place.address.isNotBlank()) {
-            resources.getString(R.string.sm_category_address, place.category.localisedName(), place.address)
+            resources.getString(
+                R.string.sm_category_address,
+                place.category.localisedName(),
+                place.address
+            )
         } else {
             place.category.localisedName()
         }
@@ -105,12 +137,10 @@ internal class PlaceFragment : BottomSheetDialogFragment() {
 
         placeRatingBar.rating = place.rating
         placeRatingTextView.text = place.rating.toString()
-        placeReviewsTextView.text =
-            context?.resources?.getQuantityString(
-                R.plurals.sm_review,
-                place.reviews.size,
-                place.reviews.size
-            )
+        val allReviews = (listOf(place.userReview) + place.otherReviews).filterNotNull()
+        placeReviewsTextView.text = context?.resources?.getQuantityString(
+            R.plurals.sm_review, allReviews.size, allReviews.size
+        )
 
         // additional info
         additionalInfoMobilePhone.visibility =
@@ -126,6 +156,7 @@ internal class PlaceFragment : BottomSheetDialogFragment() {
 
         bindIsOpenNowField(place.schedule)
         bindFullScheduleField(place.schedule)
+        bindRating(place)
 
         additionalInfoMobilePhone.text = place.phone
         additionalInfoWebsite.text = place.website
@@ -169,6 +200,39 @@ internal class PlaceFragment : BottomSheetDialogFragment() {
         }
     }
 
+    private fun bindRating(place: Place) {
+        placeRatingBar.rating = place.rating
+        placeRatingTextView.text = "%.1f".format(place.rating)
+        val allReviews = (listOf(place.userReview) + place.otherReviews).filterNotNull()
+        placeReviewsTextView.text = resources.getQuantityString(
+            R.plurals.sm_reviews_format, allReviews.size, allReviews.size
+        )
+
+        reviewView.bind(place.rating, allReviews)
+        reviewView.setOnShowAllReviewsButtonClickListener {
+            activity?.onUserInteraction()
+            ReviewListFragment().show(parentFragmentManager, "ReviewListBottomSheetFragment")
+        }
+
+        reviewView.setOnEditUserCommentClickListener {
+            activity?.onUserInteraction()
+            EditReviewFragment().show(parentFragmentManager, "EditReviewMenu")
+        }
+
+        reviewView.setOnUserChangeRatingListener { newRating ->
+            activity?.onUserInteraction()
+            viewModel.placeSelected().value?.let { place ->
+                ReviewFragment().withArguments(
+                    placeId = place.id,
+                    placeName = place.name,
+                    initialRating = newRating,
+                    edit = place.userReview != null
+                ).show(parentFragmentManager, "AddPlaceReviewFragment")
+            }
+        }
+    }
+
+    @ExperimentalStdlibApi
     private fun bindFullScheduleField(schedule: Schedule) {
         additionalInfoOpenHoursDetails.visibility = View.GONE
         additionalInfoOpenHours.visibility = View.GONE
@@ -192,91 +256,72 @@ internal class PlaceFragment : BottomSheetDialogFragment() {
             if (today != null) {
                 val fromTime = dateFormat.format(Date(today.from.inMilliseconds()))
                 val toTime = dateFormat.format(Date(today.to.inMilliseconds()))
-                val scheduleAsString = resources.getString(R.string.sm_daily_interval, fromTime, toTime)
+                val scheduleAsString =
+                    resources.getString(R.string.sm_daily_interval, fromTime, toTime)
 
-                val haveLaunchTime = today.launchTimeFrom != null && today.launchTimeTo != null
-                if (haveLaunchTime) {
-                    val launchFromTime =
-                        dateFormat.format(Date(today.launchTimeFrom!!.inMilliseconds()))
-                    val launchToTime = dateFormat.format(Date(today.launchTimeTo!!.inMilliseconds()))
-                    val launchScheduleAsString = getString(R.string.sm_launch_time) + " $launchFromTime– $launchToTime"
-                    additionalInfoOpenHours.text = "$scheduleAsString\n$launchScheduleAsString"
+                val haveLunchTime = today.lunchTimeFrom != null && today.lunchTimeTo != null
+                if (haveLunchTime) {
+                    val lunchFromTime =
+                        dateFormat.format(Date(today.lunchTimeFrom!!.inMilliseconds()))
+                    val lunchToTime = dateFormat.format(Date(today.lunchTimeTo!!.inMilliseconds()))
+                    val lunchScheduleAsString =
+                        getString(R.string.sm_lunch_time) + " $lunchFromTime–$lunchToTime"
+                    additionalInfoOpenHours.text = "$scheduleAsString\n$lunchScheduleAsString"
                 } else {
                     additionalInfoOpenHours.text = scheduleAsString
                 }
             }
         }
 
-        // temp solution. We will show detailed schedule in the next release
-        if (true) return
+        if (SoramitsuMapLibraryConfig.enableDetailedSchedule) {
+            displayDetailedScheduleInformation(schedule)
+        }
+    }
 
+    @ExperimentalStdlibApi
+    private fun displayDetailedScheduleInformation(schedule: Schedule) {
         if (schedule.isStableDailySchedule()) {
             additionalInfoOpenHours.setOnClickListener(null)
             TextViewCompat.setCompoundDrawablesRelativeWithIntrinsicBounds(
-                additionalInfoOpenHours,
-                R.drawable.sm_ic_clock, 0, 0, 0
+                additionalInfoOpenHours, R.drawable.sm_ic_clock, 0, 0, 0
             )
         } else {
+            val animatedArrowDownToUp = ContextCompat.getDrawable(
+                requireContext(), R.drawable.sm_ic_keyboard_arrow_down_24_animated
+            ) as AnimatedVectorDrawable
+            val animatedArrowUpToDown = ContextCompat.getDrawable(
+                requireContext(), R.drawable.sm_ic_keyboard_arrow_up_24_animated
+            ) as AnimatedVectorDrawable
+            val iconDrawable = ContextCompat.getDrawable(requireContext(), R.drawable.sm_ic_clock)
             TextViewCompat.setCompoundDrawablesRelativeWithIntrinsicBounds(
-                additionalInfoOpenHours,
-                R.drawable.sm_ic_clock, 0, R.drawable.sm_ic_keyboard_arrow_down_24, 0
+                additionalInfoOpenHours, iconDrawable, null, animatedArrowDownToUp, null
             )
             additionalInfoOpenHours.setOnClickListener {
                 if (additionalInfoOpenHoursDetails.visibility == View.VISIBLE) {
+                    TextViewCompat.setCompoundDrawablesRelativeWithIntrinsicBounds(
+                        additionalInfoOpenHours, iconDrawable, null, animatedArrowUpToDown, null
+                    )
+                    animatedArrowUpToDown.start()
                     additionalInfoOpenHoursDetails.visibility = View.GONE
                 } else {
-                    val scheduleAsPairsList = schedule.workingDays.map { workDay ->
-                        val fromTime = dateFormat.format(Date(workDay.from.inMilliseconds()))
-                        val toTime = dateFormat.format(Date(workDay.to.inMilliseconds()))
-                        val scheduleAsString = resources.getString(R.string.sm_daily_interval, fromTime, toTime)
-                        Pair(
-                            calendarDayAsString(workDay.weekDay),
-                            scheduleAsString
-                        )
-                    }
-
-                    val workingDays = schedule.workingDays.map { it.weekDay }
-                    val dayOffs = (Calendar.SUNDAY..Calendar.SATURDAY)
-                        .filter { it !in workingDays }
-                        .map { dayOff ->
-                            Pair(
-                                calendarDayAsString(dayOff),
-                                resources.getString(R.string.sm_closed)
-                            )
-                        }
-
-                    val haveLaunchTime = schedule.workingDays[0].launchTimeFrom != null
-                            && schedule.workingDays[0].launchTimeTo != null
-                    val launchTime = if (haveLaunchTime) {
-                        val fromTime =
-                            dateFormat.format(Date(schedule.workingDays[0].launchTimeFrom!!.inMilliseconds()))
-                        val toTime = dateFormat.format(Date(schedule.workingDays[0].launchTimeTo!!.inMilliseconds()))
-                        val scheduleAsString = "$fromTime – $toTime"
-                        listOf(Pair(getString(R.string.sm_launch_time), scheduleAsString))
-                    } else {
-                        emptyList()
-                    }
-
+                    TextViewCompat.setCompoundDrawablesRelativeWithIntrinsicBounds(
+                        additionalInfoOpenHours, iconDrawable, null, animatedArrowDownToUp, null
+                    )
+                    animatedArrowDownToUp.start()
                     additionalInfoOpenHoursDetails.visibility = View.VISIBLE
-                    detailedScheduleAdapter.update(scheduleAsPairsList + dayOffs + launchTime)
+
+                    val workingScheduleAsPairsList = schedule.generateWorkingDaysFields(requireContext())
+                    val lunchScheduleAsPairsList = schedule.generateLaunchTimeFields(requireContext())
+                    detailedScheduleAdapter.update(workingScheduleAsPairsList + lunchScheduleAsPairsList)
                 }
             }
         }
     }
 
-    private fun calendarDayAsString(calendarDay: Int) = when (calendarDay) {
-        Calendar.SUNDAY -> getString(R.string.sm_sun)
-        Calendar.MONDAY -> getString(R.string.sm_mon)
-        Calendar.TUESDAY -> getString(R.string.sm_tue)
-        Calendar.WEDNESDAY -> getString(R.string.sm_wed)
-        Calendar.THURSDAY -> getString(R.string.sm_thu)
-        Calendar.FRIDAY -> getString(R.string.sm_fri)
-        Calendar.SATURDAY -> getString(R.string.sm_sat)
-        else -> ""
-    }
-
-    private fun Schedule.isStableDailySchedule() = workingDays.size == 7 && workingDays.all { workDay ->
-        workDay.from == workingDays[0].from && workDay.to == workingDays[0].to
+    private fun Schedule.isStableDailySchedule(): Boolean {
+        return workingDays.size == 7 && workingDays.all { workDay ->
+            workDay.from == workingDays[0].from && workDay.to == workingDays[0].to
+        }
     }
 
     private fun bindIsOpenNowField(schedule: Schedule) {
@@ -294,13 +339,14 @@ internal class PlaceFragment : BottomSheetDialogFragment() {
             val workDay = schedule.workingDays.find { workDay -> workDay.weekDay == today }
             when {
                 workDay == null -> placeIsWorkingNowTextView.visibility = View.GONE
-                workDay.isLaunchTimeNow() -> {
-                    val launchTime = resources.getString(R.string.sm_launch_time)
-                    val launchEndTime = dateFormat.format(Date(workDay.launchTimeTo!!.inMilliseconds()))
-                    val till = resources.getString(R.string.sm_till, launchEndTime)
+                workDay.isLunchTimeNow() -> {
+                    val lunchTime = resources.getString(R.string.sm_lunch_time)
+                    val lunchEndTime =
+                        dateFormat.format(Date(workDay.lunchTimeTo!!.inMilliseconds()))
+                    val till = resources.getString(R.string.sm_till, lunchEndTime)
                     val colorAccent = requireContext().colorFromTheme(R.attr.colorAccent)
                     val spannableString = SpannableStringBuilder()
-                        .color(colorAccent) { append(launchTime) }
+                        .color(colorAccent) { append(lunchTime) }
                         .append(' ')
                         .append(till)
                     placeIsWorkingNowTextView.text = spannableString
@@ -339,13 +385,13 @@ internal class PlaceFragment : BottomSheetDialogFragment() {
         return timeNow >= from && timeNow <= to
     }
 
-    private fun WorkDay.isLaunchTimeNow(calendar: Calendar = Calendar.getInstance()): Boolean {
-        if (launchTimeFrom == null || launchTimeTo == null) return false
+    private fun WorkDay.isLunchTimeNow(calendar: Calendar = Calendar.getInstance()): Boolean {
+        if (lunchTimeFrom == null || lunchTimeTo == null) return false
 
         val timeNow = Time(
             hour = calendar.get(Calendar.HOUR_OF_DAY),
             minute = calendar.get(Calendar.MINUTE)
         )
-        return timeNow >= launchTimeFrom && timeNow <= launchTimeTo
+        return timeNow >= lunchTimeFrom && timeNow <= lunchTimeTo
     }
 }

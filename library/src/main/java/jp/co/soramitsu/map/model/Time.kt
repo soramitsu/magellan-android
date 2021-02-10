@@ -11,7 +11,9 @@ data class Time(
 
     operator fun compareTo(other: Time): Int = this.inMinutes().compareTo(other.inMinutes())
 
-    private companion object {
+    companion object {
         private const val MILLISECONDS_IN_MINUTE = 1000 * 60
+
+        val NOT_SET = Time(-1, -1)
     }
 }

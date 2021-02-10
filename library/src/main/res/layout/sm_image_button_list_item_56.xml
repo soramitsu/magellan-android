@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.button.MaterialButton xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/actionButton"
+    style="@style/SM.Widget.Soramitsu.MaterialComponents.Button.Grey"
+    android:layout_width="56dp"
+    android:layout_height="56dp"
+    android:layout_margin="@dimen/sm_margin_padding_size_small"
+    app:cornerRadius="10dp"
+    app:iconGravity="start"
+    app:iconTint="@android:color/black"
+    tools:icon="@drawable/sm_ic_autorenew_24" />

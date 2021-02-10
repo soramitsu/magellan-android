@@ -1,9 +1,6 @@
 package jp.co.soramitsu.map.data
 
-import jp.co.soramitsu.map.model.Category
-import jp.co.soramitsu.map.model.Cluster
-import jp.co.soramitsu.map.model.GeoPoint
-import jp.co.soramitsu.map.model.Place
+import jp.co.soramitsu.map.model.*
 
 interface PlacesRepository {
 
@@ -15,6 +12,12 @@ interface PlacesRepository {
         mapParams: MapParams,
         requestParams: RequestParams
     ): Pair<List<Place>, List<Cluster>>
+
+    fun addReview(placeId: String, newRating: Int, comment: String)
+    fun updatePlaceRating(placeId: String, newRating: Int, comment: String)
+    fun deleteReview(userReview: Review, place: Place)
+    fun getPlaceReviews(placeId: String): List<Review>
+    fun add(place: Place)
 }
 
 data class MapParams(

@@ -1,0 +1,203 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:parentTag="androidx.constraintlayout.widget.ConstraintLayout">
+
+    <TextView
+        android:id="@+id/reviewAndSummaryTitleTextView"
+        style="@style/SM.Widget.Soramitsu.TextView.SemiBold15"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="@dimen/sm_margin_padding_size_medium"
+        android:text="@string/sm_review_summary"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <RatingBar
+        android:id="@+id/reviewAndSummaryPlaceRatingBar"
+        style="@style/Widget.AppCompat.RatingBar.Small"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/sm_margin_padding_size_medium"
+        android:isIndicator="true"
+        android:numStars="5"
+        android:progressTint="?sm_ratingBarColor"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/reviewAndSummaryTitleTextView"
+        tools:rating="3" />
+
+    <TextView
+        android:id="@+id/reviewAndSummaryPlaceTotalRating"
+        style="@style/SM.Widget.Soramitsu.TextView.SemiBold15"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/sm_margin_padding_size_small"
+        app:layout_constraintBottom_toBottomOf="@id/reviewAndSummaryPlaceRatingBar"
+        app:layout_constraintStart_toEndOf="@id/reviewAndSummaryPlaceRatingBar"
+        app:layout_constraintTop_toTopOf="@id/reviewAndSummaryPlaceRatingBar"
+        app:layout_constraintVertical_bias=".7"
+        tools:text="4.9" />
+
+    <TextView
+        android:id="@+id/reviewAndSummaryTotalReviews"
+        style="@style/SM.Widget.Soramitsu.TextView.Regular14"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/sm_margin_padding_size_xsmall"
+        app:layout_constraintBottom_toBottomOf="@id/reviewAndSummaryPlaceTotalRating"
+        app:layout_constraintStart_toEndOf="@id/reviewAndSummaryPlaceTotalRating"
+        app:layout_constraintTop_toTopOf="@id/reviewAndSummaryPlaceTotalRating"
+        tools:text="(39 reviews)" />
+
+    <androidx.constraintlayout.widget.Barrier
+        android:id="@+id/reviewAndSummaryRatingBottomBarrier"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:barrierDirection="bottom"
+        app:constraint_referenced_ids="reviewAndSummaryPlaceRatingBar, reviewAndSummaryPlaceTotalRating, reviewAndSummaryTotalReviews" />
+
+    <View
+        android:id="@+id/reviewAndSummaryRateThisPlaceBackground"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:background="@drawable/sm_grey_rounded_rect"
+        app:layout_constraintBottom_toBottomOf="@id/reviewAndSummaryRateThisPlaceFlow"
+        app:layout_constraintEnd_toEndOf="@id/reviewAndSummaryRateThisPlaceFlow"
+        app:layout_constraintStart_toStartOf="@id/reviewAndSummaryRateThisPlaceFlow"
+        app:layout_constraintTop_toTopOf="@id/reviewAndSummaryRateThisPlaceFlow" />
+
+    <TextView
+        android:id="@+id/reviewAndSummaryTitleRateThisPlace"
+        style="@style/SM.Widget.Soramitsu.TextView.Regular15"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/sm_rate_this_place" />
+
+    <RatingBar
+        android:id="@+id/reviewAndSummaryRateThisPlaceRatingBar"
+        style="@style/Widget.AppCompat.RatingBar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/sm_margin_padding_size_medium"
+        android:numStars="5"
+        android:progressTint="?sm_ratingBarColor"
+        android:stepSize="1"
+        tools:rating="3" />
+
+    <androidx.constraintlayout.helper.widget.Flow
+        android:id="@+id/reviewAndSummaryRateThisPlaceFlow"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/sm_margin_padding_size_medium"
+        android:padding="@dimen/sm_margin_padding_size_large"
+        app:constraint_referenced_ids="reviewAndSummaryTitleRateThisPlace,reviewAndSummaryRateThisPlaceRatingBar"
+        app:flow_maxElementsWrap="1"
+        app:flow_verticalGap="@dimen/sm_margin_padding_size_large"
+        app:flow_wrapMode="chain"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/reviewAndSummaryRatingBottomBarrier" />
+
+    <include
+        layout="@layout/sm_comment_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/sm_margin_padding_size_medium"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/reviewAndSummaryRatingBottomBarrier" />
+
+    <ImageButton
+        android:id="@+id/reviewAndSummaryEditCommentButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/sm_margin_padding_size_small"
+        android:contentDescription="@string/sm_edit_comment_button"
+        style="@style/Widget.AppCompat.ActionButton"
+        android:src="@drawable/sm_ic_more_vert_24"
+        app:layout_constraintTop_toTopOf="@id/commentViewRoot"
+        app:layout_constraintEnd_toEndOf="@id/commentViewRoot"
+        />
+
+    <ProgressBar
+        android:id="@+id/reviewAndSummaryUploadUserCommentProgressBar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/sm_margin_padding_size_medium"
+        android:visibility="gone"
+        app:layout_constraintTop_toBottomOf="@id/reviewAndSummaryRatingBottomBarrier"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        />
+
+    <androidx.constraintlayout.widget.Barrier
+        android:id="@+id/reviewAndSummarySummaryBottomBarrier"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:constraint_referenced_ids="commentViewRoot, reviewAndSummaryRateThisPlaceFlow, reviewAndSummaryRateThisPlaceBackground, reviewAndSummaryUploadUserCommentProgressBar"
+        app:barrierAllowsGoneWidgets="true"
+        app:barrierDirection="bottom"
+        />
+
+    <androidx.constraintlayout.widget.Group
+        android:id="@+id/reviewAndSummaryUserCommentGroup"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        app:constraint_referenced_ids="commentViewRoot, reviewAndSummaryEditCommentButton"
+        />
+
+    <androidx.constraintlayout.widget.Group
+        android:id="@+id/reviewAndSummaryRateThisPlaceProposalGroup"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:constraint_referenced_ids="reviewAndSummaryRateThisPlaceFlow, reviewAndSummaryRateThisPlaceBackground"
+        />
+
+    <TextView
+        android:id="@+id/reviewAndSummaryReviewTitleTextView"
+        style="@style/SM.Widget.Soramitsu.TextView.SemiBold15"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/sm_margin_padding_size_small"
+        android:padding="@dimen/sm_margin_padding_size_medium"
+        android:text="@string/sm_reviews"
+        app:layout_constraintTop_toBottomOf="@id/reviewAndSummarySummaryBottomBarrier" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/reviewAndSummaryCommentsRecyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/reviewAndSummaryReviewTitleTextView"
+        tools:itemCount="3"
+        tools:listitem="@layout/sm_comment_view" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/reviewAndSummaryShowAllReviewsButton"
+        style="@style/Widget.MaterialComponents.Button.TextButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="start|center_vertical"
+        android:insetLeft="@dimen/sm_margin_padding_size_small"
+        android:textAppearance="@style/SM.TextAppearance.Soramitsu.MaterialComponents.Body1"
+        android:insetTop="0dp"
+        android:insetRight="@dimen/sm_margin_padding_size_small"
+        android:insetBottom="0dp"
+        android:minHeight="56dp"
+        android:text="@string/sm_show_all_reviews"
+        android:textColor="#2D2926"
+        android:textAllCaps="false"
+        app:icon="@drawable/sm_ic_show_all_reviews"
+        app:iconPadding="@dimen/sm_margin_padding_size_medium"
+        app:layout_constraintTop_toBottomOf="@id/reviewAndSummaryCommentsRecyclerView" />
+
+    <androidx.constraintlayout.widget.Group
+        android:id="@+id/reviewAndSummaryReviewSection"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:constraint_referenced_ids="reviewAndSummaryShowAllReviewsButton,reviewAndSummaryCommentsRecyclerView,reviewAndSummaryReviewTitleTextView"
+        />
+
+</merge>

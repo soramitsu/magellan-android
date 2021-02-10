@@ -17,7 +17,7 @@
     </plurals>
 
     <string name="sm_open">Open</string>
-    <string name="sm_launch_time">Launch time</string>
+    <string name="sm_lunch_time">Lunch time</string>
     <string name="sm_closed">Closed</string>
     <string name="sm_till">till %1$s</string>
     <string name="sm_24_hours">24 hours</string>
@@ -30,6 +30,14 @@
     <string name="sm_fri">Fri</string>
     <string name="sm_sat">Sat</string>
 
+    <string name="sm_sun_short">S</string>
+    <string name="sm_mon_short">M</string>
+    <string name="sm_tue_short">T</string>
+    <string name="sm_wed_short">W</string>
+    <string name="sm_thu_short">T</string>
+    <string name="sm_fri_short">F</string>
+    <string name="sm_sat_short">S</string>
+
     <string name="sm_information">Information</string>
     <string name="sm_mobile_phone">Mobile phone</string>
     <string name="sm_website">Website</string>
@@ -37,6 +45,11 @@
     <string name="sm_address">Address</string>
     <string name="sm_open_hours">Open hours</string>
     <string name="sm_daily_interval">Daily %1$s – %2$s</string>
+    <string name="sm_working_days_interval">%1$s—%2$s</string>
+    <string name="sm_working_time_interval">%1$s—%2$s</string>
+    <string name="sm_lunch_days_interval">Lunch time (%1$s—%2$s)</string>
+    <string name="sm_lunch_time_single_day">Lunch time (%1$s)</string>
+    <string name="sm_lunch_time_interval">%1$s—%2$s</string>
     <string name="sm_category">Category</string>
     <string name="sm_list_of_places">List of places</string>
     <string name="sm_search_by_name">Search by name</string>
@@ -56,4 +69,62 @@
     <string name="sm_filters">Filters</string>
     <string name="sm_zoom_out">Zoom out</string>
     <string name="sm_zoom_in">Zoom in</string>
+
+    <string name="sm_tech_string_rotation_group_name" translatable="false">rotationGroup</string>
+    <string name="sm_review_summary">Review summary</string>
+    <string name="sm_rate_this_place">Rate this place</string>
+    <string name="sm_reviews">Reviews</string>
+    <string name="sm_show_all_reviews">Show all reviews</string>
+    <string name="sm_edit_comment_button">Edit comment button</string>
+    <string name="sm_share_details_of_your_experience">Share details of your experience</string>
+    <string name="sm_post">Post</string>
+    <string name="sm_edit_review">Edit review</string>
+    <string name="sm_delete">Delete</string>
+    <string name="sm_no_reviews_yet">No reviews yet</string>
+    <string name="sm_retry">Retry</string>
+    <string name="sm_failed_to_load_reviews">Failed to load reviews</string>
+    <string name="sm_dropped_pin">Dropped pin</string>
+    <string name="sm_add_a_place">Add a place</string>
+    <string name="sm_name">Name</string>
+    <string name="sm_contacts">Contacts</string>
+    <string name="sm_phone_number">Phone number</string>
+    <string name="sm_logo">Logo</string>
+    <string name="sm_logo_size_should_be_54x54">Logo size should be 54x54</string>
+    <string name="sm_add_logo_image">Add logo image</string>
+    <string name="sm_photo">Photo</string>
+    <string name="sm_add_photo_hint">Add photo of this place, promo image, menu or similar</string>
+    <string name="sm_add_photo">Add photo</string>
+    <string name="sm_working_hours">Working hours</string>
+    <string name="sm_add_schedule">Add schedule</string>
+    <string name="sm_create_and_send_for_review">Create and send for review</string>
+    <string name="sm_choose_category">Choose category</string>
+    <string name="sm_choose_from_galery">Choose from galery</string>
+    <string name="sm_remove_logo">Remove logo</string>
+
+    <plurals name="sm_select_number_of_photos">
+        <item quantity="one">Select %1$d photo</item>
+        <item quantity="other">Select %1$d photos</item>
+    </plurals>
+
+    <string name="sm_open_24_hours">Open 24 hours</string>
+    <string name="sm_open_time">Open time</string>
+    <string name="sm_close_time">Close time</string>
+    <string name="sm_from">From</string>
+    <string name="sm_to">To</string>
+    <string name="sm_save">Save</string>
+    <string name="sm_add_opening_hours">Add opening hours %1$s</string>
+    <string name="sm_change_schedule">Change schedule</string>
+    <string name="sm_failed_to_upload_place_info">Failed to upload place info</string>
+    <string name="sm_invalid_field_value">Invalid field value</string>
+    <string name="sm_your_request_is_being_processed">Your request is being processed</string>
+    <string name="sm_we_will_check_the_information_and_notify_you_when_the_place_is_published">We will check the information and notify you when the place is published</string>
+    <string name="sm_done">Done</string>
+    <string name="sm_move_the_map_or_enter_the_address_in_the_input_to_choose_the_right_place">Move the map or enter the address in the input to choose the right place</string>
+    <string name="sm_location_on_map">Location on map</string>
+    <string name="sm_close_change_place_position_screen">Close change place position screen</string>
+
+    <plurals name="sm_reviews_format">
+        <item quantity="one">(%1$d review)</item>
+        <item quantity="other">(%1$d reviews)</item>
+    </plurals>
 </resources>

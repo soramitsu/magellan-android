@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/sm_rounded_background"
+    android:paddingBottom="@dimen/sm_margin_padding_size_small"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <View
+        android:layout_width="?attr/sm_categoriesBottomSheetTopperWidth"
+        android:layout_height="?attr/sm_categoriesBottomSheetTopperHeight"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="@dimen/sm_margin_padding_size_small"
+        android:background="?attr/sm_categoriesBottomSheetTopperDrawable"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        />
+
+    <TextView
+        android:id="@+id/editReview"
+        style="?sm_textViewStyleRegular15"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/sm_margin_padding_size_xmedium"
+        android:text="@string/sm_edit_review"
+        android:background="?selectableItemBackground"
+        android:gravity="center_vertical"
+        android:paddingTop="@dimen/sm_margin_padding_size_small"
+        android:paddingBottom="@dimen/sm_margin_padding_size_small"
+        android:paddingStart="@dimen/sm_margin_padding_size_medium"
+        android:paddingEnd="@dimen/sm_margin_padding_size_medium"
+        android:drawablePadding="@dimen/sm_margin_padding_size_medium"
+        app:drawableStartCompat="@drawable/sm_ic_edit_circle_44"
+        app:layout_constraintTop_toTopOf="parent"
+        />
+
+    <View
+        android:id="@+id/editReviewUnderline"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginStart="72dp"
+        android:layout_marginEnd="16dp"
+        android:background="?sm_categoriesBottomSheetSeparatorColor"
+        app:layout_constraintTop_toBottomOf="@id/editReview"
+        />
+
+    <TextView
+        android:id="@+id/deleteReview"
+        style="?sm_textViewStyleRegular15"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/sm_delete"
+        android:background="?selectableItemBackground"
+        android:gravity="center_vertical"
+        android:paddingTop="@dimen/sm_margin_padding_size_small"
+        android:paddingBottom="@dimen/sm_margin_padding_size_small"
+        android:paddingStart="@dimen/sm_margin_padding_size_medium"
+        android:paddingEnd="@dimen/sm_margin_padding_size_medium"
+        android:drawablePadding="@dimen/sm_margin_padding_size_medium"
+        app:drawableStartCompat="@drawable/sm_ic_delete_circle_44"
+        app:layout_constraintTop_toBottomOf="@id/editReview"
+        />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
