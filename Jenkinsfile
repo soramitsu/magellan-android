@@ -11,7 +11,7 @@ pipeline {
             label 'd3-build-agent'
             image dockerImage
             registryUrl 'https://docker.soramitsu.co.jp'
-            registryCredentialsId 'nexus-build-tools-ro'
+            registryCredentialsId 'bot-build-tools-ro'
             // Uncomment if you need docker sock inside
             // args '-v /var/run/docker.sock:/var/run/docker.sock -v /tmp:/tmp'
         }
@@ -45,7 +45,7 @@ pipeline {
             }
             environment {
                 NEXUS_URL = "https://nexus.iroha.tech/repository/maven-soramitsu/"
-                NEXUS = credentials('nexus-soramitsu-rw') // -> NEXUS_USR NEXUS_PSW
+                NEXUS = credentials('bot-soramitsu-rw') // -> NEXUS_USR NEXUS_PSW
             }
             steps {
                 script {
