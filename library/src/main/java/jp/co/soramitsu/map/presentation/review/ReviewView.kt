@@ -2,18 +2,19 @@ package jp.co.soramitsu.map.presentation.review
 
 import android.content.Context
 import android.util.AttributeSet
+import android.view.LayoutInflater
 import android.view.View
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.LinearLayoutManager
 import jp.co.soramitsu.map.R
+import jp.co.soramitsu.map.SoramitsuMapLibraryConfig
+import jp.co.soramitsu.map.databinding.SmReviewViewBinding
 import jp.co.soramitsu.map.model.Review
 import jp.co.soramitsu.map.presentation.InitialsExtractor
-import kotlinx.android.synthetic.main.sm_comment_view.view.*
-import kotlinx.android.synthetic.main.sm_review_view.view.*
 import java.text.SimpleDateFormat
 import java.util.*
 
-class ReviewView @JvmOverloads constructor(
+internal class ReviewView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0
@@ -24,6 +25,8 @@ class ReviewView @JvmOverloads constructor(
     private var onEditUserCommentClickListener: () -> Unit = {}
 
     private val reviewsAdapter: ReviewsAdapter = ReviewsAdapter()
+
+    private val binding = SmReviewViewBinding.inflate(LayoutInflater.from(context), this)
 
     fun setOnUserChangeRatingListener(onUserChangeRatingListener: (Int) -> Unit) {
         this.onUserChangeRatingListener = onUserChangeRatingListener
@@ -38,9 +41,9 @@ class ReviewView @JvmOverloads constructor(
     }
 
     fun bind(rating: Float, reviews: List<Review>) {
-        reviewAndSummaryPlaceRatingBar.rating = rating
-        reviewAndSummaryPlaceTotalRating.text = "%.1f".format(rating)
-        reviewAndSummaryTotalReviews.text = resources
+        binding.reviewAndSummaryPlaceRatingBar.rating = rating
+        binding.reviewAndSummaryPlaceTotalRating.text = "%.1f".format(rating)
+        binding.reviewAndSummaryTotalReviews.text = resources
             .getQuantityString(R.plurals.sm_reviews_format, reviews.size, reviews.size)
 
         val userReview = reviews.find { review -> review.author.user }
@@ -52,9 +55,9 @@ class ReviewView @JvmOverloads constructor(
         viewState.renderCommentViewState()
 
         if (reviews.isEmpty()) {
-            reviewAndSummaryReviewSection.visibility = View.GONE
+            binding.reviewAndSummaryReviewSection.visibility = View.GONE
         } else {
-            reviewAndSummaryReviewSection.visibility = View.VISIBLE
+            binding.reviewAndSummaryReviewSection.visibility = View.VISIBLE
             val nonUserReviews = reviews
                 .take(MAXIMAL_NUMBER_OF_COMMENTS)
                 .toMutableList()
@@ -63,18 +66,18 @@ class ReviewView @JvmOverloads constructor(
             reviewsAdapter.setItems(nonUserReviews)
         }
 
-        reviewAndSummaryRateThisPlaceRatingBar.setOnRatingBarChangeListener { _, newRating, fromUser ->
+        binding.reviewAndSummaryRateThisPlaceRatingBar.setOnRatingBarChangeListener { _, newRating, fromUser ->
             if (fromUser) {
                 onUserChangeRatingListener.invoke(newRating.toInt())
-                reviewAndSummaryRateThisPlaceRatingBar.rating = 0f
+                binding.reviewAndSummaryRateThisPlaceRatingBar.rating = 0f
             }
         }
 
-        reviewAndSummaryShowAllReviewsButton.setOnClickListener {
+        binding.reviewAndSummaryShowAllReviewsButton.setOnClickListener {
             onShowAllReviewsButtonClickListener.invoke()
         }
 
-        reviewAndSummaryEditCommentButton.setOnClickListener {
+        binding.reviewAndSummaryEditCommentButton.setOnClickListener {
             onEditUserCommentClickListener.invoke()
         }
     }
@@ -88,38 +91,38 @@ class ReviewView @JvmOverloads constructor(
      */
     private fun UserCommentSectionState.renderCommentViewState() = when(this) {
         UserCommentSectionState.Loading -> {
-            reviewAndSummaryUploadUserCommentProgressBar.visibility = View.VISIBLE
-            reviewAndSummaryUserCommentGroup.visibility = View.GONE
-            reviewAndSummaryRateThisPlaceProposalGroup.visibility = View.GONE
+            binding.reviewAndSummaryUploadUserCommentProgressBar.visibility = View.VISIBLE
+            binding.reviewAndSummaryUserCommentGroup.visibility = View.GONE
+            binding.reviewAndSummaryRateThisPlaceProposalGroup.visibility = View.GONE
         }
 
         UserCommentSectionState.CanBeReviewed -> {
-            reviewAndSummaryUploadUserCommentProgressBar.visibility = View.GONE
-            reviewAndSummaryUserCommentGroup.visibility = View.GONE
-            reviewAndSummaryRateThisPlaceProposalGroup.visibility = View.VISIBLE
-            reviewAndSummaryRateThisPlaceRatingBar.rating = 0f
+            binding.reviewAndSummaryUploadUserCommentProgressBar.visibility = View.GONE
+            binding.reviewAndSummaryUserCommentGroup.visibility = View.GONE
+            binding.reviewAndSummaryRateThisPlaceProposalGroup.visibility = View.VISIBLE
+            binding.reviewAndSummaryRateThisPlaceRatingBar.rating = 0f
         }
 
         is UserCommentSectionState.PlaceReviewedByUser -> {
-            reviewAndSummaryUploadUserCommentProgressBar.visibility = View.GONE
-            reviewAndSummaryUserCommentGroup.visibility = View.VISIBLE
-            reviewAndSummaryRateThisPlaceProposalGroup.visibility = View.GONE
+            binding.reviewAndSummaryUploadUserCommentProgressBar.visibility = View.GONE
+            binding.reviewAndSummaryUserCommentGroup.visibility = View.VISIBLE
+            binding.reviewAndSummaryRateThisPlaceProposalGroup.visibility = View.GONE
 
-            commentViewAuthorName.text = userReview.author.name
-            commentViewRating.rating = userReview.rating
-            commentViewCommentTextView.text = userReview.text
-            commentViewInitialsTextView.text = InitialsExtractor.extract(userReview.author.name)
+            binding.commentViewRoot.commentViewAuthorName.text = userReview.author.name
+            binding.commentViewRoot.commentViewRating.rating = userReview.rating
+            binding.commentViewRoot.commentViewCommentTextView.text = userReview.text
+            binding.commentViewRoot.commentViewInitialsTextView.text = InitialsExtractor.extract(userReview.author.name)
 
             val simpleDateFormat = SimpleDateFormat(DATE_FORMAT, Locale.getDefault())
-            commentViewCommentDate.text = simpleDateFormat.format(Date(userReview.date))
+            binding.commentViewRoot.commentViewCommentDate.text = simpleDateFormat.format(Date(userReview.date))
         }
+    }.also {
+        SoramitsuMapLibraryConfig.logger.log("ReviewView", this.toString())
     }
 
     init {
-        View.inflate(context, R.layout.sm_review_view, this)
-
-        reviewAndSummaryCommentsRecyclerView.layoutManager = LinearLayoutManager(context)
-        reviewAndSummaryCommentsRecyclerView.adapter = reviewsAdapter
+        binding.reviewAndSummaryCommentsRecyclerView.layoutManager = LinearLayoutManager(context)
+        binding.reviewAndSummaryCommentsRecyclerView.adapter = reviewsAdapter
     }
 
     /**

@@ -5,53 +5,50 @@ import android.app.TimePickerDialog
 import android.content.Context
 import android.text.format.DateFormat.is24HourFormat
 import android.util.AttributeSet
+import android.view.LayoutInflater
 import android.view.View
 import android.widget.EditText
 import androidx.constraintlayout.widget.ConstraintLayout
-import jp.co.soramitsu.map.R
+import jp.co.soramitsu.map.databinding.SmAddScheduleSectionViewBinding
 import jp.co.soramitsu.map.model.Time
 import jp.co.soramitsu.map.model.WorkDay
-import kotlinx.android.synthetic.main.sm_add_schedule_section_view.view.*
 import java.time.DayOfWeek
-import java.time.LocalDateTime
-import java.time.Month
-import java.time.format.DateTimeFormatter
-import java.time.format.DateTimeFormatterBuilder
-import java.time.format.DateTimeParseException
-import java.time.format.FormatStyle
-import java.time.temporal.ChronoField
 import java.time.temporal.WeekFields
 import java.util.*
 
-class ScheduleSectionView @JvmOverloads constructor(
+internal class ScheduleSectionView @JvmOverloads constructor(
     context: Context,
     attributeSet: AttributeSet? = null,
     defStyleRes: Int = 0
 ) : ConstraintLayout(context, attributeSet, defStyleRes) {
 
     private val weekdaysChips by lazy {
-        listOf(weekday1, weekday2, weekday3, weekday4, weekday5, weekday6, weekday7)
+        with(binding) {
+            listOf(weekday1, weekday2, weekday3, weekday4, weekday5, weekday6, weekday7)
+        }
     }
 
-    private var onRemoveButtonClickListener: () -> Unit = { }
+    private val binding = SmAddScheduleSectionViewBinding.inflate(LayoutInflater.from(context), this)
+
+    private var onRemoveButtonClickListener: () -> Unit = {}
     private var onWorkingDaysSelected: () -> Unit = { }
 
     val selectedDays: List<WorkDay>
         get() {
-            val is24Hours = open24HoursSwitch.isChecked
+            val is24Hours = binding.open24HoursSwitch.isChecked
             val from = if (is24Hours) {
                 Time(0, 0)
             } else {
-                TimeUtils.parseTime(openFromEditText.text.toString())
+                TimeUtils.parseTime(binding.openFromEditText.text.toString())
             }
             val to = if (is24Hours) {
                 Time(23, 59)
             } else {
-                TimeUtils.parseTime(closeAtEditText.text.toString())
+                TimeUtils.parseTime(binding.closeAtEditText.text.toString())
             }
 
-            val lunchTimeFrom = TimeUtils.parseTime(lunchFromEditText.text.toString())
-            val lunchTimeTo = TimeUtils.parseTime(lunchToEditText.text.toString())
+            val lunchTimeFrom = TimeUtils.parseTime(binding.lunchFromEditText.text.toString())
+            val lunchTimeTo = TimeUtils.parseTime(binding.lunchToEditText.text.toString())
             return weekdaysChips.filter { it.isChecked }.map { chip ->
                 val dayOfWeek = chip.tag as DayOfWeek
                 WorkDay(
@@ -69,19 +66,19 @@ class ScheduleSectionView @JvmOverloads constructor(
             field = value
 
             weekdaysChips.forEach { it.isCheckable = value }
-            open24HoursSwitch.isEnabled = value
-            openFromTextInputLayout.isEnabled = value
-            closeAtTextInputLayout.isEnabled = value
-            lunchTimeSwitch.isEnabled = value
-            lunchFromTextInputLayout.isEnabled = value
-            lunchToTextInputLayout.isEnabled = value
+            binding.open24HoursSwitch.isEnabled = value
+            binding.openFromTextInputLayout.isEnabled = value
+            binding.closeAtTextInputLayout.isEnabled = value
+            binding.lunchTimeSwitch.isEnabled = value
+            binding.lunchFromTextInputLayout.isEnabled = value
+            binding.lunchToTextInputLayout.isEnabled = value
         }
 
     var removeButtonVisibility: Boolean = false
         set(value) {
             field = value
-            deleteButton.visibility = if (value) View.VISIBLE else View.GONE
-            topSeparator.visibility = if (value) View.VISIBLE else View.GONE
+            binding.deleteButton.visibility = if (value) View.VISIBLE else View.GONE
+            binding.topSeparator.visibility = if (value) View.VISIBLE else View.GONE
         }
 
     fun setOnRemoveButtonClickListener(onRemoveButtonClickListener: () -> Unit) {
@@ -93,20 +90,20 @@ class ScheduleSectionView @JvmOverloads constructor(
     }
 
     fun getSectionData(): SectionData {
-        val is24Hours = open24HoursSwitch.isChecked
+        val is24Hours = binding.open24HoursSwitch.isChecked
         val from = if (is24Hours) {
             Time(0, 0)
         } else {
-            TimeUtils.parseTime(openFromEditText.text.toString())
+            TimeUtils.parseTime(binding.openFromEditText.text.toString())
         }
         val to = if (is24Hours) {
             Time(23, 59)
         } else {
-            TimeUtils.parseTime(closeAtEditText.text.toString())
+            TimeUtils.parseTime(binding.closeAtEditText.text.toString())
         }
 
-        val lunchTimeFrom = TimeUtils.parseTime(lunchFromEditText.text.toString())
-        val lunchTimeTo = TimeUtils.parseTime(lunchToEditText.text.toString())
+        val lunchTimeFrom = TimeUtils.parseTime(binding.lunchFromEditText.text.toString())
+        val lunchTimeTo = TimeUtils.parseTime(binding.lunchToEditText.text.toString())
 
         val daysMap = mutableMapOf<DayOfWeek, SelectionState>()
         weekdaysChips
@@ -138,19 +135,19 @@ class ScheduleSectionView @JvmOverloads constructor(
         tag = sectionData.id
 
         if (fromTime != Time.NOT_SET) {
-            openFromEditText.setText(TimeUtils.formatTime(fromTime.hour, fromTime.minute))
+            binding.openFromEditText.setText(TimeUtils.formatTime(fromTime.hour, fromTime.minute))
         }
 
         if (toTime != Time.NOT_SET) {
-            closeAtEditText.setText(TimeUtils.formatTime(toTime.hour, toTime.minute))
+            binding.closeAtEditText.setText(TimeUtils.formatTime(toTime.hour, toTime.minute))
         }
 
         if (lunchFromTime != Time.NOT_SET) {
-            lunchFromEditText.setText(TimeUtils.formatTime(lunchFromTime.hour, lunchFromTime.minute))
+            binding.lunchFromEditText.setText(TimeUtils.formatTime(lunchFromTime.hour, lunchFromTime.minute))
         }
 
         if (lunchToTime != Time.NOT_SET) {
-            lunchToEditText.setText(TimeUtils.formatTime(lunchToTime.hour, lunchToTime.minute))
+            binding.lunchToEditText.setText(TimeUtils.formatTime(lunchToTime.hour, lunchToTime.minute))
         }
 
         daysMap
@@ -208,29 +205,28 @@ class ScheduleSectionView @JvmOverloads constructor(
     }
 
     init {
-        View.inflate(context, R.layout.sm_add_schedule_section_view, this)
         layoutTransition = LayoutTransition()
 
         displayLocalisedWeekdays()
 
-        open24HoursSwitch.setOnCheckedChangeListener { _, isChecked ->
-            openHoursFlow.visibility = if (isChecked) View.GONE else View.VISIBLE
+        binding.open24HoursSwitch.setOnCheckedChangeListener { _, isChecked ->
+            binding.openHoursFlow.visibility = if (isChecked) View.GONE else View.VISIBLE
         }
 
-        lunchTimeSwitch.setOnCheckedChangeListener { _, isChecked ->
-            lunchHoursFlow.visibility = if (isChecked) View.VISIBLE else View.GONE
+        binding.lunchTimeSwitch.setOnCheckedChangeListener { _, isChecked ->
+            binding.lunchHoursFlow.visibility = if (isChecked) View.VISIBLE else View.GONE
         }
 
         weekdaysChips.forEach { chip ->
             chip.setOnCheckedChangeListener { _, _ -> onWorkingDaysSelected.invoke() }
         }
 
-        deleteButton.setOnClickListener { onRemoveButtonClickListener.invoke() }
+        binding.deleteButton.setOnClickListener { onRemoveButtonClickListener.invoke() }
 
-        initTimeField(openFromEditText)
-        initTimeField(closeAtEditText)
+        initTimeField(binding.openFromEditText)
+        initTimeField(binding.closeAtEditText)
 
-        initTimeField(lunchFromEditText)
-        initTimeField(lunchToEditText)
+        initTimeField(binding.lunchFromEditText)
+        initTimeField(binding.lunchToEditText)
     }
 }
