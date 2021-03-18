@@ -64,7 +64,7 @@ internal class DemoPlacesRepository : PlacesRepository {
                 id = index.toString(),
                 schedule = schedule,
                 rating = 3.5f,
-                reviews = listOf(
+                otherReviews = listOf(
                     Review(
                         author = Author(
                             name = names.random(),
@@ -126,15 +126,9 @@ internal class DemoPlacesRepository : PlacesRepository {
     }
 
     override fun updatePlaceRating(placeId: String, newRating: Int, text: String) {
-        val placeIdx = places.indexOfFirst { place ->  place.id == placeId }
-        val review = places[placeIdx].reviews.find { review -> review.author.user }
-        review?.let {
-            places[placeIdx] = places[placeIdx].copy(
-                reviews = places[placeIdx].reviews - review
-            )
-        }
+        val placeIdx = places.indexOfFirst { place -> place.id == placeId }
         places[placeIdx] = places[placeIdx].copy(
-            reviews = places[placeIdx].reviews + Review(
+            userReview = Review(
                 rating = newRating.toFloat(),
                 date = Date().time,
                 text = text,
@@ -148,13 +142,13 @@ internal class DemoPlacesRepository : PlacesRepository {
 
     override fun deleteReview(userReview: Review, place: Place) {
         val placeIdx = places.indexOfFirst { it.id == place.id }
-        places[placeIdx] = places[placeIdx].copy(
-            reviews = places[placeIdx].reviews - userReview
-        )
+        places[placeIdx] = places[placeIdx].copy(userReview = null)
     }
 
     override fun getPlaceReviews(placeId: String): List<Review> {
-        return places.find { it.id == placeId }?.reviews.orEmpty()
+        return places.find { it.id == placeId }?.let {
+            listOf(it.userReview) + it.otherReviews
+        }?.filterNotNull().orEmpty()
     }
 
     override fun add(place: Place) {

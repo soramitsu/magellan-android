@@ -9,7 +9,6 @@ import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.location.Location
 import android.os.Bundle
-import android.os.Handler
 import android.view.MotionEvent
 import android.view.View
 import androidx.annotation.DrawableRes
@@ -69,11 +68,6 @@ open class SoramitsuMapFragment : Fragment(R.layout.sm_fragment_map_soramitsu), 
 
     private val markers = mutableListOf<Marker>()
     private val clusters = mutableListOf<Marker>()
-
-    // will be used for throttling. Maybe we can achieve the same
-    // behavior using delay() before request and cancelling corresponding job
-    private val handler = Handler()
-    private var onMapScrollStopCallback: Runnable? = null
 
     protected fun retryGetPlacesRequest() {
         googleMap?.let { googleMap ->
@@ -162,8 +156,6 @@ open class SoramitsuMapFragment : Fragment(R.layout.sm_fragment_map_soramitsu), 
     override fun onPause() {
         super.onPause()
         soramitsuMapView.onPause()
-
-        handler.removeCallbacksAndMessages(null)
     }
 
     override fun onStop() {
@@ -210,25 +202,20 @@ open class SoramitsuMapFragment : Fragment(R.layout.sm_fragment_map_soramitsu), 
             )
 
             googleMap.setOnCameraMoveListener {
-                // throttleLast(onCardScrollStopCallback, 500ms)
-                onMapScrollStopCallback?.let { handler.removeCallbacks(it) }
-                onMapScrollStopCallback = Runnable {
-                    val farLeft = googleMap.projection.visibleRegion.farLeft
-                    val nearRight = googleMap.projection.visibleRegion.nearRight
-                    val zoom = googleMap.cameraPosition.zoom.toInt()
-                    viewModel.mapParams = MapParams(
-                        topLeft = GeoPoint(
-                            latitude = farLeft.latitude,
-                            longitude = farLeft.longitude
-                        ),
-                        bottomRight = GeoPoint(
-                            latitude = nearRight.latitude,
-                            longitude = nearRight.longitude
-                        ),
-                        zoom = zoom
-                    )
-                }
-                onMapScrollStopCallback?.let { handler.postDelayed(it, 500) }
+                val farLeft = googleMap.projection.visibleRegion.farLeft
+                val nearRight = googleMap.projection.visibleRegion.nearRight
+                val zoom = googleMap.cameraPosition.zoom.toInt()
+                viewModel.mapParams = MapParams(
+                    topLeft = GeoPoint(
+                        latitude = farLeft.latitude,
+                        longitude = farLeft.longitude
+                    ),
+                    bottomRight = GeoPoint(
+                        latitude = nearRight.latitude,
+                        longitude = nearRight.longitude
+                    ),
+                    zoom = zoom
+                )
 
                 activity?.onUserInteraction()
             }
