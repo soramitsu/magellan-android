@@ -136,10 +136,11 @@ class PlaceProposalFragment :
 
             createAndSendForReviewButton.setOnClickListener {
                 val position = placeProposalViewModel.position ?: return@setOnClickListener
+                val category = categoryTextView.category ?: return@setOnClickListener
                 val place = Place(
                     name = placeNameEditText.text.toString(),
                     address = addressTextView.text.toString(),
-                    category = categoryTextView.category,
+                    category = category,
                     position = position,
                     phone = placePhoneNumberEditText.text.toString(),
                     website = websiteEditText.text.toString(),

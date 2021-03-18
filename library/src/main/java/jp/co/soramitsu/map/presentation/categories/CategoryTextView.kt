@@ -6,14 +6,18 @@ import android.graphics.Canvas
 import android.graphics.Paint
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
+import android.os.Parcel
+import android.os.Parcelable
 import android.util.AttributeSet
 import androidx.annotation.DrawableRes
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.content.ContextCompat
 import androidx.core.widget.TextViewCompat
 import jp.co.soramitsu.map.R
+import jp.co.soramitsu.map.SoramitsuMapLibraryConfig
 import jp.co.soramitsu.map.ext.getResourceIdForAttr
 import jp.co.soramitsu.map.model.Category
+import kotlinx.coroutines.*
 
 class CategoryTextView @JvmOverloads constructor(
     context: Context,
@@ -21,15 +25,79 @@ class CategoryTextView @JvmOverloads constructor(
     defStyleRes: Int = 0
 ) : AppCompatTextView(context, attributeSet, defStyleRes) {
 
-    var category: Category = Category.OTHER
+    private val viewScope: CoroutineScope = MainScope()
+
+    private val logger = SoramitsuMapLibraryConfig.logger
+    private val repository = SoramitsuMapLibraryConfig.repository
+
+    var category: Category? = null
         set(value) {
             field = value
+
+            // we already know what to show in category field. Just cancel background task and enable CategoryView
+            if (value != null && viewScope.isActive) {
+                isEnabled = true
+                viewScope.cancel()
+            }
+
             invalidateSelf()
         }
 
+    override fun onFinishInflate() {
+        super.onFinishInflate()
+        reloadDefaultCategory()
+    }
+
+    override fun onDetachedFromWindow() {
+        super.onDetachedFromWindow()
+
+        viewScope.cancel()
+    }
+
+    override fun onSaveInstanceState(): Parcelable {
+        val savedState = CategoryTextViewSavedState(super.onSaveInstanceState()!!)
+        savedState.category = category
+        return savedState
+    }
+
+    override fun onRestoreInstanceState(state: Parcelable?) {
+        if (state is CategoryTextViewSavedState) {
+            super.onRestoreInstanceState(state.superState)
+            category = state.category
+        } else {
+            super.onRestoreInstanceState(state)
+        }
+
+        if (category == null) reloadDefaultCategory()
+    }
+
+    private fun reloadDefaultCategory() {
+        // if category already set, we won't do anything to prevent unexpected field override
+        if (category != null) return
+
+        viewScope.launch {
+            isEnabled = false
+            val result = withContext(Dispatchers.IO) {
+                runCatching {
+                    repository.getCategories().first()
+                }.onFailure {
+                    logger.log("CategoryView", it)
+                }.onSuccess {
+                    logger.log("CategoryView", "Default category: $it")
+                }
+            }
+            isEnabled = result.isSuccess
+
+            // if category loaded from outside and set to the corresponding field, we wont rewrite field
+            if (category == null) {
+                category = result.getOrNull()
+            }
+        }
+    }
+
     private fun invalidateSelf() {
-        text = category.localisedName()
-        val categoryIcon = wrapInCircle44dp(iconForCategory(context, category))
+        text = category?.localisedName().orEmpty()
+        val categoryIcon = wrapInCircle44dp(iconForCategory(context, category ?: Category.OTHER))
         TextViewCompat.setCompoundDrawablesRelativeWithIntrinsicBounds(
             this, categoryIcon, null, null, null
         )
@@ -71,5 +139,34 @@ class CategoryTextView @JvmOverloads constructor(
 
     init {
         invalidateSelf()
+    }
+
+    internal class CategoryTextViewSavedState : BaseSavedState {
+
+        var category: Category? = null
+
+        internal constructor(superState: Parcelable) : super(superState)
+
+        internal constructor(parcel: Parcel) : super(parcel) {
+            category = parcel.readSerializable() as? Category
+        }
+
+        override fun writeToParcel(out: Parcel, flags: Int) {
+            super.writeToParcel(out, flags)
+
+            category?.let { category -> out.writeSerializable(category) }
+        }
+
+        companion object {
+            @JvmField
+            val CREATOR = object : Parcelable.Creator<CategoryTextViewSavedState> {
+                override fun createFromParcel(source: Parcel): CategoryTextViewSavedState {
+                    return CategoryTextViewSavedState(source)
+                }
+
+                override fun newArray(size: Int): Array<CategoryTextViewSavedState> = emptyArray()
+
+            }
+        }
     }
 }
