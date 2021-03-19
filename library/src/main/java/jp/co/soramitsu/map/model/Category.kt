@@ -1,12 +1,13 @@
 package jp.co.soramitsu.map.model
 
+import java.io.Serializable
 import java.util.*
 
 data class Category(
     val id: Long,
     val name: String,
     val khmerName: String = ""
-) {
+): Serializable {
 
     fun localisedName(): String {
         val useKhmerName = Locale.getDefault().language == "km" && khmerName.isNotBlank()

@@ -13,7 +13,8 @@ data class Place(
     val website: String = "",
     val facebook: String = "",
     val address: String = "",
-    val reviews: List<Review> = emptyList(),
+    val userReview: Review? = null,
+    val otherReviews: List<Review> = emptyList(),
     val id: String = "",
     val logoUrl: String = "",
     val promoImageUrl: String = "",
@@ -42,8 +43,11 @@ data class Place(
         if (website != other.website) return false
         if (facebook != other.facebook) return false
         if (address != other.address) return false
-        if (reviews != other.reviews) return false
+        if (userReview != other.userReview) return false
+        if (otherReviews != other.otherReviews) return false
         if (id != other.id) return false
+        if (logoUrl != other.logoUrl) return false
+        if (promoImageUrl != other.promoImageUrl) return false
         if (!logo.contentEquals(other.logo)) return false
         if (!promoImage.contentEquals(other.promoImage)) return false
 
@@ -61,8 +65,11 @@ data class Place(
         result = 31 * result + website.hashCode()
         result = 31 * result + facebook.hashCode()
         result = 31 * result + address.hashCode()
-        result = 31 * result + reviews.hashCode()
+        result = 31 * result + (userReview?.hashCode() ?: 0)
+        result = 31 * result + otherReviews.hashCode()
         result = 31 * result + id.hashCode()
+        result = 31 * result + logoUrl.hashCode()
+        result = 31 * result + promoImageUrl.hashCode()
         result = 31 * result + logo.contentHashCode()
         result = 31 * result + promoImage.contentHashCode()
         return result
