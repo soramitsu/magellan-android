@@ -165,7 +165,11 @@ internal class PlaceFragment : BottomSheetDialogFragment() {
 
         bindIsOpenNowField(place.schedule)
         bindFullScheduleField(place.schedule)
-        bindRating(place)
+        if (SoramitsuMapLibraryConfig.enablePlaceReviews) {
+            bindRating(place)
+        } else {
+            binding.reviewView.visibility = View.GONE
+        }
 
         binding.additionalInfoMobilePhone.text = place.phone
         binding.additionalInfoWebsite.text = place.website
