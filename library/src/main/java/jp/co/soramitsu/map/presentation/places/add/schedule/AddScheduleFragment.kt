@@ -11,24 +11,27 @@ import androidx.transition.Transition
 import androidx.transition.TransitionListenerAdapter
 import androidx.transition.TransitionManager
 import jp.co.soramitsu.map.R
+import jp.co.soramitsu.map.databinding.SmFragmentAddScheduleBinding
 import jp.co.soramitsu.map.ext.intervals
-import kotlinx.android.synthetic.main.sm_fragment_add_schedule.*
 
 @ExperimentalStdlibApi
-class AddScheduleFragment : Fragment(R.layout.sm_fragment_add_schedule) {
+internal class AddScheduleFragment : Fragment(R.layout.sm_fragment_add_schedule) {
 
     // shared between PlaceProposalFragment and AddScheduleFragment to
     // apply schedule changes and display them to user
     private lateinit var placeProposalViewModel: PlaceProposalViewModel
 
+    private var _binding: SmFragmentAddScheduleBinding? = null
+    private val binding get() = _binding!!
+
     private var currentScheduleSection: ScheduleSectionView? = null
         set(value) {
             field = value
-            value?.removeButtonVisibility = scheduleLinearLayout.childCount > 1
+            value?.removeButtonVisibility = binding.scheduleLinearLayout.childCount > 1
             value?.setOnRemoveButtonClickListener {
                 placeProposalViewModel.removeSectionWithId(value.tag as Int)
                 currentScheduleSection =
-                    scheduleLinearLayout.children.last() as? ScheduleSectionView
+                    binding.scheduleLinearLayout.children.last() as? ScheduleSectionView
             }
             value?.setOnWorkingDaysSelected {
                 placeProposalViewModel.onSectionChanged(value.getSectionData())
@@ -36,9 +39,20 @@ class AddScheduleFragment : Fragment(R.layout.sm_fragment_add_schedule) {
             }
         }
 
+    private var addSectionTransitionListener = object : TransitionListenerAdapter() {
+        override fun onTransitionEnd(transition: Transition) {
+            super.onTransitionEnd(transition)
+            binding.scrollView.post {
+                binding.scrollView.smoothScrollBy(0, currentScheduleSection?.height ?: 0)
+            }
+        }
+    }
+
     @ExperimentalStdlibApi
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        _binding = SmFragmentAddScheduleBinding.bind(view)
 
         placeProposalViewModel = ViewModelProvider(
             requireActivity(),
@@ -46,7 +60,7 @@ class AddScheduleFragment : Fragment(R.layout.sm_fragment_add_schedule) {
         )[PlaceProposalViewModel::class.java]
 
         placeProposalViewModel.sections.observe(viewLifecycleOwner) { sections ->
-            val alreadyPresentedSectionIds: List<Int> = scheduleLinearLayout
+            val alreadyPresentedSectionIds: List<Int> = binding.scheduleLinearLayout
                 .children
                 .filterIsInstance(ScheduleSectionView::class.java)
                 .mapNotNull { it.tag as Int }
@@ -59,18 +73,18 @@ class AddScheduleFragment : Fragment(R.layout.sm_fragment_add_schedule) {
             val sectionsToRebind = targetSectionIds.intersect(alreadyPresentedSectionIds)
 
             sectionsToRemove.forEach { sectionId ->
-                scheduleLinearLayout
+                binding.scheduleLinearLayout
                     .children
                     .filterIsInstance(ScheduleSectionView::class.java)
                     .find { it.tag == sectionId }?.let { sectionToRemove ->
-                        scheduleLinearLayout.removeView(sectionToRemove)
+                        binding.scheduleLinearLayout.removeView(sectionToRemove)
                     }
             }
 
             sectionsToAdd.forEach { sectionId -> addSection(sections.first { it.id == sectionId }) }
 
             sectionsToRebind.forEach { sectionId ->
-                scheduleLinearLayout
+                binding.scheduleLinearLayout
                     .children
                     .filterIsInstance(ScheduleSectionView::class.java)
                     .find { it.tag == sectionId }?.let { sectionToRebind ->
@@ -79,11 +93,11 @@ class AddScheduleFragment : Fragment(R.layout.sm_fragment_add_schedule) {
                     }
             }
 
-            scheduleLinearLayout.children
+            binding.scheduleLinearLayout.children
                 .filterIsInstance(ScheduleSectionView::class.java)
                 .forEach { it.editable = false }
 
-            currentScheduleSection = scheduleLinearLayout.children
+            currentScheduleSection = binding.scheduleLinearLayout.children
                 .filterIsInstance(ScheduleSectionView::class.java)
                 .last()
             currentScheduleSection?.editable = true
@@ -91,15 +105,15 @@ class AddScheduleFragment : Fragment(R.layout.sm_fragment_add_schedule) {
             updateButtonTitle()
         }
 
-        toolbar.setNavigationOnClickListener { activity?.onBackPressed() }
+        binding.toolbar.setNavigationOnClickListener { activity?.onBackPressed() }
 
-        addScheduleSection.setOnClickListener {
+        binding.addScheduleSection.setOnClickListener {
             currentScheduleSection?.getSectionData()?.let { currentSectionData ->
                 placeProposalViewModel.addSection(currentSectionData)
             }
         }
 
-        saveButton.setOnClickListener {
+        binding.saveButton.setOnClickListener {
             currentScheduleSection?.getSectionData()?.let { currentSectionData ->
                 placeProposalViewModel.onSaveButtonClick(currentSectionData)
             }
@@ -110,7 +124,9 @@ class AddScheduleFragment : Fragment(R.layout.sm_fragment_add_schedule) {
     override fun onDestroyView() {
         super.onDestroyView()
         currentScheduleSection = null
-        TransitionManager.endTransitions(scheduleLinearLayout)
+        TransitionManager.endTransitions(binding.scheduleLinearLayout)
+
+        _binding = null
     }
 
     private fun addSection(newSectionData: SectionData) {
@@ -129,18 +145,11 @@ class AddScheduleFragment : Fragment(R.layout.sm_fragment_add_schedule) {
         val transition = Fade().apply {
             duration = resources.getInteger(android.R.integer.config_mediumAnimTime).toLong()
             addTarget(newSection.id)
-            addListener(object : TransitionListenerAdapter() {
-                override fun onTransitionEnd(transition: Transition) {
-                    super.onTransitionEnd(transition)
-                    scrollView?.post {
-                        scrollView?.smoothScrollBy(0, currentScheduleSection?.height ?: 0)
-                    }
-                }
-            })
+            addListener(addSectionTransitionListener)
         }
-        TransitionManager.beginDelayedTransition(scheduleLinearLayout, transition)
+        TransitionManager.beginDelayedTransition(binding.scheduleLinearLayout, transition)
 
-        scheduleLinearLayout.addView(newSection)
+        binding.scheduleLinearLayout.addView(newSection)
     }
 
     private fun updateButtonTitle() {
@@ -159,12 +168,12 @@ class AddScheduleFragment : Fragment(R.layout.sm_fragment_add_schedule) {
                     }
                 }
 
-            addScheduleSection.text = resources.getString(R.string.sm_add_opening_hours, postfix)
+            binding.addScheduleSection.text = resources.getString(R.string.sm_add_opening_hours, postfix)
 
             if (currentSectionData.daysMap.containsValue(SelectionState.NotSelected)) {
-                addScheduleSection.visibility = View.VISIBLE
+                binding.addScheduleSection.visibility = View.VISIBLE
             } else {
-                addScheduleSection.visibility = View.GONE
+                binding.addScheduleSection.visibility = View.GONE
             }
         }
     }

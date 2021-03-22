@@ -15,13 +15,15 @@ import com.bumptech.glide.Glide
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import jp.co.soramitsu.map.R
 import jp.co.soramitsu.map.SoramitsuMapLibraryConfig
+import jp.co.soramitsu.map.databinding.SmMultichoiceImagePickerBinding
 import jp.co.soramitsu.map.ext.images
-import kotlinx.android.synthetic.main.sm_multichoice_image_picker.*
-import kotlinx.android.synthetic.main.sm_single_choice_image_picker.imagesRecyclerView
 
-class MultichoiceBottomSheetImagePicker : BottomSheetDialogFragment() {
+internal class MultichoiceBottomSheetImagePicker : BottomSheetDialogFragment() {
 
     private lateinit var imagesAdapter: SelectableImagesAdapter
+
+    private var _binding: SmMultichoiceImagePickerBinding? = null
+    private val binding get() = _binding!!
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -34,10 +36,12 @@ class MultichoiceBottomSheetImagePicker : BottomSheetDialogFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        _binding = SmMultichoiceImagePickerBinding.bind(view)
+
         view.doOnLayout { (view.parent as? View)?.setBackgroundColor(Color.TRANSPARENT) }
 
         imagesAdapter = SelectableImagesAdapter(Glide.with(this), SoramitsuMapLibraryConfig.enableMultiplePlacePhotos)
-        imagesRecyclerView.adapter = imagesAdapter
+        binding.imagesRecyclerView.adapter = imagesAdapter
         imagesAdapter.setOnImageSelectedListener { selectedItem ->
             if (SoramitsuMapLibraryConfig.enableMultiplePlacePhotos) {
                 val updatedItems = imagesAdapter.items.toMutableList()
@@ -56,17 +60,17 @@ class MultichoiceBottomSheetImagePicker : BottomSheetDialogFragment() {
         }
 
         updateConfirmButtonTitle(0)
-        confirmSelectedPhotosButton.setOnClickListener {
+        binding.confirmSelectedPhotosButton.setOnClickListener {
             val listener = parentFragment as? ImagesSelectionListener
             val selectedUris = imagesAdapter.items.filter { it.selected }.map { it.imageUri }
             listener?.onImagesSelected(selectedUris, ImagePickerCode.MULTICHOICE)
             dismiss()
         }
 
-        val padding = imagesRecyclerView.resources
+        val padding = binding.imagesRecyclerView.resources
             .getDimension(R.dimen.sm_margin_padding_size_medium)
             .toInt()
-        imagesRecyclerView.addItemDecoration(SpanItemDecorator(padding))
+        binding.imagesRecyclerView.addItemDecoration(SpanItemDecorator(padding))
 
         if (ActivityCompat.checkSelfPermission(
                 requireActivity(),
@@ -80,6 +84,12 @@ class MultichoiceBottomSheetImagePicker : BottomSheetDialogFragment() {
                 READ_EXTERNAL_STORAGE_PERMISSION_REQUEST_CODE
             )
         }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+
+        _binding = null
     }
 
     override fun onRequestPermissionsResult(
@@ -115,7 +125,7 @@ class MultichoiceBottomSheetImagePicker : BottomSheetDialogFragment() {
             numberOfSelectedPhotos,
             numberOfSelectedPhotos
         )
-        confirmSelectedPhotosButton.text = confirmButtonTitle
+        binding.confirmSelectedPhotosButton.text = confirmButtonTitle
     }
 
     private companion object {

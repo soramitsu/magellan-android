@@ -15,13 +15,13 @@ import androidx.core.content.ContextCompat
 import androidx.core.text.color
 import androidx.core.view.doOnLayout
 import androidx.core.widget.TextViewCompat
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import jp.co.soramitsu.map.R
 import jp.co.soramitsu.map.SoramitsuMapLibraryConfig
+import jp.co.soramitsu.map.databinding.SmPlaceBottomSheetBinding
 import jp.co.soramitsu.map.ext.colorFromTheme
 import jp.co.soramitsu.map.ext.dimenFromTheme
 import jp.co.soramitsu.map.model.Place
@@ -35,7 +35,6 @@ import jp.co.soramitsu.map.presentation.places.add.schedule.generateWorkingDaysF
 import jp.co.soramitsu.map.presentation.review.EditReviewFragment
 import jp.co.soramitsu.map.presentation.review.ReviewFragment
 import jp.co.soramitsu.map.presentation.review.ReviewListFragment
-import kotlinx.android.synthetic.main.sm_place_bottom_sheet.*
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -49,6 +48,9 @@ internal class PlaceFragment : BottomSheetDialogFragment() {
 
     private val detailedScheduleAdapter = DetailedScheduleAdapter()
 
+    private var _binding: SmPlaceBottomSheetBinding? = null
+    private val binding get() = _binding!!
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -61,28 +63,29 @@ internal class PlaceFragment : BottomSheetDialogFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        _binding = SmPlaceBottomSheetBinding.bind(view)
+
         view.doOnLayout {
             val parent = (view.parent as? View)
             parent?.setBackgroundColor(Color.TRANSPARENT)
             dialog?.window?.setDimAmount(0f)
         }
 
-        additionalInfoOpenHoursDetails.layoutManager = LinearLayoutManager(context)
-        additionalInfoOpenHoursDetails.adapter = detailedScheduleAdapter
+        binding.additionalInfoOpenHoursDetails.layoutManager = LinearLayoutManager(context)
+        binding.additionalInfoOpenHoursDetails.adapter = detailedScheduleAdapter
 
         parentFragmentManager.fragments.find { it is SoramitsuMapFragment }?.let { hostFragment ->
             viewModel = ViewModelProvider(hostFragment, ViewModelProvider.NewInstanceFactory())
                 .get(SoramitsuMapViewModel::class.java)
 
             viewModel.placeSelected().value?.let { place -> bindBottomSheetWithPlace(place) }
-            viewModel.placeSelected().observe(viewLifecycleOwner, Observer { place ->
+            viewModel.placeSelected().observe(viewLifecycleOwner) { place ->
                 place?.let { bindBottomSheetWithPlace(place) }
-            })
-            viewModel.uploadReviewInProgress()
-                .observe(viewLifecycleOwner, Observer { placeUpdateInProgress ->
-                    reviewView.showUploadingReviewIndicator(placeUpdateInProgress)
-                })
-            viewModel.editPlaceReviewClicked().observe(viewLifecycleOwner, Observer { place ->
+            }
+            viewModel.uploadReviewInProgress().observe(viewLifecycleOwner) { placeUpdateInProgress ->
+                binding.reviewView.showUploadingReviewIndicator(placeUpdateInProgress)
+            }
+            viewModel.editPlaceReviewClicked().observe(viewLifecycleOwner) { place ->
                 val initialRating = place.userReview?.rating ?: place.rating
                 ReviewFragment().withArguments(
                     placeId = place.id,
@@ -91,8 +94,14 @@ internal class PlaceFragment : BottomSheetDialogFragment() {
                     edit = place.userReview != null,
                     initialRating = initialRating.toInt()
                 ).show(parentFragmentManager, "AddPlaceReviewFragment")
-            })
+            }
         }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+
+        _binding = null
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
@@ -122,7 +131,7 @@ internal class PlaceFragment : BottomSheetDialogFragment() {
     @ExperimentalStdlibApi
     private fun bindBottomSheetWithPlace(place: Place) {
         // header info
-        placeNameTextView.text = place.localisedName()
+        binding.placeNameTextView.text = place.localisedName()
 
         val placeAddress = if (place.address.isNotBlank()) {
             resources.getString(
@@ -133,49 +142,49 @@ internal class PlaceFragment : BottomSheetDialogFragment() {
         } else {
             place.category.localisedName()
         }
-        placeAddressTextView.text = placeAddress
+        binding.placeAddressTextView.text = placeAddress
 
-        placeRatingBar.rating = place.rating
-        placeRatingTextView.text = place.rating.toString()
+        binding.placeRatingBar.rating = place.rating
+        binding.placeRatingTextView.text = place.rating.toString()
         val allReviews = (listOf(place.userReview) + place.otherReviews).filterNotNull()
-        placeReviewsTextView.text = context?.resources?.getQuantityString(
+        binding.placeReviewsTextView.text = context?.resources?.getQuantityString(
             R.plurals.sm_review, allReviews.size, allReviews.size
         )
 
         // additional info
-        additionalInfoMobilePhone.visibility =
+        binding.additionalInfoMobilePhone.visibility =
             if (place.phone.isEmpty()) View.GONE else View.VISIBLE
-        additionalInfoWebsite.visibility =
+        binding.additionalInfoWebsite.visibility =
             if (place.website.isEmpty()) View.GONE else View.VISIBLE
-        additionalInfoFacebook.visibility =
+        binding.additionalInfoFacebook.visibility =
             if (place.facebook.isEmpty()) View.GONE else View.VISIBLE
-        additionalInfoAddress.visibility =
+        binding.additionalInfoAddress.visibility =
             if (place.address.isEmpty()) View.GONE else View.VISIBLE
-        placeIsWorkingNowTextView.visibility =
+        binding.placeIsWorkingNowTextView.visibility =
             if (place.schedule.workingDays.isNotEmpty() || place.schedule.open24) View.VISIBLE else View.GONE
 
         bindIsOpenNowField(place.schedule)
         bindFullScheduleField(place.schedule)
         bindRating(place)
 
-        additionalInfoMobilePhone.text = place.phone
-        additionalInfoWebsite.text = place.website
-        additionalInfoFacebook.text = "facebook.com/${place.facebook}"
-        additionalInfoAddress.text = place.address
+        binding.additionalInfoMobilePhone.text = place.phone
+        binding.additionalInfoWebsite.text = place.website
+        binding.additionalInfoFacebook.text = "facebook.com/${place.facebook}"
+        binding.additionalInfoAddress.text = place.address
 
-        additionalInfoMobilePhone.setOnClickListener {
+        binding.additionalInfoMobilePhone.setOnClickListener {
             startActivity(Intent(Intent.ACTION_DIAL).apply {
                 data = Uri.parse("tel:${place.phone}")
             })
         }
 
-        additionalInfoWebsite.setOnClickListener {
+        binding.additionalInfoWebsite.setOnClickListener {
             startActivity(Intent(Intent.ACTION_VIEW).apply {
                 data = Uri.parse(place.website)
             })
         }
 
-        additionalInfoFacebook.setOnClickListener {
+        binding.additionalInfoFacebook.setOnClickListener {
             val facebookIntent = Intent(Intent.ACTION_VIEW).apply {
                 data = Uri.parse("facebook://facebook.com/${place.facebook}")
             }
@@ -188,38 +197,36 @@ internal class PlaceFragment : BottomSheetDialogFragment() {
             }
         }
 
-        additionalInfoAddress.setOnClickListener {
+        binding.additionalInfoAddress.setOnClickListener {
             startActivity(Intent(Intent.ACTION_VIEW).apply {
                 data = Uri.parse("geo:0,0?q=${Uri.encode(place.address)}")
                 `package` = "com.google.android.apps.maps"
             })
         }
 
-        closePlaceInfoButton.setOnClickListener {
-            dismiss()
-        }
+        binding.closePlaceInfoButton.setOnClickListener { dismiss() }
     }
 
     private fun bindRating(place: Place) {
-        placeRatingBar.rating = place.rating
-        placeRatingTextView.text = "%.1f".format(place.rating)
+        binding.placeRatingBar.rating = place.rating
+        binding.placeRatingTextView.text = "%.1f".format(place.rating)
         val allReviews = (listOf(place.userReview) + place.otherReviews).filterNotNull()
-        placeReviewsTextView.text = resources.getQuantityString(
+        binding.placeReviewsTextView.text = resources.getQuantityString(
             R.plurals.sm_reviews_format, allReviews.size, allReviews.size
         )
 
-        reviewView.bind(place.rating, allReviews)
-        reviewView.setOnShowAllReviewsButtonClickListener {
+        binding.reviewView.bind(place.rating, allReviews)
+        binding.reviewView.setOnShowAllReviewsButtonClickListener {
             activity?.onUserInteraction()
             ReviewListFragment().show(parentFragmentManager, "ReviewListBottomSheetFragment")
         }
 
-        reviewView.setOnEditUserCommentClickListener {
+        binding.reviewView.setOnEditUserCommentClickListener {
             activity?.onUserInteraction()
             EditReviewFragment().show(parentFragmentManager, "EditReviewMenu")
         }
 
-        reviewView.setOnUserChangeRatingListener { newRating ->
+        binding.reviewView.setOnUserChangeRatingListener { newRating ->
             activity?.onUserInteraction()
             viewModel.placeSelected().value?.let { place ->
                 ReviewFragment().withArguments(
@@ -234,20 +241,20 @@ internal class PlaceFragment : BottomSheetDialogFragment() {
 
     @ExperimentalStdlibApi
     private fun bindFullScheduleField(schedule: Schedule) {
-        additionalInfoOpenHoursDetails.visibility = View.GONE
-        additionalInfoOpenHours.visibility = View.GONE
+        binding.additionalInfoOpenHoursDetails.visibility = View.GONE
+        binding.additionalInfoOpenHours.visibility = View.GONE
         val todayDayOfWeek = Calendar.getInstance().get(Calendar.DAY_OF_WEEK)
         val today = schedule.workingDays.find { workDay -> workDay.weekDay == todayDayOfWeek }
         if (!schedule.open24 && today == null) return
 
-        additionalInfoOpenHours.visibility = View.VISIBLE
+        binding.additionalInfoOpenHours.visibility = View.VISIBLE
 
         if (schedule.open24) {
             val open24Hours = getString(R.string.sm_open) + " " + getString(R.string.sm_24_hours)
-            additionalInfoOpenHours.text = open24Hours
-            additionalInfoOpenHours.setOnClickListener(null)
+            binding.additionalInfoOpenHours.text = open24Hours
+            binding.additionalInfoOpenHours.setOnClickListener(null)
             TextViewCompat.setCompoundDrawablesRelativeWithIntrinsicBounds(
-                additionalInfoOpenHours,
+                binding.additionalInfoOpenHours,
                 R.drawable.sm_ic_clock, 0, 0, 0
             )
             return
@@ -266,9 +273,9 @@ internal class PlaceFragment : BottomSheetDialogFragment() {
                     val lunchToTime = dateFormat.format(Date(today.lunchTimeTo!!.inMilliseconds()))
                     val lunchScheduleAsString =
                         getString(R.string.sm_lunch_time) + " $lunchFromTime–$lunchToTime"
-                    additionalInfoOpenHours.text = "$scheduleAsString\n$lunchScheduleAsString"
+                    binding.additionalInfoOpenHours.text = "$scheduleAsString\n$lunchScheduleAsString"
                 } else {
-                    additionalInfoOpenHours.text = scheduleAsString
+                    binding.additionalInfoOpenHours.text = scheduleAsString
                 }
             }
         }
@@ -281,9 +288,9 @@ internal class PlaceFragment : BottomSheetDialogFragment() {
     @ExperimentalStdlibApi
     private fun displayDetailedScheduleInformation(schedule: Schedule) {
         if (schedule.isStableDailySchedule()) {
-            additionalInfoOpenHours.setOnClickListener(null)
+            binding.additionalInfoOpenHours.setOnClickListener(null)
             TextViewCompat.setCompoundDrawablesRelativeWithIntrinsicBounds(
-                additionalInfoOpenHours, R.drawable.sm_ic_clock, 0, 0, 0
+                binding.additionalInfoOpenHours, R.drawable.sm_ic_clock, 0, 0, 0
             )
         } else {
             val animatedArrowDownToUp = ContextCompat.getDrawable(
@@ -294,21 +301,21 @@ internal class PlaceFragment : BottomSheetDialogFragment() {
             ) as AnimatedVectorDrawable
             val iconDrawable = ContextCompat.getDrawable(requireContext(), R.drawable.sm_ic_clock)
             TextViewCompat.setCompoundDrawablesRelativeWithIntrinsicBounds(
-                additionalInfoOpenHours, iconDrawable, null, animatedArrowDownToUp, null
+                binding.additionalInfoOpenHours, iconDrawable, null, animatedArrowDownToUp, null
             )
-            additionalInfoOpenHours.setOnClickListener {
-                if (additionalInfoOpenHoursDetails.visibility == View.VISIBLE) {
+            binding.additionalInfoOpenHours.setOnClickListener {
+                if (binding.additionalInfoOpenHoursDetails.visibility == View.VISIBLE) {
                     TextViewCompat.setCompoundDrawablesRelativeWithIntrinsicBounds(
-                        additionalInfoOpenHours, iconDrawable, null, animatedArrowUpToDown, null
+                        binding.additionalInfoOpenHours, iconDrawable, null, animatedArrowUpToDown, null
                     )
                     animatedArrowUpToDown.start()
-                    additionalInfoOpenHoursDetails.visibility = View.GONE
+                    binding.additionalInfoOpenHoursDetails.visibility = View.GONE
                 } else {
                     TextViewCompat.setCompoundDrawablesRelativeWithIntrinsicBounds(
-                        additionalInfoOpenHours, iconDrawable, null, animatedArrowDownToUp, null
+                        binding.additionalInfoOpenHours, iconDrawable, null, animatedArrowDownToUp, null
                     )
                     animatedArrowDownToUp.start()
-                    additionalInfoOpenHoursDetails.visibility = View.VISIBLE
+                    binding.additionalInfoOpenHoursDetails.visibility = View.VISIBLE
 
                     val workingScheduleAsPairsList = schedule.generateWorkingDaysFields(requireContext())
                     val lunchScheduleAsPairsList = schedule.generateLaunchTimeFields(requireContext())
@@ -333,12 +340,12 @@ internal class PlaceFragment : BottomSheetDialogFragment() {
                 .color(colorAccent) { append(open) }
                 .append(' ')
                 .append(allDayLong)
-            placeIsWorkingNowTextView.text = spannableString
+            binding.placeIsWorkingNowTextView.text = spannableString
         } else {
             val today = Calendar.getInstance().get(Calendar.DAY_OF_WEEK)
             val workDay = schedule.workingDays.find { workDay -> workDay.weekDay == today }
             when {
-                workDay == null -> placeIsWorkingNowTextView.visibility = View.GONE
+                workDay == null -> binding.placeIsWorkingNowTextView.visibility = View.GONE
                 workDay.isLunchTimeNow() -> {
                     val lunchTime = resources.getString(R.string.sm_lunch_time)
                     val lunchEndTime =
@@ -349,7 +356,7 @@ internal class PlaceFragment : BottomSheetDialogFragment() {
                         .color(colorAccent) { append(lunchTime) }
                         .append(' ')
                         .append(till)
-                    placeIsWorkingNowTextView.text = spannableString
+                    binding.placeIsWorkingNowTextView.text = spannableString
                 }
                 workDay.isWorkTime() -> {
                     val open = resources.getString(R.string.sm_open)
@@ -360,7 +367,7 @@ internal class PlaceFragment : BottomSheetDialogFragment() {
                         .color(colorAccent) { append(open) }
                         .append(' ')
                         .append(till)
-                    placeIsWorkingNowTextView.text = spannableString
+                    binding.placeIsWorkingNowTextView.text = spannableString
                 }
                 else -> {
                     val closed = resources.getString(R.string.sm_closed)
@@ -371,7 +378,7 @@ internal class PlaceFragment : BottomSheetDialogFragment() {
                         .color(colorAccent) { append(closed) }
                         .append(' ')
                         .append(till)
-                    placeIsWorkingNowTextView.text = spannableString
+                    binding.placeIsWorkingNowTextView.text = spannableString
                 }
             }
         }

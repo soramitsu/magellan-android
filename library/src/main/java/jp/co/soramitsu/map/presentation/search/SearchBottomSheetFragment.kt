@@ -17,20 +17,23 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import jp.co.soramitsu.map.R
+import jp.co.soramitsu.map.databinding.SmSearchPanelBinding
 import jp.co.soramitsu.map.model.GeoPoint
 import jp.co.soramitsu.map.presentation.SoramitsuMapFragment
 import jp.co.soramitsu.map.presentation.SoramitsuMapViewModel
 import jp.co.soramitsu.map.presentation.places.PlaceFragment
 import jp.co.soramitsu.map.presentation.places.PlacesSearchResultsAdapter
-import kotlinx.android.synthetic.main.sm_search_panel.*
 
 /**
  * Bottom sheet dialog that is shown when user try to enter something in search
  * field on maps screen
  */
-class SearchBottomSheetFragment : BottomSheetDialogFragment() {
+internal class SearchBottomSheetFragment : BottomSheetDialogFragment() {
 
     private lateinit var viewModel: SoramitsuMapViewModel
+
+    private var _binding: SmSearchPanelBinding? = null
+    private val binding get() = _binding!!
 
     private val placesAdapter = PlacesSearchResultsAdapter { place ->
         viewModel.onPlaceSelected(place)
@@ -52,6 +55,8 @@ class SearchBottomSheetFragment : BottomSheetDialogFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        _binding = SmSearchPanelBinding.bind(view)
+
         // init view model
         parentFragmentManager.fragments.find { it is SoramitsuMapFragment }?.let { hostFragment ->
             viewModel = ViewModelProvider(hostFragment, ViewModelProvider.NewInstanceFactory())
@@ -67,9 +72,9 @@ class SearchBottomSheetFragment : BottomSheetDialogFragment() {
         }
 
         // configure list of places
-        placesRecyclerView.adapter = placesAdapter
-        placesRecyclerView.layoutManager = LinearLayoutManager(context)
-        placesRecyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+        binding.placesRecyclerView.adapter = placesAdapter
+        binding.placesRecyclerView.layoutManager = LinearLayoutManager(context)
+        binding.placesRecyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                 super.onScrolled(recyclerView, dx, dy)
 
@@ -78,11 +83,11 @@ class SearchBottomSheetFragment : BottomSheetDialogFragment() {
         })
 
         // search button click handler
-        placesWithSearchTextInputEditText.setOnEditorActionListener { v, actionId, _ ->
+        binding.placesWithSearchTextInputEditText.setOnEditorActionListener { v, actionId, _ ->
             activity?.onUserInteraction()
 
             if (actionId == EditorInfo.IME_ACTION_SEARCH) {
-                val searchText = placesWithSearchTextInputEditText.text?.toString().orEmpty()
+                val searchText = binding.placesWithSearchTextInputEditText.text?.toString().orEmpty()
                 viewModel.requestParams = viewModel.requestParams.copy(query = searchText)
             }
 
@@ -90,10 +95,10 @@ class SearchBottomSheetFragment : BottomSheetDialogFragment() {
         }
 
         // clear edit text button click handler
-        placesWithSearchTextInputLayout.setEndIconOnClickListener { v ->
+        binding.placesWithSearchTextInputLayout.setEndIconOnClickListener { v ->
             activity?.onUserInteraction()
 
-            placesWithSearchTextInputEditText.text = null
+            binding.placesWithSearchTextInputEditText.text = null
             viewModel.requestParams = viewModel.requestParams.copy(query = "")
         }
 
@@ -102,8 +107,8 @@ class SearchBottomSheetFragment : BottomSheetDialogFragment() {
             placesAdapter.update(viewState.places)
         })
 
-        placesWithSearchTextInputEditText.setText(viewModel.requestParams.query)
-        placesWithSearchTextInputEditText.doOnTextChanged { _, _, _, _ ->
+        binding.placesWithSearchTextInputEditText.setText(viewModel.requestParams.query)
+        binding.placesWithSearchTextInputEditText.doOnTextChanged { _, _, _, _ ->
             activity?.onUserInteraction()
         }
     }
@@ -111,7 +116,9 @@ class SearchBottomSheetFragment : BottomSheetDialogFragment() {
     override fun onDestroyView() {
         super.onDestroyView()
 
-        placesRecyclerView.clearOnScrollListeners()
+        binding.placesRecyclerView.clearOnScrollListeners()
+
+        _binding = null
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
@@ -142,7 +149,9 @@ class SearchBottomSheetFragment : BottomSheetDialogFragment() {
             })
 
             // request focus on search edit text
-            placesWithSearchTextInputEditText.setSelection(placesWithSearchTextInputEditText.text?.length ?: 0)
+            binding.placesWithSearchTextInputEditText.setSelection(
+                binding.placesWithSearchTextInputEditText.text?.length ?: 0
+            )
         }
         return dialog
     }

@@ -16,13 +16,16 @@ import androidx.core.view.doOnLayout
 import com.bumptech.glide.Glide
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import jp.co.soramitsu.map.R
+import jp.co.soramitsu.map.databinding.SmSingleChoiceImagePickerBinding
 import jp.co.soramitsu.map.ext.images
-import kotlinx.android.synthetic.main.sm_single_choice_image_picker.*
 import java.util.*
 
-class SingleChoiceBottomSheetImagePicker : BottomSheetDialogFragment() {
+internal class SingleChoiceBottomSheetImagePicker : BottomSheetDialogFragment() {
 
     private lateinit var imagesAdapter: SelectableImagesAdapter
+
+    private var _binding: SmSingleChoiceImagePickerBinding? = null
+    private val binding get() = _binding!!
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -35,10 +38,12 @@ class SingleChoiceBottomSheetImagePicker : BottomSheetDialogFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        _binding = SmSingleChoiceImagePickerBinding.bind(view)
+
         view.doOnLayout { (view.parent as? View)?.setBackgroundColor(Color.TRANSPARENT) }
 
         imagesAdapter = SelectableImagesAdapter(Glide.with(this), false)
-        imagesRecyclerView.adapter = imagesAdapter
+        binding.imagesRecyclerView.adapter = imagesAdapter
         imagesAdapter.setOnImageSelectedListener { uri ->
             val listener = parentFragment as? ImagesSelectionListener
             val selectedImages = Collections.singletonList(uri)
@@ -49,17 +54,17 @@ class SingleChoiceBottomSheetImagePicker : BottomSheetDialogFragment() {
             dismiss()
         }
 
-        chooseFromGallery.setOnClickListener {
+        binding.chooseFromGallery.setOnClickListener {
             val galleryIntent = Intent(Intent.ACTION_PICK)
             galleryIntent.setType("image/*")
             startActivityForResult(galleryIntent, PICK_PHOTO_FROM_GALLERY_REQUEST_CODE);
 
         }
 
-        val padding = imagesRecyclerView.resources
+        val padding = binding.imagesRecyclerView.resources
             .getDimension(R.dimen.sm_margin_padding_size_medium)
             .toInt()
-        imagesRecyclerView.addItemDecoration(SpanItemDecorator(padding))
+        binding.imagesRecyclerView.addItemDecoration(SpanItemDecorator(padding))
 
         if (ActivityCompat.checkSelfPermission(
                 requireActivity(),
@@ -73,6 +78,12 @@ class SingleChoiceBottomSheetImagePicker : BottomSheetDialogFragment() {
                 READ_EXTERNAL_STORAGE_PERMISSION_REQUEST_CODE
             )
         }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+
+        _binding = null
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {

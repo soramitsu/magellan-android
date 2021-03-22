@@ -9,9 +9,9 @@ import androidx.core.view.doOnLayout
 import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import jp.co.soramitsu.map.R
+import jp.co.soramitsu.map.databinding.SmEditReviewMenuBottomSheetBinding
 import jp.co.soramitsu.map.presentation.SoramitsuMapFragment
 import jp.co.soramitsu.map.presentation.SoramitsuMapViewModel
-import kotlinx.android.synthetic.main.sm_edit_review_menu_bottom_sheet.*
 
 internal class EditReviewFragment : BottomSheetDialogFragment() {
 
@@ -21,6 +21,9 @@ internal class EditReviewFragment : BottomSheetDialogFragment() {
                 .get(SoramitsuMapViewModel::class.java)
         }
     }
+
+    private var _binding: SmEditReviewMenuBottomSheetBinding? = null
+    private val binding get() = _binding!!
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -33,18 +36,24 @@ internal class EditReviewFragment : BottomSheetDialogFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        view.doOnLayout {
-            (view.parent as? View)?.setBackgroundColor(Color.TRANSPARENT)
-        }
+        _binding = SmEditReviewMenuBottomSheetBinding.bind(view)
 
-        editReview.setOnClickListener {
+        view.doOnLayout { (view.parent as? View)?.setBackgroundColor(Color.TRANSPARENT) }
+
+        binding.editReview.setOnClickListener {
             viewModel?.onEditReviewClicked()
             dismiss()
         }
 
-        deleteReview.setOnClickListener {
+        binding.deleteReview.setOnClickListener {
             viewModel?.onDeleteReviewClicked()
             dismiss()
         }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+
+        _binding = null
     }
 }
