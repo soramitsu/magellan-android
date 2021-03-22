@@ -282,15 +282,21 @@ open class SoramitsuMapFragment : Fragment(R.layout.sm_fragment_map_soramitsu), 
                 binding.searchOnFragmentInputEditText.setText(query)
             }
 
-            googleMap.setOnMapClickListener { position ->
-                viewModel.onMapClickedAtPosition(position.toPosition())
-
-                (parentFragmentManager.findFragmentByTag("Place") as? PlaceFragment)?.dismiss()
-
-                val addPlaceFragment = AddPlaceFragment().withPosition(position)
-                addPlaceFragment.setTargetFragment(this, REQUEST_CODE_ADD_PLACE)
-                addPlaceFragment.show(parentFragmentManager, "AddPlaceFragment")
+            if (SoramitsuMapLibraryConfig.enablePlaceProposal) {
+                enablePlaceProposal()
             }
+        }
+    }
+
+    private fun enablePlaceProposal() {
+        googleMap?.setOnMapClickListener { position ->
+            viewModel.onMapClickedAtPosition(position.toPosition())
+
+            (parentFragmentManager.findFragmentByTag("Place") as? PlaceFragment)?.dismiss()
+
+            val addPlaceFragment = AddPlaceFragment().withPosition(position)
+            addPlaceFragment.setTargetFragment(this, REQUEST_CODE_ADD_PLACE)
+            addPlaceFragment.show(parentFragmentManager, "AddPlaceFragment")
         }
     }
 
