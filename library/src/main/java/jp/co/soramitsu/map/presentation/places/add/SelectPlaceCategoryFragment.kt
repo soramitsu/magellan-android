@@ -11,12 +11,15 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import jp.co.soramitsu.map.R
+import jp.co.soramitsu.map.databinding.SmFragmentSelectPlaceCategoryBinding
 import jp.co.soramitsu.map.model.Category
-import kotlinx.android.synthetic.main.sm_fragment_select_place_category.*
 
-class SelectPlaceCategoryFragment : BottomSheetDialogFragment() {
+internal class SelectPlaceCategoryFragment : BottomSheetDialogFragment() {
 
     private lateinit var viewModel: SelectPlaceViewModel
+
+    private var _binding: SmFragmentSelectPlaceCategoryBinding? = null
+    private val binding get() = _binding!!
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -29,11 +32,13 @@ class SelectPlaceCategoryFragment : BottomSheetDialogFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        _binding = SmFragmentSelectPlaceCategoryBinding.bind(view)
+
         val factory = ViewModelProvider.NewInstanceFactory()
         viewModel = ViewModelProvider(this, factory)[SelectPlaceViewModel::class.java]
 
         view.doOnLayout { (view.parent as? View)?.setBackgroundColor(Color.TRANSPARENT) }
-        categoriesRecyclerView.layoutManager = LinearLayoutManager(context)
+        binding.categoriesRecyclerView.layoutManager = LinearLayoutManager(context)
 
         val categoriesAdapter = CategoriesAdapter()
         categoriesAdapter.setOnCategorySelectedListener { category ->
@@ -41,11 +46,17 @@ class SelectPlaceCategoryFragment : BottomSheetDialogFragment() {
             dismiss()
         }
 
-        categoriesRecyclerView.adapter = categoriesAdapter
+        binding.categoriesRecyclerView.adapter = categoriesAdapter
 
         viewModel.categories.observe(viewLifecycleOwner, Observer { categories ->
             categoriesAdapter.setItems(categories)
         })
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+
+        _binding = null
     }
 
     internal interface OnCategorySelected {

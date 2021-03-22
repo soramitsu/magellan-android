@@ -15,9 +15,9 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import jp.co.soramitsu.map.R
+import jp.co.soramitsu.map.databinding.SmAddReviewFragmentBinding
 import jp.co.soramitsu.map.presentation.SoramitsuMapFragment
 import jp.co.soramitsu.map.presentation.SoramitsuMapViewModel
-import kotlinx.android.synthetic.main.sm_add_review_fragment.*
 
 internal class ReviewFragment : BottomSheetDialogFragment() {
 
@@ -26,6 +26,9 @@ internal class ReviewFragment : BottomSheetDialogFragment() {
     private val initialRating: Int get() = requireArguments().getInt(EXTRA_INITIAL_RATING, 0)
     private val comment: String get() = requireArguments().getString(EXTRA_COMMENT, "").orEmpty()
     private val isEdit: Boolean get() = requireArguments().getBoolean(EXTRA_EDIT)
+
+    private var _binding: SmAddReviewFragmentBinding? = null
+    private val binding get() = _binding!!
 
     private val viewModel: ReviewViewModel by lazy {
         ViewModelProvider(this, ViewModelProvider.NewInstanceFactory())[ReviewViewModel::class.java]
@@ -54,53 +57,55 @@ internal class ReviewFragment : BottomSheetDialogFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        _binding = SmAddReviewFragmentBinding.bind(view)
+
         view.doOnLayout {
             val parent = (view.parent as? View)
             parent?.setBackgroundColor(Color.TRANSPARENT)
         }
 
-        toolbar.setNavigationOnClickListener {
+        binding.toolbar.setNavigationOnClickListener {
             activity?.onUserInteraction()
             dismiss()
         }
 
-        placeNameTextView.text = placeName
-        placeRatingBar.rating = initialRating.toFloat()
-        commentEditText.setText(comment)
-        postButton.setOnClickListener {
+        binding.placeNameTextView.text = placeName
+        binding.placeRatingBar.rating = initialRating.toFloat()
+        binding.commentEditText.setText(comment)
+        binding.postButton.setOnClickListener {
             activity?.onUserInteraction()
             if (isEdit) {
                 viewModel.updateReview(
                     placeId = placeId,
-                    rating = placeRatingBar.rating.toInt(),
-                    comment = commentEditText.text.toString()
+                    rating = binding.placeRatingBar.rating.toInt(),
+                    comment = binding.commentEditText.text.toString()
                 )
             } else {
                 viewModel.addReview(
                     placeId = placeId,
-                    rating = placeRatingBar.rating.toInt(),
-                    comment = commentEditText.text.toString()
+                    rating = binding.placeRatingBar.rating.toInt(),
+                    comment = binding.commentEditText.text.toString()
                 )
             }
         }
 
-        commentEditText.doOnTextChanged { text, start, before, count ->
+        binding.commentEditText.doOnTextChanged { text, start, before, count ->
             activity?.onUserInteraction()
         }
 
         viewModel.viewState.observe(viewLifecycleOwner, Observer { viewState ->
             when (viewState) {
                 ReviewViewModel.ViewState.InputComment, ReviewViewModel.ViewState.Error -> {
-                    progressBar.visibility = View.GONE
-                    postButton.visibility = View.VISIBLE
-                    placeRatingBar.setIsIndicator(false)
-                    commentInputLayout.isEnabled = true
+                    binding.progressBar.visibility = View.GONE
+                    binding.postButton.visibility = View.VISIBLE
+                    binding.placeRatingBar.setIsIndicator(false)
+                    binding.commentInputLayout.isEnabled = true
                 }
                 ReviewViewModel.ViewState.Loading -> {
-                    progressBar.visibility = View.VISIBLE
-                    postButton.visibility = View.GONE
-                    placeRatingBar.setIsIndicator(true)
-                    commentInputLayout.isEnabled = false
+                    binding.progressBar.visibility = View.VISIBLE
+                    binding.postButton.visibility = View.GONE
+                    binding.placeRatingBar.setIsIndicator(true)
+                    binding.commentInputLayout.isEnabled = false
                 }
                 ReviewViewModel.ViewState.Submitted -> {
                     // todo: show notification
@@ -115,6 +120,12 @@ internal class ReviewFragment : BottomSheetDialogFragment() {
                 // just to make sure that all cases was handled
             }
         })
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+
+        _binding = null
     }
 
     fun withArguments(placeId: String, placeName: String, initialRating: Int, edit: Boolean, comment: String = ""): ReviewFragment {
