@@ -9,9 +9,9 @@ object SoramitsuMapLibraryConfig {
     var defaultPosition: Position = Position(11.541789, 104.913587)
     var repository: PlacesRepository = DemoPlacesRepository()
 
-    var enableDetailedSchedule: Boolean = BuildConfig.DEBUG
-    var enablePlaceProposal: Boolean = BuildConfig.DEBUG
-    var enablePlaceReviews: Boolean = BuildConfig.DEBUG
+    var enableDetailedSchedule: Boolean = false
+    var enablePlaceProposal: Boolean = false
+    var enablePlaceReviews: Boolean = false
 
     var enableMultiplePlacePhotos: Boolean = false
 
