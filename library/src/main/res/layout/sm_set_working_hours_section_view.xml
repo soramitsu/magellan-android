@@ -35,7 +35,7 @@
         android:padding="@dimen/sm_margin_padding_size_medium"
         android:text="@string/sm_change_schedule"
         android:visibility="gone"
-        app:drawableStartCompat="@drawable/sm_ic_calendar_today_circle_44"
+        app:drawableStartCompat="@drawable/sm_ic_add_schedule_circle_44"
         app:layout_constraintTop_toBottomOf="@id/workingHoursRecyclerView" />
 
     <TextView
@@ -48,7 +48,7 @@
         android:gravity="center_vertical"
         android:padding="@dimen/sm_margin_padding_size_medium"
         android:text="@string/sm_add_schedule"
-        app:drawableStartCompat="@drawable/sm_ic_insert_photo_circle_44"
+        app:drawableStartCompat="@drawable/sm_ic_add_schedule_circle_44"
         app:layout_constraintTop_toBottomOf="@id/workingHoursRecyclerView" />
 
 </merge>

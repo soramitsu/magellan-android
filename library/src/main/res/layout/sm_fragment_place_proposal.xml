@@ -186,7 +186,7 @@
                 android:gravity="center_vertical"
                 android:padding="@dimen/sm_margin_padding_size_medium"
                 android:text="@string/sm_add_logo_image"
-                app:drawableStartCompat="@drawable/sm_ic_location_circle_44" />
+                app:drawableStartCompat="@drawable/sm_ic_add_logo_circle_44" />
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/logoRecyclerView"
@@ -228,7 +228,7 @@
                 android:gravity="center_vertical"
                 android:padding="@dimen/sm_margin_padding_size_medium"
                 android:text="@string/sm_add_photo"
-                app:drawableStartCompat="@drawable/sm_ic_insert_photo_circle_44" />
+                app:drawableStartCompat="@drawable/sm_ic_add_photo_circle_44" />
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/photosRecyclerView"
@@ -249,6 +249,16 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
 
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/createAndSendForReviewButton"
+                style="@style/SM.Widget.Soramitsu.MaterialComponents.Button.Accent"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom"
+                android:layout_margin="@dimen/sm_margin_padding_size_medium"
+                android:text="@string/sm_create_and_send_for_review"
+                app:layout_behavior="com.google.android.material.behavior.HideBottomViewOnScrollBehavior" />
+
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 
@@ -260,16 +270,6 @@
         android:visibility="gone"
         tools:visibility="visible"
         />
-
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/createAndSendForReviewButton"
-        style="@style/SM.Widget.Soramitsu.MaterialComponents.Button.Accent"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom"
-        android:layout_margin="@dimen/sm_margin_padding_size_medium"
-        android:text="@string/sm_create_and_send_for_review"
-        app:layout_behavior="com.google.android.material.behavior.HideBottomViewOnScrollBehavior" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
 

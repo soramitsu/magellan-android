@@ -71,6 +71,7 @@ open class SoramitsuMapFragment : Fragment(R.layout.sm_fragment_map_soramitsu), 
         )
     }
 
+    private var droppedPinMarker: Marker? = null
     private val markers = mutableListOf<Marker>()
     private val clusters = mutableListOf<Marker>()
 
@@ -191,6 +192,10 @@ open class SoramitsuMapFragment : Fragment(R.layout.sm_fragment_map_soramitsu), 
             val intent = ProposePlaceActivity.createLaunchIntent(context, position, address)
             startActivityForResult(intent, REQUEST_CODE_ADD_PLACE)
         }
+    }
+
+    override fun onAddPlaceFragmentDismiss() {
+        viewModel.onAddPlaceCancelled()
     }
 
     private fun onMapReady(map: GoogleMap?) {
@@ -323,6 +328,31 @@ open class SoramitsuMapFragment : Fragment(R.layout.sm_fragment_map_soramitsu), 
     }
 
     private fun displayMarkers(viewState: SoramitsuMapViewState) {
+        SoramitsuMapLibraryConfig.logger.log("MapViewState", viewState.toString())
+        if (viewState.dropPinPosition != null) {
+            val addPlaceDrawablePin = ContextCompat.getDrawable(requireContext(), R.drawable.sm_pin_add_place) ?: return
+            val bitmap = Bitmap.createBitmap(
+                addPlaceDrawablePin.intrinsicWidth,
+                addPlaceDrawablePin.intrinsicHeight,
+                Bitmap.Config.ARGB_8888
+            )
+            val canvas = Canvas(bitmap)
+            addPlaceDrawablePin.setBounds(0, 0, canvas.width, canvas.height)
+            addPlaceDrawablePin.draw(canvas)
+
+            droppedPinMarker?.remove()
+            droppedPinMarker = googleMap?.addMarker(
+                MarkerOptions()
+                    .position(viewState.dropPinPosition.asLatLng())
+                    .icon(BitmapDescriptorFactory.fromBitmap(bitmap))
+            )
+
+            markers.forEach { marker -> marker.remove() }
+            return
+        }
+
+        droppedPinMarker?.remove()
+
         val markersToRemove = markers.filter { marker ->
             if (marker.tag is MarkerTagData) {
                 val markerTagData = marker.tag as MarkerTagData

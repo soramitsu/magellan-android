@@ -1,5 +1,6 @@
 package jp.co.soramitsu.map.presentation.places.add
 
+import android.content.DialogInterface
 import android.graphics.Color
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -20,6 +21,8 @@ internal class AddPlaceFragment : BottomSheetDialogFragment() {
 
     interface Listener {
         fun onAddPlaceButtonClick(position: LatLng, address: String)
+
+        fun onAddPlaceFragmentDismiss()
     }
 
     private val position: LatLng get() = requireArguments().getParcelable<LatLng>(EXTRA_POSITION) as LatLng
@@ -41,8 +44,7 @@ internal class AddPlaceFragment : BottomSheetDialogFragment() {
         _binding = SmAddPlaceFragmentBinding.bind(view)
 
         view.doOnLayout {
-            val parent = (view.parent as? View)
-            parent?.setBackgroundColor(Color.TRANSPARENT)
+            (view.parent as? View)?.setBackgroundColor(Color.TRANSPARENT)
             dialog?.window?.setDimAmount(0f)
         }
 
@@ -67,6 +69,18 @@ internal class AddPlaceFragment : BottomSheetDialogFragment() {
         super.onDestroyView()
 
         _binding = null
+    }
+
+    override fun onDismiss(dialog: DialogInterface) {
+        super.onDismiss(dialog)
+
+        (targetFragment as? Listener)?.onAddPlaceFragmentDismiss()
+    }
+
+    override fun onCancel(dialog: DialogInterface) {
+        super.onCancel(dialog)
+
+        (targetFragment as? Listener)?.onAddPlaceFragmentDismiss()
     }
 
     fun withPosition(position: LatLng) = this.apply {
