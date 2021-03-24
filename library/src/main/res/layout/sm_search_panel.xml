@@ -5,7 +5,7 @@
     android:id="@+id/searchPanelBottomSheet"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="?attr/sm_categoriesBottomSheetBackground"
+    android:background="@drawable/sm_rounded_background_with_topper"
     android:elevation="12dp"
     app:behavior_peekHeight="?attr/sm_categoriesBottomSheetPeekHeight"
     app:layout_behavior="@string/bottom_sheet_behavior">
@@ -16,13 +16,6 @@
         android:layout_marginTop="24dp"
         android:background="@android:color/white"
         />
-
-    <View
-        android:layout_width="?attr/sm_categoriesBottomSheetTopperWidth"
-        android:layout_height="?attr/sm_categoriesBottomSheetTopperHeight"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginTop="8dp"
-        android:background="?attr/sm_categoriesBottomSheetTopperDrawable" />
 
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"

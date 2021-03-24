@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     xmlns:tools="http://schemas.android.com/tools"
-    android:background="@drawable/sm_rounded_background">
+    android:background="@drawable/sm_rounded_background_with_topper">
 
     <TextView
         style="?sm_textViewStyleSemiBold15"
@@ -13,14 +13,6 @@
         android:layout_marginTop="@dimen/sm_margin_padding_size_medium"
         android:padding="@dimen/sm_margin_padding_size_small"
         android:text="@string/sm_choose_category" />
-
-    <View
-        android:layout_width="?attr/sm_categoriesBottomSheetTopperWidth"
-        android:layout_height="?attr/sm_categoriesBottomSheetTopperHeight"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginTop="@dimen/sm_margin_padding_size_small"
-        android:background="?attr/sm_categoriesBottomSheetTopperDrawable"
-        />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/categoriesRecyclerView"
