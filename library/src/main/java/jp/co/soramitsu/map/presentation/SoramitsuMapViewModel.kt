@@ -213,6 +213,10 @@ internal class SoramitsuMapViewModel(
         )
     }
 
+    fun onAddPlaceCancelled() {
+        viewState.value = viewState.value?.copy(dropPinPosition = null)
+    }
+
     init {
         viewState.value = SoramitsuMapViewState()
     }

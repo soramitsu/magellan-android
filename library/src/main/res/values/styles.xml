@@ -13,6 +13,10 @@
         <item name="endIconMode">clear_text</item>
         <item name="hintAnimationEnabled">true</item>
         <item name="hintEnabled">true</item>
+        <item name="boxCornerRadiusBottomStart">10dp</item>
+        <item name="boxCornerRadiusBottomEnd">10dp</item>
+        <item name="boxCornerRadiusTopStart">10dp</item>
+        <item name="boxCornerRadiusTopEnd">10dp</item>
         <item name="hintTextAppearance">
             @style/SM.TextAppearance.Soramitsu.MaterialComponents.Body2
         </item>
