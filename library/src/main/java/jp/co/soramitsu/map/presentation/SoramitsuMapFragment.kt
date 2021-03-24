@@ -15,7 +15,6 @@ import androidx.annotation.DrawableRes
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.google.android.gms.location.LocationServices
@@ -216,7 +215,7 @@ open class SoramitsuMapFragment : Fragment(R.layout.sm_fragment_map_soramitsu), 
                 )
             )
 
-            googleMap.setOnCameraMoveListener {
+            val onVisibleRegionChanged: () -> Unit = {
                 val farLeft = googleMap.projection.visibleRegion.farLeft
                 val nearRight = googleMap.projection.visibleRegion.nearRight
                 val zoom = googleMap.cameraPosition.zoom.toInt()
@@ -231,9 +230,11 @@ open class SoramitsuMapFragment : Fragment(R.layout.sm_fragment_map_soramitsu), 
                     ),
                     zoom = zoom
                 )
-
-                activity?.onUserInteraction()
             }
+
+            googleMap.setOnCameraIdleListener { onVisibleRegionChanged.invoke() }
+            googleMap.setOnCameraMoveCanceledListener { onVisibleRegionChanged.invoke() }
+            googleMap.setOnCameraMoveListener { activity?.onUserInteraction() }
 
             viewModel.placeSelected().observe(viewLifecycleOwner) { selectedPlace ->
                 val buttonsVisibility = if (selectedPlace == null) View.VISIBLE else View.GONE
@@ -275,12 +276,6 @@ open class SoramitsuMapFragment : Fragment(R.layout.sm_fragment_map_soramitsu), 
 
                     true
                 }
-            }
-
-            lifecycleScope.launch {
-                // wait some time to prevent passing [(0,0), (0,0)] rectangle
-                delay(100)
-                viewModel.mapParams = getMapParams(googleMap)
             }
 
             viewModel.searchQuery.observe(viewLifecycleOwner) { query ->
