@@ -17,6 +17,7 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
@@ -24,20 +25,21 @@ import com.google.android.gms.maps.model.*
 import jp.co.soramitsu.map.R
 import jp.co.soramitsu.map.SoramitsuMapLibraryConfig
 import jp.co.soramitsu.map.data.MapParams
+import jp.co.soramitsu.map.databinding.SmFragmentMapSoramitsuBinding
 import jp.co.soramitsu.map.ext.asLatLng
 import jp.co.soramitsu.map.ext.getResourceIdForAttr
 import jp.co.soramitsu.map.ext.toPosition
 import jp.co.soramitsu.map.model.Category
 import jp.co.soramitsu.map.model.GeoPoint
 import jp.co.soramitsu.map.model.Place
-import jp.co.soramitsu.map.model.Position
 import jp.co.soramitsu.map.presentation.categories.CategoriesFragment
 import jp.co.soramitsu.map.presentation.places.PlaceFragment
 import jp.co.soramitsu.map.presentation.places.add.AddPlaceFragment
 import jp.co.soramitsu.map.presentation.places.add.ProposePlaceActivity
 import jp.co.soramitsu.map.presentation.places.add.RequestSentBottomSheetFragment
 import jp.co.soramitsu.map.presentation.search.SearchBottomSheetFragment
-import kotlinx.android.synthetic.main.sm_fragment_map_soramitsu.*
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 /**
  * Used fragment as a base class because Maps module have to minimize
@@ -48,6 +50,9 @@ open class SoramitsuMapFragment : Fragment(R.layout.sm_fragment_map_soramitsu), 
     private lateinit var viewModel: SoramitsuMapViewModel
 
     private var googleMap: GoogleMap? = null
+
+    private var _binding: SmFragmentMapSoramitsuBinding? = null
+    private val binding get() = _binding!!
 
     private fun getMapParams(googleMap: GoogleMap): MapParams {
         val farLeft = googleMap.projection.visibleRegion.farLeft
@@ -109,18 +114,21 @@ open class SoramitsuMapFragment : Fragment(R.layout.sm_fragment_map_soramitsu), 
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        soramitsuMapView.onCreate(savedInstanceState)
-        soramitsuMapView.getMapAsync { onMapReady(it) }
+
+        _binding = SmFragmentMapSoramitsuBinding.bind(view)
+
+        binding.soramitsuMapView.onCreate(savedInstanceState)
+        binding.soramitsuMapView.getMapAsync { onMapReady(it) }
 
         initSearchPanel()
 
-        showFiltersButton.setOnClickListener { CategoriesFragment().show(parentFragmentManager, "Categories") }
+        binding.showFiltersButton.setOnClickListener { CategoriesFragment().show(parentFragmentManager, "Categories") }
 
-        findMeButton.setOnClickListener {
+        binding.findMeButton.setOnClickListener {
             googleMap?.let { googleMap -> onFindMeButtonClicked(googleMap) }
         }
 
-        zoomInButton.setOnClickListener {
+        binding.zoomInButton.setOnClickListener {
             googleMap?.let { googleMap ->
                 googleMap.animateCamera(
                     CameraUpdateFactory.newLatLngZoom(
@@ -131,7 +139,7 @@ open class SoramitsuMapFragment : Fragment(R.layout.sm_fragment_map_soramitsu), 
             }
         }
 
-        zoomOutButton.setOnClickListener {
+        binding.zoomOutButton.setOnClickListener {
             googleMap?.let { googleMap ->
                 googleMap.animateCamera(
                     CameraUpdateFactory.newLatLngZoom(
@@ -145,27 +153,29 @@ open class SoramitsuMapFragment : Fragment(R.layout.sm_fragment_map_soramitsu), 
 
     override fun onStart() {
         super.onStart()
-        soramitsuMapView.onStart()
+        binding.soramitsuMapView.onStart()
     }
 
     override fun onResume() {
         super.onResume()
-        soramitsuMapView.onResume()
+        binding.soramitsuMapView.onResume()
     }
 
     override fun onPause() {
         super.onPause()
-        soramitsuMapView.onPause()
+        binding.soramitsuMapView.onPause()
     }
 
     override fun onStop() {
         super.onStop()
-        soramitsuMapView.onStop()
+        binding.soramitsuMapView.onStop()
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
-        soramitsuMapView.onDestroy()
+        binding.soramitsuMapView.onDestroy()
+
+        _binding = null
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -220,19 +230,19 @@ open class SoramitsuMapFragment : Fragment(R.layout.sm_fragment_map_soramitsu), 
                 activity?.onUserInteraction()
             }
 
-            viewModel.placeSelected().observe(viewLifecycleOwner, Observer { selectedPlace ->
+            viewModel.placeSelected().observe(viewLifecycleOwner) { selectedPlace ->
                 val buttonsVisibility = if (selectedPlace == null) View.VISIBLE else View.GONE
-                zoomButtonsPanel.visibility = buttonsVisibility
-                findMeButton.visibility = buttonsVisibility
-                showFiltersButton.visibility = buttonsVisibility
-                searchPanelFakeBottomSheet.visibility = buttonsVisibility
+                binding.zoomButtonsPanel.visibility = buttonsVisibility
+                binding.findMeButton.visibility = buttonsVisibility
+                binding.showFiltersButton.visibility = buttonsVisibility
+                binding.searchPanelFakeBottomSheet.visibility = buttonsVisibility
 
                 highlightSelectedPlace()
 
                 activity?.onUserInteraction()
-            })
+            }
 
-            viewModel.viewState().observe(viewLifecycleOwner, Observer { viewState ->
+            viewModel.viewState().observe(viewLifecycleOwner) { viewState ->
                 displayMarkers(viewState)
                 displayClusters(viewState)
 
@@ -260,23 +270,33 @@ open class SoramitsuMapFragment : Fragment(R.layout.sm_fragment_map_soramitsu), 
 
                     true
                 }
-            })
-
-            viewModel.mapParams = getMapParams(googleMap)
-
-            viewModel.searchQuery.observe(viewLifecycleOwner, Observer { query ->
-                searchOnFragmentInputEditText.setText(query)
-            })
-
-            googleMap.setOnMapClickListener { position ->
-                viewModel.onMapClickedAtPosition(position.toPosition())
-
-                (parentFragmentManager.findFragmentByTag("Place") as? PlaceFragment)?.dismiss()
-
-                val addPlaceFragment = AddPlaceFragment().withPosition(position)
-                addPlaceFragment.setTargetFragment(this, REQUEST_CODE_ADD_PLACE)
-                addPlaceFragment.show(parentFragmentManager, "AddPlaceFragment")
             }
+
+            lifecycleScope.launch {
+                // wait some time to prevent passing [(0,0), (0,0)] rectangle
+                delay(100)
+                viewModel.mapParams = getMapParams(googleMap)
+            }
+
+            viewModel.searchQuery.observe(viewLifecycleOwner) { query ->
+                binding.searchOnFragmentInputEditText.setText(query)
+            }
+
+            if (SoramitsuMapLibraryConfig.enablePlaceProposal) {
+                enablePlaceProposal()
+            }
+        }
+    }
+
+    private fun enablePlaceProposal() {
+        googleMap?.setOnMapClickListener { position ->
+            viewModel.onMapClickedAtPosition(position.toPosition())
+
+            (parentFragmentManager.findFragmentByTag("Place") as? PlaceFragment)?.dismiss()
+
+            val addPlaceFragment = AddPlaceFragment().withPosition(position)
+            addPlaceFragment.setTargetFragment(this, REQUEST_CODE_ADD_PLACE)
+            addPlaceFragment.show(parentFragmentManager, "AddPlaceFragment")
         }
     }
 
@@ -395,7 +415,7 @@ open class SoramitsuMapFragment : Fragment(R.layout.sm_fragment_map_soramitsu), 
 
         // dirty hack to use internal google implementation of the "find me" button
         val defaultFindMeButtonResId = 2
-        val defaultLocationButton = soramitsuMapView.findViewById<View>(defaultFindMeButtonResId)
+        val defaultLocationButton = binding.soramitsuMapView.findViewById<View>(defaultFindMeButtonResId)
         defaultLocationButton.visibility = View.GONE
 
         // get last location from google services
@@ -412,21 +432,21 @@ open class SoramitsuMapFragment : Fragment(R.layout.sm_fragment_map_soramitsu), 
 
     private fun initSearchPanel() {
         // show fullscreen search fragment when user try to enter search query
-        searchOnFragmentInputEditText.setOnClickListener {
+        binding.searchOnFragmentInputEditText.setOnClickListener {
             activity?.onUserInteraction()
 
             SearchBottomSheetFragment().show(parentFragmentManager, "SearchBottomSheetFragment")
         }
 
         // clear edit text button click handler
-        placesWithSearchTextInputLayout.setEndIconOnClickListener { v ->
+        binding.placesWithSearchTextInputLayout.setEndIconOnClickListener { v ->
             activity?.onUserInteraction()
 
-            searchOnFragmentInputEditText.text = null
+            binding.searchOnFragmentInputEditText.text = null
             viewModel.requestParams = viewModel.requestParams.copy(query = "")
         }
 
-        searchOnFragmentInputEditText.setOnTouchListener { v, event ->
+        binding.searchOnFragmentInputEditText.setOnTouchListener { v, event ->
             if (event?.action == MotionEvent.ACTION_DOWN) {
                 activity?.onUserInteraction()
 

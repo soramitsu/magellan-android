@@ -11,9 +11,8 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.RequestManager
 import com.google.android.material.button.MaterialButton
 import jp.co.soramitsu.map.R
-import kotlinx.android.synthetic.main.sm_fragment_photo.*
 
-class RemovableImagesAdapter(private val requestManager: RequestManager) :
+internal class RemovableImagesAdapter(private val requestManager: RequestManager) :
     RecyclerView.Adapter<RemovableImagesAdapter.BaseViewHolder>() {
 
     private val _items = mutableListOf<RemovableImageListItem>()

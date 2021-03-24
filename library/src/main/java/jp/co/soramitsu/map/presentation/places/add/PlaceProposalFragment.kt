@@ -11,14 +11,14 @@ import androidx.lifecycle.ViewModelProvider
 import com.bumptech.glide.Glide
 import com.bumptech.glide.RequestManager
 import jp.co.soramitsu.map.R
+import jp.co.soramitsu.map.databinding.SmFragmentPlaceProposalBinding
 import jp.co.soramitsu.map.model.Category
 import jp.co.soramitsu.map.model.Place
 import jp.co.soramitsu.map.model.Schedule
 import jp.co.soramitsu.map.presentation.places.add.image.*
 import jp.co.soramitsu.map.presentation.places.add.schedule.PlaceProposalViewModel
-import kotlinx.android.synthetic.main.sm_fragment_place_proposal.*
 
-class PlaceProposalFragment :
+internal class PlaceProposalFragment :
     Fragment(R.layout.sm_fragment_place_proposal),
     SelectPlaceCategoryFragment.OnCategorySelected,
     ImagesSelectionListener {
@@ -31,6 +31,9 @@ class PlaceProposalFragment :
     private lateinit var addPlaceViewModel: AddPlaceViewModel
     private lateinit var placeProposalViewModel: PlaceProposalViewModel
 
+    private var _binding: SmFragmentPlaceProposalBinding? = null
+    private val binding get() = _binding!!
+
     private val requestManager: RequestManager?
         get() = try {
             Glide.with(this)
@@ -41,6 +44,8 @@ class PlaceProposalFragment :
     @ExperimentalStdlibApi
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        _binding = SmFragmentPlaceProposalBinding.bind(view)
 
         addPlaceViewModel = ViewModelProvider(
             this, object : ViewModelProvider.Factory {
@@ -58,34 +63,34 @@ class PlaceProposalFragment :
         addPlaceViewModel.viewState.observe(viewLifecycleOwner) { viewState -> viewState.render() }
 
         placeProposalViewModel.schedule.observe(viewLifecycleOwner) { schedule ->
-            scheduleSection.schedule = schedule
+            binding.scheduleSection.schedule = schedule
         }
 
-        toolbar.setNavigationOnClickListener { activity?.onBackPressed() }
+        binding.toolbar.setNavigationOnClickListener { activity?.onBackPressed() }
 
-        addressTextView.text = placeProposalViewModel.address
+        binding.addressTextView.text = placeProposalViewModel.address
 
-        scheduleSection.setOnAddButtonClickListener {
+        binding.scheduleSection.setOnAddButtonClickListener {
             placeProposalViewModel.onAddScheduleButtonClicked()
         }
 
-        scheduleSection.setOnChangeScheduleButtonClickListener {
+        binding.scheduleSection.setOnChangeScheduleButtonClickListener {
             placeProposalViewModel.onChangeScheduleButtonClicked()
         }
 
-        addressTextView.setOnClickListener {
+        binding.addressTextView.setOnClickListener {
             placeProposalViewModel.onChangeAddressButtonClicked()
         }
 
-        categoryTextView.setOnClickListener {
+        binding.categoryTextView.setOnClickListener {
             SelectPlaceCategoryFragment().show(childFragmentManager, "SelectCategoryFragment")
         }
 
-        addLogoTextView.setOnClickListener {
+        binding.addLogoTextView.setOnClickListener {
             SingleChoiceBottomSheetImagePicker().show(childFragmentManager, "LogoPicker")
         }
 
-        addPhotoTextView.setOnClickListener {
+        binding.addPhotoTextView.setOnClickListener {
             MultichoiceBottomSheetImagePicker().show(childFragmentManager, "PhotosPicker")
         }
 
@@ -97,15 +102,15 @@ class PlaceProposalFragment :
             logoAdapter.setOnImageSelectedListener { imageUri ->
                 val selectedItemPosition = logoAdapter.items
                     .indexOfFirst { it is RemovableImagesAdapter.RemovableImageListItem.Image && it.imageUri == imageUri }
-                val viewHolder = logoRecyclerView.findViewHolderForAdapterPosition(selectedItemPosition)
+                val viewHolder = binding.logoRecyclerView.findViewHolderForAdapterPosition(selectedItemPosition)
                 viewHolder as RemovableImagesAdapter.BaseViewHolder.ImageViewHolder
                 showPhoto(viewHolder.imageView, imageUri)
             }
             logoAdapter.setOnRemoveImageClickListener {
-                logoRecyclerView.visibility = View.GONE
-                addLogoTextView.visibility = View.VISIBLE
+                binding.logoRecyclerView.visibility = View.GONE
+                binding.addLogoTextView.visibility = View.VISIBLE
             }
-            logoRecyclerView.adapter = logoAdapter
+            binding.logoRecyclerView.adapter = logoAdapter
 
             photosAdapter = RemovableImagesAdapter(glideRequestManager)
             photosAdapter.setOnButtonClickListener {
@@ -114,7 +119,7 @@ class PlaceProposalFragment :
             photosAdapter.setOnImageSelectedListener { imageUri ->
                 val selectedItemPosition = photosAdapter.items
                     .indexOfFirst { it is RemovableImagesAdapter.RemovableImageListItem.Image && it.imageUri == imageUri }
-                val viewHolder = photosRecyclerView.findViewHolderForAdapterPosition(selectedItemPosition)
+                val viewHolder = binding.photosRecyclerView.findViewHolderForAdapterPosition(selectedItemPosition)
                 viewHolder as RemovableImagesAdapter.BaseViewHolder.ImageViewHolder
                 showPhoto(viewHolder.imageView, imageUri)
             }
@@ -127,28 +132,35 @@ class PlaceProposalFragment :
 
                     val removedLastImage = imageItems.size == 1
                     if (removedLastImage) {
-                        photosRecyclerView.visibility = View.GONE
-                        addPhotoTextView.visibility = View.VISIBLE
+                        binding.photosRecyclerView.visibility = View.GONE
+                        binding.addPhotoTextView.visibility = View.VISIBLE
                     }
                 }
             }
-            photosRecyclerView.adapter = photosAdapter
+            binding.photosRecyclerView.adapter = photosAdapter
 
-            createAndSendForReviewButton.setOnClickListener {
+            binding.createAndSendForReviewButton.setOnClickListener {
                 val position = placeProposalViewModel.position ?: return@setOnClickListener
+                val category = binding.categoryTextView.category ?: return@setOnClickListener
                 val place = Place(
-                    name = placeNameEditText.text.toString(),
-                    address = addressTextView.text.toString(),
-                    category = categoryTextView.category,
+                    name = binding.placeNameEditText.text.toString(),
+                    address = binding.addressTextView.text.toString(),
+                    category = category,
                     position = position,
-                    phone = placePhoneNumberEditText.text.toString(),
-                    website = websiteEditText.text.toString(),
-                    facebook = facebookEditText.text.toString(),
-                    schedule = scheduleSection.schedule ?: Schedule()
+                    phone = binding.placePhoneNumberEditText.text.toString(),
+                    website = binding.websiteEditText.text.toString(),
+                    facebook = binding.facebookEditText.text.toString(),
+                    schedule = binding.scheduleSection.schedule ?: Schedule()
                 )
                 addPlaceViewModel.addPlace(place)
             }
         } ?: activity?.onBackPressed()
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+
+        _binding = null
     }
 
     override fun onImagesSelected(selectedImages: List<Uri>, imagePickerCode: ImagePickerCode) = when (imagePickerCode) {
@@ -157,12 +169,12 @@ class PlaceProposalFragment :
     }
 
     override fun onCategorySelected(category: Category) {
-        categoryTextView.category = category
+        binding.categoryTextView.category = category
     }
 
     private fun onLogoSelected(logoUri: Uri) {
-        logoRecyclerView.visibility = View.VISIBLE
-        addLogoTextView.visibility = View.GONE
+        binding.logoRecyclerView.visibility = View.VISIBLE
+        binding.addLogoTextView.visibility = View.GONE
 
         val items = listOf(
             RemovableImagesAdapter.RemovableImageListItem.Button(UPDATE_LOGO_BUTTON, R.drawable.sm_ic_autorenew_24),
@@ -174,8 +186,8 @@ class PlaceProposalFragment :
     }
 
     private fun onPhotosSelected(selectedImages: List<Uri>) {
-        photosRecyclerView.visibility = View.VISIBLE
-        addPhotoTextView.visibility = View.GONE
+        binding.photosRecyclerView.visibility = View.VISIBLE
+        binding.addPhotoTextView.visibility = View.GONE
 
         val buttons = listOf<RemovableImagesAdapter.RemovableImageListItem>(
             RemovableImagesAdapter.RemovableImageListItem.Button(
@@ -196,27 +208,27 @@ class PlaceProposalFragment :
 
     private fun AddPlaceViewState.render() = when (this) {
         AddPlaceViewState.Loading -> {
-            progressBar.visibility = View.VISIBLE
+            binding.progressBar.visibility = View.VISIBLE
             toggleUiAvailability(false)
 
-            placeNameTextInputLayout.isErrorEnabled = false
+            binding.placeNameTextInputLayout.isErrorEnabled = false
         }
 
         AddPlaceViewState.Success -> {
-            progressBar.visibility = View.GONE
+            binding.progressBar.visibility = View.GONE
             toggleUiAvailability(true)
 
-            placeNameTextInputLayout.isErrorEnabled = false
+            binding.placeNameTextInputLayout.isErrorEnabled = false
 
             activity?.setResult(Activity.RESULT_OK)
             activity?.finish()
         }
 
         is AddPlaceViewState.Error -> {
-            progressBar.visibility = View.GONE
+            binding.progressBar.visibility = View.GONE
             toggleUiAvailability(true)
 
-            placeNameTextInputLayout.isErrorEnabled = false
+            binding.placeNameTextInputLayout.isErrorEnabled = false
 
             Toast.makeText(
                 requireContext(),
@@ -226,31 +238,31 @@ class PlaceProposalFragment :
         }
 
         is AddPlaceViewState.ValidationFailed -> {
-            progressBar.visibility = View.GONE
+            binding.progressBar.visibility = View.GONE
             toggleUiAvailability(true)
 
             when (this.invalidField) {
                 AddPlaceViewState.ValidationFailed.Field.NAME -> {
-                    placeNameTextInputLayout.isErrorEnabled = true
-                    placeNameTextInputLayout.error = getString(R.string.sm_invalid_field_value)
+                    binding.placeNameTextInputLayout.isErrorEnabled = true
+                    binding.placeNameTextInputLayout.error = getString(R.string.sm_invalid_field_value)
                 }
             }
         }
     }
 
     private fun toggleUiAvailability(enabled: Boolean) {
-        scheduleSection.isEnabled = enabled
-        categoryTextView.isEnabled = enabled
-        addLogoTextView.isEnabled = enabled
-        addPhotoTextView.isEnabled = enabled
+        binding.scheduleSection.isEnabled = enabled
+        binding.categoryTextView.isEnabled = enabled
+        binding.addLogoTextView.isEnabled = enabled
+        binding.addPhotoTextView.isEnabled = enabled
 
         logoAdapter.enabled = enabled
         photosAdapter.enabled = enabled
 
-        placeNameTextInputLayout.isEnabled = enabled
-        placePhoneNumberTextInputLayout.isEnabled = enabled
-        facebookTextInputLayout.isEnabled = enabled
-        websiteTextInputLayout.isEnabled = enabled
+        binding.placeNameTextInputLayout.isEnabled = enabled
+        binding.placePhoneNumberTextInputLayout.isEnabled = enabled
+        binding.facebookTextInputLayout.isEnabled = enabled
+        binding.websiteTextInputLayout.isEnabled = enabled
     }
 
     private companion object {

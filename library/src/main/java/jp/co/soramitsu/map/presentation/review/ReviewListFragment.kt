@@ -14,9 +14,9 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import jp.co.soramitsu.map.R
+import jp.co.soramitsu.map.databinding.SmFragmentReviewListBinding
 import jp.co.soramitsu.map.presentation.SoramitsuMapFragment
 import jp.co.soramitsu.map.presentation.SoramitsuMapViewModel
-import kotlinx.android.synthetic.main.sm_fragment_review_list.*
 
 internal class ReviewListFragment : BottomSheetDialogFragment() {
 
@@ -27,6 +27,9 @@ internal class ReviewListFragment : BottomSheetDialogFragment() {
                 .get(SoramitsuMapViewModel::class.java)
         }
     }
+
+    private var _binding: SmFragmentReviewListBinding? = null
+    private val binding get() = _binding!!
 
     private lateinit var viewModel: ReviewListViewModel
 
@@ -51,27 +54,29 @@ internal class ReviewListFragment : BottomSheetDialogFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        _binding = SmFragmentReviewListBinding.bind(view)
+
         view.doOnLayout {
             val parent = (view.parent as? View)
             parent?.setBackgroundColor(Color.TRANSPARENT)
         }
 
-        reviewsRecyclerView.layoutManager = LinearLayoutManager(context)
-        reviewsRecyclerView.adapter = reviewsAdapter
+        binding.reviewsRecyclerView.layoutManager = LinearLayoutManager(context)
+        binding.reviewsRecyclerView.adapter = reviewsAdapter
 
-        toolbar.setNavigationOnClickListener { dismiss() }
+        binding.toolbar.setNavigationOnClickListener { dismiss() }
 
         viewModel = ViewModelProvider(this, ViewModelProvider.NewInstanceFactory())
             .get(ReviewListViewModel::class.java)
         viewModel.viewState.observe(viewLifecycleOwner, Observer { renderViewState(it) })
 
-        retryButton.setOnClickListener {
+        binding.retryButton.setOnClickListener {
             sharedViewModel?.placeSelected()?.value?.id?.let { placeId ->
                 viewModel.reloadReviews(placeId)
             }
         }
 
-        ratePlaceButton.setOnClickListener {
+        binding.ratePlaceButton.setOnClickListener {
             dismiss()
             sharedViewModel?.onEditReviewClicked()
         }
@@ -85,50 +90,56 @@ internal class ReviewListFragment : BottomSheetDialogFragment() {
         })
     }
 
+    override fun onDestroyView() {
+        super.onDestroyView()
+
+        _binding = null
+    }
+
     private fun renderViewState(viewState: ReviewListViewModel.ReviewListViewState) =
         when (viewState) {
             ReviewListViewModel.ReviewListViewState.Loading -> {
-                progressBar.visibility = View.VISIBLE
-                reviewsRecyclerView.visibility = View.GONE
-                noReviewsYet.visibility = View.GONE
-                retryFlow.visibility = View.GONE
-                ratePlaceButton.visibility = View.GONE
+                binding.progressBar.visibility = View.VISIBLE
+                binding.reviewsRecyclerView.visibility = View.GONE
+                binding.noReviewsYet.visibility = View.GONE
+                binding.retryFlow.visibility = View.GONE
+                binding.ratePlaceButton.visibility = View.GONE
             }
 
             is ReviewListViewModel.ReviewListViewState.Error -> {
-                progressBar.visibility = View.GONE
-                reviewsRecyclerView.visibility = View.GONE
-                noReviewsYet.visibility = View.GONE
-                retryFlow.visibility = View.VISIBLE
-                ratePlaceButton.visibility = View.GONE
+                binding.progressBar.visibility = View.GONE
+                binding.reviewsRecyclerView.visibility = View.GONE
+                binding.noReviewsYet.visibility = View.GONE
+                binding.retryFlow.visibility = View.VISIBLE
+                binding.ratePlaceButton.visibility = View.GONE
             }
 
             is ReviewListViewModel.ReviewListViewState.ContentWithoutUserReview -> {
-                progressBar.visibility = View.GONE
-                reviewsRecyclerView.visibility = View.VISIBLE
-                noReviewsYet.visibility = View.GONE
-                retryFlow.visibility = View.GONE
-                ratePlaceButton.visibility = View.VISIBLE
+                binding.progressBar.visibility = View.GONE
+                binding.reviewsRecyclerView.visibility = View.VISIBLE
+                binding.noReviewsYet.visibility = View.GONE
+                binding.retryFlow.visibility = View.GONE
+                binding.ratePlaceButton.visibility = View.VISIBLE
 
                 reviewsAdapter.setItems(viewState.reviews)
             }
 
             is ReviewListViewModel.ReviewListViewState.ContentWithUserReview -> {
-                progressBar.visibility = View.GONE
-                reviewsRecyclerView.visibility = View.VISIBLE
-                noReviewsYet.visibility = View.GONE
-                retryFlow.visibility = View.GONE
-                ratePlaceButton.visibility = View.GONE
+                binding.progressBar.visibility = View.GONE
+                binding.reviewsRecyclerView.visibility = View.VISIBLE
+                binding.noReviewsYet.visibility = View.GONE
+                binding.retryFlow.visibility = View.GONE
+                binding.ratePlaceButton.visibility = View.GONE
 
                 reviewsAdapter.setItems(viewState.reviews)
             }
 
             ReviewListViewModel.ReviewListViewState.NoReviewsYet -> {
-                progressBar.visibility = View.GONE
-                reviewsRecyclerView.visibility = View.GONE
-                noReviewsYet.visibility = View.VISIBLE
-                retryFlow.visibility = View.GONE
-                ratePlaceButton.visibility = View.VISIBLE
+                binding.progressBar.visibility = View.GONE
+                binding.reviewsRecyclerView.visibility = View.GONE
+                binding.noReviewsYet.visibility = View.VISIBLE
+                binding.retryFlow.visibility = View.GONE
+                binding.ratePlaceButton.visibility = View.VISIBLE
             }
         }
 }

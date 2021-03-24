@@ -2,26 +2,28 @@ package jp.co.soramitsu.map.presentation.places.add
 
 import android.content.Context
 import android.util.AttributeSet
-import android.view.View
+import android.view.LayoutInflater
 import androidx.annotation.LayoutRes
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintSet
 import androidx.transition.TransitionManager
 import jp.co.soramitsu.map.R
 import jp.co.soramitsu.map.SoramitsuMapLibraryConfig
+import jp.co.soramitsu.map.databinding.SmSetWorkingHoursSectionViewBinding
 import jp.co.soramitsu.map.model.Schedule
 import jp.co.soramitsu.map.presentation.places.DetailedScheduleAdapter
 import jp.co.soramitsu.map.presentation.places.add.schedule.generateLaunchTimeFields
 import jp.co.soramitsu.map.presentation.places.add.schedule.generateWorkingDaysFields
-import kotlinx.android.synthetic.main.sm_set_working_hours_section_view.view.*
 
-class ScheduleSectionView @JvmOverloads constructor(
+internal class ScheduleSectionView @JvmOverloads constructor(
     context: Context,
     attributeSet: AttributeSet? = null,
     defaultStyleResId: Int = 0
 ) : ConstraintLayout(context, attributeSet, defaultStyleResId) {
 
     private val logger = SoramitsuMapLibraryConfig.logger
+
+    private val binding = SmSetWorkingHoursSectionViewBinding.inflate(LayoutInflater.from(context), this)
 
     @ExperimentalStdlibApi
     var schedule: Schedule? = null
@@ -76,12 +78,10 @@ class ScheduleSectionView @JvmOverloads constructor(
     }
 
     init {
-        View.inflate(context, R.layout.sm_set_working_hours_section_view, this)
+        binding.workingHoursRecyclerView.adapter = adapter
 
-        workingHoursRecyclerView.adapter = adapter
-
-        addScheduleTextView.setOnClickListener { onAddButtonClickListener.invoke() }
-        changeScheduleTextView.setOnClickListener { onChangeScheduleButtonClickListener.invoke() }
+        binding.addScheduleTextView.setOnClickListener { onAddButtonClickListener.invoke() }
+        binding.changeScheduleTextView.setOnClickListener { onChangeScheduleButtonClickListener.invoke() }
     }
 
     private sealed class SectionState {

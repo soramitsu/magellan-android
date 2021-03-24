@@ -4,6 +4,7 @@ import android.content.DialogInterface
 import android.graphics.Color
 import android.os.Bundle
 import android.os.Handler
+import android.os.Looper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -12,9 +13,9 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import jp.co.soramitsu.map.R
+import jp.co.soramitsu.map.databinding.SmCategoriesFragmentBinding
 import jp.co.soramitsu.map.presentation.SoramitsuMapFragment
 import jp.co.soramitsu.map.presentation.SoramitsuMapViewModel
-import kotlinx.android.synthetic.main.sm_categories_fragment.*
 
 internal class CategoriesFragment : BottomSheetDialogFragment() {
 
@@ -23,6 +24,9 @@ internal class CategoriesFragment : BottomSheetDialogFragment() {
     private val categoriesAdapter: CategoriesAdapter = CategoriesAdapter().apply {
         onCategoryClick = { category -> viewModel.onCategorySelected(category) }
     }
+
+    private var _binding: SmCategoriesFragmentBinding? = null
+    private val binding get() = _binding!!
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -35,7 +39,7 @@ internal class CategoriesFragment : BottomSheetDialogFragment() {
     override fun onResume() {
         super.onResume()
 
-        Handler().postDelayed({
+        Handler(Looper.getMainLooper()).postDelayed({
             val parent = (view?.parent as? View)
             parent?.setBackgroundColor(Color.TRANSPARENT)
         }, 50)
@@ -43,8 +47,11 @@ internal class CategoriesFragment : BottomSheetDialogFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        categoriesRecyclerView.layoutManager = LinearLayoutManager(requireContext())
-        categoriesRecyclerView.adapter = categoriesAdapter
+
+        _binding = SmCategoriesFragmentBinding.bind(view)
+
+        binding.categoriesRecyclerView.layoutManager = LinearLayoutManager(requireContext())
+        binding.categoriesRecyclerView.adapter = categoriesAdapter
 
         parentFragmentManager.fragments.find { it is SoramitsuMapFragment }?.let { hostFragment ->
             viewModel = ViewModelProvider(hostFragment, ViewModelProvider.NewInstanceFactory())
@@ -52,13 +59,19 @@ internal class CategoriesFragment : BottomSheetDialogFragment() {
 
             viewModel.viewState().observe(viewLifecycleOwner, Observer { viewState ->
                 categoriesAdapter.update(viewState.categories)
-                resetFiltersButton.isEnabled = viewState.enableResetButton
+                binding.resetFiltersButton.isEnabled = viewState.enableResetButton
             })
 
-            resetFiltersButton.setOnClickListener {
+            binding.resetFiltersButton.setOnClickListener {
                 viewModel.onResetCategoriesFilterButtonClicked()
             }
         }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+
+        _binding = null
     }
 
     override fun onDismiss(dialog: DialogInterface) {

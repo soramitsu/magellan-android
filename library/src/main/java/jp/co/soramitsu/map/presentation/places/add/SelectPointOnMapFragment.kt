@@ -14,10 +14,10 @@ import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.model.LatLng
 import jp.co.soramitsu.map.BuildConfig
 import jp.co.soramitsu.map.R
+import jp.co.soramitsu.map.databinding.SmFragmentSelectPointOnMapBinding
 import jp.co.soramitsu.map.ext.addressString
 import jp.co.soramitsu.map.ext.toPosition
 import jp.co.soramitsu.map.presentation.places.add.schedule.PlaceProposalViewModel
-import kotlinx.android.synthetic.main.sm_fragment_select_point_on_map.*
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import java.util.concurrent.TimeUnit
@@ -29,24 +29,29 @@ internal class SelectPointOnMapFragment : Fragment(R.layout.sm_fragment_select_p
 
     private lateinit var placeProposalViewModel: PlaceProposalViewModel
 
+    private var _binding: SmFragmentSelectPointOnMapBinding? = null
+    private val binding get() = _binding!!
+
     private var getAddressJob: Job? = null
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        _binding = SmFragmentSelectPointOnMapBinding.bind(view)
 
         placeProposalViewModel = ViewModelProvider(
             requireActivity(),
             ViewModelProvider.NewInstanceFactory()
         )[PlaceProposalViewModel::class.java]
 
-        mapView.onCreate(savedInstanceState)
-        mapView.getMapAsync { onMapReady(it) }
+        binding.mapView.onCreate(savedInstanceState)
+        binding.mapView.getMapAsync { onMapReady(it) }
 
-        closeScreenButton.setOnClickListener { activity?.onBackPressed() }
-        doneButton.setOnClickListener {
+        binding.closeScreenButton.setOnClickListener { activity?.onBackPressed() }
+        binding.doneButton.setOnClickListener {
             googleMap?.cameraPosition?.target?.let {
                 placeProposalViewModel.position = it.toPosition()
-                placeProposalViewModel.address = addressEditText.text.toString()
+                placeProposalViewModel.address = binding.addressEditText.text.toString()
             }
             activity?.onBackPressed()
         }
@@ -54,29 +59,31 @@ internal class SelectPointOnMapFragment : Fragment(R.layout.sm_fragment_select_p
 
     override fun onStart() {
         super.onStart()
-        mapView.onStart()
+        binding.mapView.onStart()
     }
 
     override fun onResume() {
         super.onResume()
-        mapView.onResume()
+        binding.mapView.onResume()
     }
 
     override fun onPause() {
         super.onPause()
-        mapView.onPause()
+        binding.mapView.onPause()
     }
 
     override fun onStop() {
         super.onStop()
-        mapView.onStop()
+        binding.mapView.onStop()
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
-        mapView.onDestroy()
+        binding.mapView.onDestroy()
 
         stopPointerAnimation()
+
+        _binding = null
     }
 
     @SuppressLint("ClickableViewAccessibility")
@@ -105,9 +112,9 @@ internal class SelectPointOnMapFragment : Fragment(R.layout.sm_fragment_select_p
         googleMap?.cameraPosition?.target?.let { target ->
             getAddressJob?.cancel()
             getAddressJob = lifecycleScope.launch {
-                addressEditText.isEnabled = false
-                addressEditText.setText(target.toPosition().addressString(requireContext()))
-                addressEditText.isEnabled = true
+                binding.addressEditText.isEnabled = false
+                binding.addressEditText.setText(target.toPosition().addressString(requireContext()))
+                binding.addressEditText.isEnabled = true
             }
         }
     }
@@ -122,12 +129,12 @@ internal class SelectPointOnMapFragment : Fragment(R.layout.sm_fragment_select_p
         pointerAnimator?.repeatCount = ValueAnimator.INFINITE
         pointerAnimator?.addUpdateListener {
             val dy = it.animatedValue as Float
-            arrowsImageView.translationY = dy
-            arrowView.translationY = dy
+            binding.arrowsImageView.translationY = dy
+            binding.arrowView.translationY = dy
         }
         pointerAnimator?.doOnCancel {
-            arrowsImageView.translationY = 0f
-            arrowView.translationY = 0f
+            binding.arrowsImageView.translationY = 0f
+            binding.arrowView.translationY = 0f
         }
         pointerAnimator?.start()
     }
