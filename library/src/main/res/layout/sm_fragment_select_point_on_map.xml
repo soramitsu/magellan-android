@@ -61,28 +61,9 @@
         android:id="@+id/bottomPanelBackground"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:background="@drawable/sm_rounded_background"
+        android:background="@drawable/sm_rounded_background_with_topper"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toTopOf="@id/topBarrier" />
-
-    <androidx.constraintlayout.widget.Barrier
-        android:id="@+id/topBarrier"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:barrierDirection="top"
-        app:barrierMargin="-8dp"
-        app:constraint_referenced_ids="topperView" />
-
-    <View
-        android:id="@+id/topperView"
-        android:layout_width="?attr/sm_categoriesBottomSheetTopperWidth"
-        android:layout_height="?attr/sm_categoriesBottomSheetTopperHeight"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginTop="@dimen/sm_margin_padding_size_small"
-        android:layout_marginBottom="@dimen/sm_margin_padding_size_small"
-        app:layout_constraintBottom_toTopOf="@id/selectPointTitleTextView"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintTop_toTopOf="@id/selectPointTitleTextView" />
 
     <TextView
         android:id="@+id/selectPointTitleTextView"
@@ -90,6 +71,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="@dimen/sm_margin_padding_size_small"
+        android:paddingTop="@dimen/sm_margin_padding_size_medium"
         android:paddingStart="@dimen/sm_margin_padding_size_medium"
         android:paddingEnd="@dimen/sm_margin_padding_size_medium"
         android:text="@string/sm_location_on_map"

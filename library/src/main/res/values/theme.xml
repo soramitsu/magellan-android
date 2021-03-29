@@ -13,7 +13,6 @@
 
         <!-- Default attribute values -->
         <item name="sm_categoriesBottomSheetPeekHeight">82dp</item>
-        <item name="sm_categoriesBottomSheetBackground">@drawable/sm_rounded_background</item>
 
         <item name="sm_categoriesBottomSheetSearchTextHintColor">#898989</item>
         <item name="sm_categoriesBottomSheetSearchBoxStrokeColor">#898989</item>
@@ -22,10 +21,6 @@
             @style/SM.TextAppearance.Soramitsu.MaterialComponents.Caption
         </item>
         <item name="sm_categoriesBottomSheetSeparatorColor">#F5F5F5</item>
-
-        <item name="sm_categoriesBottomSheetTopperDrawable">@drawable/sm_rounded_rectangle</item>
-        <item name="sm_categoriesBottomSheetTopperHeight">4dp</item>
-        <item name="sm_categoriesBottomSheetTopperWidth">36dp</item>
 
         <item name="sm_categoryResetButtonStyle">@style/SM.Widget.Soramitsu.Map.Category.ResetButton</item>
 
@@ -53,7 +48,6 @@
 
         <item name="sm_checkIcon">@drawable/sm_ic_check_24dp</item>
 
-        <item name="sm_placeBottomSheetBackground">@drawable/sm_rounded_background</item>
         <item name="sm_placeBottomSheetPeekHeight">352dp</item>
         <item name="sm_placeTitleTextColor">#000000</item>
 
