@@ -28,29 +28,12 @@
         app:layout_constraintTop_toTopOf="parent"
         app:useCompatPadding="true" />
 
-    <View
-        android:id="@+id/contentBackground"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_marginTop="76dp"
-        android:background="?sm_placeBottomSheetBackground"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/closePlaceInfoButton" />
-
-    <View
-        android:layout_width="?attr/sm_categoriesBottomSheetTopperWidth"
-        android:layout_height="?attr/sm_categoriesBottomSheetTopperHeight"
-        android:layout_marginTop="84dp"
-        android:layout_gravity="center_horizontal"
-        android:background="?attr/sm_categoriesBottomSheetTopperDrawable"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@id/contentBackground" />
-
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="92dp"
+        android:layout_marginTop="80dp"
+        android:paddingTop="@dimen/sm_margin_padding_size_medium"
+        android:background="@drawable/sm_rounded_background_with_topper"
         app:layout_constraintTop_toTopOf="@id/contentBackground">
 
         <androidx.constraintlayout.widget.ConstraintLayout

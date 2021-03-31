@@ -2,20 +2,9 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@drawable/sm_rounded_background"
+    android:background="@drawable/sm_rounded_background_with_topper"
     android:paddingBottom="@dimen/sm_margin_padding_size_small"
     xmlns:app="http://schemas.android.com/apk/res-auto">
-
-    <View
-        android:layout_width="?attr/sm_categoriesBottomSheetTopperWidth"
-        android:layout_height="?attr/sm_categoriesBottomSheetTopperHeight"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginTop="@dimen/sm_margin_padding_size_small"
-        android:background="?attr/sm_categoriesBottomSheetTopperDrawable"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        />
 
     <TextView
         android:id="@+id/editReview"

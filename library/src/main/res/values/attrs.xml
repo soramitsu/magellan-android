@@ -1,15 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <attr name="sm_categoriesBottomSheetPeekHeight" format="dimension|reference" />
-    <attr name="sm_categoriesBottomSheetBackground" format="color|reference" />
 
     <attr name="sm_iconColor" format="color|reference" />
     <attr name="sm_iconBackgroundColor" format="color|reference" />
-
-    <!-- small rounded rectangle at top of bottom sheets -->
-    <attr name="sm_categoriesBottomSheetTopperDrawable" format="reference" />
-    <attr name="sm_categoriesBottomSheetTopperWidth" format="dimension|reference" />
-    <attr name="sm_categoriesBottomSheetTopperHeight" format="dimension|reference" />
 
     <attr name="sm_categoriesBottomSheetSearchTextHintColor" format="color|reference" />
     <attr name="sm_categoriesBottomSheetSearchBoxStrokeColor" format="color|reference" />
@@ -46,7 +40,6 @@
 
     <attr name="sm_checkIcon" format="reference" />
 
-    <attr name="sm_placeBottomSheetBackground" format="reference" />
     <attr name="sm_placeBottomSheetPeekHeight" format="dimension|reference" />
     <attr name="sm_placeTitleTextColor" format="color|reference" />
 
