@@ -7,7 +7,7 @@ data class Category(
     val id: Long,
     val name: String,
     val khmerName: String = ""
-): Serializable {
+) : Serializable {
 
     fun localisedName(): String {
         val useKhmerName = Locale.getDefault().language == "km" && khmerName.isNotBlank()

@@ -58,7 +58,6 @@ class DetailedScheduleAdapter(
 
         override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean =
             itemsBefore[oldItemPosition] == itemsAfter[newItemPosition]
-
     }
 
     enum class Orientation(val layoutResId: Int) {

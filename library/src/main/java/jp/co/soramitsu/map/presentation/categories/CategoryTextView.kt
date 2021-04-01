@@ -30,6 +30,10 @@ class CategoryTextView @JvmOverloads constructor(
             invalidateSelf()
         }
 
+    init {
+        invalidateSelf()
+    }
+
     override fun onSaveInstanceState(): Parcelable {
         val savedState = CategoryTextViewSavedState(super.onSaveInstanceState()!!)
         savedState.category = category
@@ -51,7 +55,6 @@ class CategoryTextView @JvmOverloads constructor(
             TextViewCompat.setCompoundDrawablesRelativeWithIntrinsicBounds(
                 this, R.drawable.sm_ic_choose_category_circle_44, 0, 0, 0
             )
-
         } else {
             text = category?.localisedName().orEmpty()
             val categoryIcon = wrapInCircle44dp(iconForCategory(context, category ?: Category.OTHER))
@@ -95,10 +98,6 @@ class CategoryTextView @JvmOverloads constructor(
         else -> context.getResourceIdForAttr(R.attr.sm_categoryIconOther)
     }
 
-    init {
-        invalidateSelf()
-    }
-
     internal class CategoryTextViewSavedState : BaseSavedState {
 
         var category: Category? = null
@@ -123,7 +122,6 @@ class CategoryTextView @JvmOverloads constructor(
                 }
 
                 override fun newArray(size: Int): Array<CategoryTextViewSavedState> = emptyArray()
-
             }
         }
     }

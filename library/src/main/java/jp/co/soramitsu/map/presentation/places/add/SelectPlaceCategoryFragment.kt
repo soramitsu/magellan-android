@@ -6,7 +6,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.doOnLayout
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
@@ -48,9 +47,9 @@ internal class SelectPlaceCategoryFragment : BottomSheetDialogFragment() {
 
         binding.categoriesRecyclerView.adapter = categoriesAdapter
 
-        viewModel.categories.observe(viewLifecycleOwner, Observer { categories ->
+        viewModel.categories.observe(viewLifecycleOwner) { categories ->
             categoriesAdapter.setItems(categories)
-        })
+        }
     }
 
     override fun onDestroyView() {

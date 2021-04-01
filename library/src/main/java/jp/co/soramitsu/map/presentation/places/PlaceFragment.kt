@@ -74,13 +74,19 @@ internal class PlaceFragment : BottomSheetDialogFragment() {
         binding.additionalInfoOpenHoursDetails.layoutManager = LinearLayoutManager(context)
         binding.additionalInfoOpenHoursDetails.adapter = detailedScheduleAdapter
 
-        parentFragmentManager.fragments.find { it is SoramitsuMapFragment }?.let { hostFragment ->
+        requireFragmentManager().fragments.find { it is SoramitsuMapFragment }?.let { hostFragment ->
             viewModel = ViewModelProvider(hostFragment, ViewModelProvider.NewInstanceFactory())
                 .get(SoramitsuMapViewModel::class.java)
 
-            viewModel.placeSelected().value?.let { place -> bindBottomSheetWithPlace(place) }
+            viewModel.placeSelected().value?.let { place ->
+                bindBottomSheetWithPlace(place)
+                bindAdditionalInfo(place)
+            }
             viewModel.placeSelected().observe(viewLifecycleOwner) { place ->
-                place?.let { bindBottomSheetWithPlace(place) }
+                place?.let {
+                    bindBottomSheetWithPlace(place)
+                    bindAdditionalInfo(place)
+                }
             }
             viewModel.uploadReviewInProgress().observe(viewLifecycleOwner) { placeUpdateInProgress ->
                 binding.reviewView.showUploadingReviewIndicator(placeUpdateInProgress)
@@ -93,7 +99,7 @@ internal class PlaceFragment : BottomSheetDialogFragment() {
                     comment = place.userReview?.text.orEmpty(),
                     edit = place.userReview != null,
                     initialRating = initialRating.toInt()
-                ).show(parentFragmentManager, "AddPlaceReviewFragment")
+                ).show(requireFragmentManager(), "AddPlaceReviewFragment")
             }
         }
     }
@@ -112,7 +118,7 @@ internal class PlaceFragment : BottomSheetDialogFragment() {
             bottomSheetDialog.behavior.peekHeight = peekHeight
 
             val touchOutside = dialog.window?.decorView?.findViewById<View>(R.id.touch_outside)
-            touchOutside?.setOnTouchListener { v, event ->
+            touchOutside?.setOnTouchListener { _, event ->
                 activity?.dispatchTouchEvent(event)
                 false
             }
@@ -128,7 +134,6 @@ internal class PlaceFragment : BottomSheetDialogFragment() {
         viewModel.onPlaceSelected(null)
     }
 
-    @ExperimentalStdlibApi
     private fun bindBottomSheetWithPlace(place: Place) {
         // header info
         binding.placeNameTextView.text = place.localisedName()
@@ -151,6 +156,11 @@ internal class PlaceFragment : BottomSheetDialogFragment() {
             R.plurals.sm_review, allReviews.size, allReviews.size
         )
 
+        binding.closePlaceInfoButton.setOnClickListener { dismiss() }
+    }
+
+    @ExperimentalStdlibApi
+    private fun bindAdditionalInfo(place: Place) {
         // additional info
         binding.additionalInfoMobilePhone.visibility =
             if (place.phone.isEmpty()) View.GONE else View.VISIBLE
@@ -177,15 +187,19 @@ internal class PlaceFragment : BottomSheetDialogFragment() {
         binding.additionalInfoAddress.text = place.address
 
         binding.additionalInfoMobilePhone.setOnClickListener {
-            startActivity(Intent(Intent.ACTION_DIAL).apply {
-                data = Uri.parse("tel:${place.phone}")
-            })
+            startActivity(
+                Intent(Intent.ACTION_DIAL).apply {
+                    data = Uri.parse("tel:${place.phone}")
+                }
+            )
         }
 
         binding.additionalInfoWebsite.setOnClickListener {
-            startActivity(Intent(Intent.ACTION_VIEW).apply {
-                data = Uri.parse(place.website)
-            })
+            startActivity(
+                Intent(Intent.ACTION_VIEW).apply {
+                    data = Uri.parse(place.website)
+                }
+            )
         }
 
         binding.additionalInfoFacebook.setOnClickListener {
@@ -195,20 +209,22 @@ internal class PlaceFragment : BottomSheetDialogFragment() {
             if (facebookIntent.resolveActivity(requireActivity().packageManager) != null) {
                 startActivity(facebookIntent)
             } else {
-                startActivity(Intent(Intent.ACTION_VIEW).apply {
-                    data = Uri.parse("https://facebook.com/${place.facebook}")
-                })
+                startActivity(
+                    Intent(Intent.ACTION_VIEW).apply {
+                        data = Uri.parse("https://facebook.com/${place.facebook}")
+                    }
+                )
             }
         }
 
         binding.additionalInfoAddress.setOnClickListener {
-            startActivity(Intent(Intent.ACTION_VIEW).apply {
-                data = Uri.parse("geo:0,0?q=${Uri.encode(place.address)}")
-                `package` = "com.google.android.apps.maps"
-            })
+            startActivity(
+                Intent(Intent.ACTION_VIEW).apply {
+                    data = Uri.parse("geo:0,0?q=${Uri.encode(place.address)}")
+                    `package` = "com.google.android.apps.maps"
+                }
+            )
         }
-
-        binding.closePlaceInfoButton.setOnClickListener { dismiss() }
     }
 
     private fun bindRating(place: Place) {
@@ -222,12 +238,12 @@ internal class PlaceFragment : BottomSheetDialogFragment() {
         binding.reviewView.bind(place.rating, allReviews)
         binding.reviewView.setOnShowAllReviewsButtonClickListener {
             activity?.onUserInteraction()
-            ReviewListFragment().show(parentFragmentManager, "ReviewListBottomSheetFragment")
+            ReviewListFragment().show(requireFragmentManager(), "ReviewListBottomSheetFragment")
         }
 
         binding.reviewView.setOnEditUserCommentClickListener {
             activity?.onUserInteraction()
-            EditReviewFragment().show(parentFragmentManager, "EditReviewMenu")
+            EditReviewFragment().show(requireFragmentManager(), "EditReviewMenu")
         }
 
         binding.reviewView.setOnUserChangeRatingListener { newRating ->
@@ -238,7 +254,7 @@ internal class PlaceFragment : BottomSheetDialogFragment() {
                     placeName = place.name,
                     initialRating = newRating,
                     edit = place.userReview != null
-                ).show(parentFragmentManager, "AddPlaceReviewFragment")
+                ).show(requireFragmentManager(), "AddPlaceReviewFragment")
             }
         }
     }
@@ -263,24 +279,22 @@ internal class PlaceFragment : BottomSheetDialogFragment() {
             )
             return
         }
-        if (schedule.workingDays.isNotEmpty()) {
-            if (today != null) {
-                val fromTime = dateFormat.format(Date(today.from.inMilliseconds()))
-                val toTime = dateFormat.format(Date(today.to.inMilliseconds()))
-                val scheduleAsString =
-                    resources.getString(R.string.sm_daily_interval, fromTime, toTime)
+        if (schedule.workingDays.isNotEmpty() && today != null) {
+            val fromTime = dateFormat.format(Date(today.from.inMilliseconds()))
+            val toTime = dateFormat.format(Date(today.to.inMilliseconds()))
+            val scheduleAsString =
+                resources.getString(R.string.sm_daily_interval, fromTime, toTime)
 
-                val haveLunchTime = today.lunchTimeFrom != null && today.lunchTimeTo != null
-                if (haveLunchTime) {
-                    val lunchFromTime =
-                        dateFormat.format(Date(today.lunchTimeFrom!!.inMilliseconds()))
-                    val lunchToTime = dateFormat.format(Date(today.lunchTimeTo!!.inMilliseconds()))
-                    val lunchScheduleAsString =
-                        getString(R.string.sm_lunch_time) + " $lunchFromTime–$lunchToTime"
-                    binding.additionalInfoOpenHours.text = "$scheduleAsString\n$lunchScheduleAsString"
-                } else {
-                    binding.additionalInfoOpenHours.text = scheduleAsString
-                }
+            val haveLunchTime = today.lunchTimeFrom != null && today.lunchTimeTo != null
+            if (haveLunchTime) {
+                val lunchFromTime =
+                    dateFormat.format(Date(today.lunchTimeFrom!!.inMilliseconds()))
+                val lunchToTime = dateFormat.format(Date(today.lunchTimeTo!!.inMilliseconds()))
+                val lunchScheduleAsString =
+                    getString(R.string.sm_lunch_time) + " $lunchFromTime–$lunchToTime"
+                binding.additionalInfoOpenHours.text = "$scheduleAsString\n$lunchScheduleAsString"
+            } else {
+                binding.additionalInfoOpenHours.text = scheduleAsString
             }
         }
 
@@ -329,6 +343,7 @@ internal class PlaceFragment : BottomSheetDialogFragment() {
         }
     }
 
+    @Suppress("MagicNumber")
     private fun Schedule.isStableDailySchedule(): Boolean {
         return workingDays.size == 7 && workingDays.all { workDay ->
             workDay.from == workingDays[0].from && workDay.to == workingDays[0].to

@@ -9,7 +9,6 @@ import android.view.ViewGroup
 import androidx.core.os.bundleOf
 import androidx.core.view.doOnLayout
 import androidx.core.widget.doOnTextChanged
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
@@ -93,7 +92,7 @@ internal class ReviewFragment : BottomSheetDialogFragment() {
             activity?.onUserInteraction()
         }
 
-        viewModel.viewState.observe(viewLifecycleOwner, Observer { viewState ->
+        viewModel.viewState.observe(viewLifecycleOwner) { viewState ->
             when (viewState) {
                 ReviewViewModel.ViewState.InputComment, ReviewViewModel.ViewState.Error -> {
                     binding.progressBar.visibility = View.GONE
@@ -109,7 +108,7 @@ internal class ReviewFragment : BottomSheetDialogFragment() {
                 }
                 ReviewViewModel.ViewState.Submitted -> {
                     // todo: show notification
-                    parentFragmentManager.fragments.find { it is SoramitsuMapFragment }?.let { hostFragment ->
+                    fragmentManager?.fragments?.find { it is SoramitsuMapFragment }?.let { hostFragment ->
                         ViewModelProvider(hostFragment, ViewModelProvider.NewInstanceFactory())
                             .get(SoramitsuMapViewModel::class.java)
                             .onPlaceReviewAdded()
@@ -119,7 +118,7 @@ internal class ReviewFragment : BottomSheetDialogFragment() {
             }.run {
                 // just to make sure that all cases was handled
             }
-        })
+        }
     }
 
     override fun onDestroyView() {

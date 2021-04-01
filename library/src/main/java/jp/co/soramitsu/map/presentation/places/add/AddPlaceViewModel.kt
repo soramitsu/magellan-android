@@ -29,7 +29,7 @@ internal class AddPlaceViewModel(
 
     fun addPlace(place: Place) {
         viewModelScope.launch {
-            try {
+            kotlin.runCatching {
                 if (place.name.isEmpty()) {
                     _viewState.value = AddPlaceViewState.ValidationFailed(
                         AddPlaceViewState.ValidationFailed.Field.NAME
@@ -47,9 +47,9 @@ internal class AddPlaceViewModel(
                     )
                 }
                 _viewState.value = AddPlaceViewState.Success
-            } catch (exception: Exception) {
-                logger.log("AddPlace", exception)
-                _viewState.value = AddPlaceViewState.Error(exception)
+            }.onFailure {
+                logger.log("AddPlace", it)
+                _viewState.value = AddPlaceViewState.Error(it)
             }
         }
     }
@@ -62,5 +62,5 @@ sealed class AddPlaceViewState {
         enum class Field { NAME }
     }
 
-    data class Error(val exception: Exception) : AddPlaceViewState()
+    data class Error(val exception: Throwable) : AddPlaceViewState()
 }

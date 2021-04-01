@@ -7,7 +7,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.doOnLayout
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.bottomsheet.BottomSheetBehavior
@@ -22,7 +21,7 @@ internal class ReviewListFragment : BottomSheetDialogFragment() {
 
     private val reviewsAdapter = ReviewsAdapter()
     private val sharedViewModel by lazy {
-        parentFragmentManager.fragments.find { it is SoramitsuMapFragment }?.let { hostFragment ->
+        requireFragmentManager().fragments.find { it is SoramitsuMapFragment }?.let { hostFragment ->
             ViewModelProvider(hostFragment, ViewModelProvider.NewInstanceFactory())
                 .get(SoramitsuMapViewModel::class.java)
         }
@@ -68,7 +67,7 @@ internal class ReviewListFragment : BottomSheetDialogFragment() {
 
         viewModel = ViewModelProvider(this, ViewModelProvider.NewInstanceFactory())
             .get(ReviewListViewModel::class.java)
-        viewModel.viewState.observe(viewLifecycleOwner, Observer { renderViewState(it) })
+        viewModel.viewState.observe(viewLifecycleOwner) { renderViewState(it) }
 
         binding.retryButton.setOnClickListener {
             sharedViewModel?.placeSelected()?.value?.id?.let { placeId ->
@@ -82,12 +81,12 @@ internal class ReviewListFragment : BottomSheetDialogFragment() {
         }
 
         reviewsAdapter.setOnEditCommentButtonClickListener {
-            EditReviewFragment().show(parentFragmentManager, "EditReviewMenu")
+            EditReviewFragment().show(requireFragmentManager(), "EditReviewMenu")
         }
 
-        sharedViewModel?.placeSelected()?.observe(viewLifecycleOwner, Observer { place ->
+        sharedViewModel?.placeSelected()?.observe(viewLifecycleOwner) { place ->
             place?.let { viewModel.reloadReviews(place.id) }
-        })
+        }
     }
 
     override fun onDestroyView() {

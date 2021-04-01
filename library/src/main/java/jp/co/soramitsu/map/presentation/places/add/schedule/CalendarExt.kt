@@ -48,7 +48,7 @@ fun calendarDayToDayOfWeek(calendarDay: Int) = when (calendarDay) {
     Calendar.THURSDAY -> DayOfWeek.THURSDAY
     Calendar.FRIDAY -> DayOfWeek.FRIDAY
     Calendar.SATURDAY -> DayOfWeek.SATURDAY
-    else -> throw IllegalArgumentException()
+    else -> throw IllegalArgumentException("Invalid calendar day value: $calendarDay . Must be one of Calendar constants")
 }
 
 @ExperimentalStdlibApi
@@ -58,8 +58,8 @@ fun Schedule.generateWorkingDaysFields(context: Context): List<Pair<String, Stri
     }
     return asIntervals().map { interval ->
         val workDay = interval.first
-        val workingInterval = workDay.from != Time.NOT_SET
-                && workDay.to != Time.NOT_SET
+        val workingInterval = workDay.from != Time.NOT_SET &&
+                workDay.to != Time.NOT_SET
 
         // 6am - 9pm
         val workingTimeInterval = if (workingInterval) {
@@ -95,14 +95,14 @@ fun Schedule.generateLaunchTimeFields(context: Context): List<Pair<String, Strin
         workDay1.lunchTimeFrom == workDay2.lunchTimeFrom &&
                 workDay1.lunchTimeTo == workDay2.lunchTimeTo
     }.filter { interval ->
-        interval.first.lunchTimeFrom != null
-                && interval.first.lunchTimeFrom != Time.NOT_SET
-                && interval.first.lunchTimeTo != null
-                && interval.first.lunchTimeTo != Time.NOT_SET
-                && interval.second.lunchTimeFrom != null
-                && interval.second.lunchTimeFrom != Time.NOT_SET
-                && interval.second.lunchTimeTo != null
-                && interval.second.lunchTimeTo != Time.NOT_SET
+        interval.first.lunchTimeFrom != null &&
+                interval.first.lunchTimeFrom != Time.NOT_SET &&
+                interval.first.lunchTimeTo != null &&
+                interval.first.lunchTimeTo != Time.NOT_SET &&
+                interval.second.lunchTimeFrom != null &&
+                interval.second.lunchTimeFrom != Time.NOT_SET &&
+                interval.second.lunchTimeTo != null &&
+                interval.second.lunchTimeTo != Time.NOT_SET
     }.map { interval ->
         val dateFormat = SimpleDateFormat("HH:mm", Locale.getDefault()).apply {
             timeZone = TimeZone.getTimeZone("UTC")

@@ -1,0 +1,150 @@
+config:
+  # is automatically ignored when custom-checks.jar is on the classpath
+  # however other CI checks use the argsfile where our plugin is not applied
+  # we need to care take of this by explicitly allowing this properties
+  excludes: 'custom-checks.*'
+
+custom-checks:
+  active: false
+  SpekTestDiscovery:
+    active: true
+    includes: [ '**/test/**/*Spec.kt' ]
+
+comments:
+  CommentOverPrivateProperty:
+    active: true
+  UndocumentedPublicClass:
+    active: true
+    excludes: [ '**/*.kt' ]
+    includes: [ '**/detekt-api/src/main/**/api/*.kt' ]
+  UndocumentedPublicFunction:
+    active: true
+    excludes: [ '**/*.kt' ]
+    includes: [ '**/detekt-api/src/main/**/api/*.kt' ]
+
+complexity:
+  StringLiteralDuplication:
+    active: false
+    excludes: [ '**/test/**', '**/*Test.kt', '**/*Spec.kt' ]
+    threshold: 5
+    ignoreAnnotation: true
+    excludeStringsWithLessThan5Characters: true
+    ignoreStringsRegex: '$^'
+  ComplexInterface:
+    active: true
+    threshold: 10
+    includeStaticDeclarations: false
+    includePrivateDeclarations: false
+  ComplexMethod:
+    active: true
+    ignoreSingleWhenExpression: true
+  LargeClass:
+    active: true
+    excludes: [ '**/test/**', '**/*.Test.kt', '**/*.Spec.kt' ]
+  MethodOverloading:
+    active: true
+  TooManyFunctions:
+    active: false
+
+exceptions:
+  NotImplementedDeclaration:
+    active: true
+  InstanceOfCheckForException:
+    active: true
+  RethrowCaughtException:
+    active: true
+  ReturnFromFinally:
+    active: true
+  ThrowingExceptionFromFinally:
+    active: true
+  ThrowingExceptionsWithoutMessageOrCause:
+    active: true
+  ThrowingNewInstanceOfSameException:
+    active: true
+
+formatting:
+  active: true
+  android: true
+  autoCorrect: true
+  AnnotationSpacing:
+    active: true
+  EnumEntryNameCase:
+    active: true
+  FinalNewline:
+    active: true
+    autoCorrect: true
+  ImportOrdering:
+    active: false
+  Indentation:
+    active: false
+  MaximumLineLength:
+    active: false
+  NoBlankLineBeforeRbrace:
+    active: false
+  NoConsecutiveBlankLines:
+    active: false
+  NoEmptyFirstLineInMethodBlock:
+    active: true
+  NoWildcardImports:
+    active: false
+  ParameterListWrapping:
+    active: false
+  SpacingAroundAngleBrackets:
+    active: true
+  SpacingAroundDoubleColon:
+    active: true
+  SpacingAroundUnaryOperator:
+    active: true
+  SpacingBetweenDeclarationsWithAnnotations:
+    active: true
+  SpacingBetweenDeclarationsWithComments:
+    active: true
+
+potential-bugs:
+  UnsafeCast:
+    active: true
+    excludes: [ '**/test/**', '**/*.Test.kt', '**/*.Spec.kt' ]
+  UselessPostfixExpression:
+    active: true
+
+style:
+  ClassOrdering:
+    active: true
+  CollapsibleIfStatements:
+    active: true
+  ForbiddenComment:
+    active: false
+    values: [ 'TODO:', 'FIXME:', 'STOPSHIP:', '@author' ]
+    excludes: [ '**/detekt-rules-style/**/ForbiddenComment.kt' ]
+  LibraryCodeMustSpecifyReturnType:
+    active: true
+    excludes: [ '**/*.kt' ]
+    includes: [ '**/detekt-api/src/main/**/api/*.kt' ]
+  MaxLineLength:
+    active: false
+    excludes: [ '**/test/**', '**/*Test.kt', '**/*Spec.kt' ]
+    excludeCommentStatements: true
+  MagicNumber:
+    ignorePropertyDeclaration: true
+    ignoreAnnotation: true
+    ignoreEnums: true
+    ignoreNumbers: [ '-1', '0', '1', '2', '100', '1000' ]
+    excludes: [ '**/test/**', '**/*Test.kt', '**/*Spec.kt' ]
+  NestedClassesVisibility:
+    active: true
+  RedundantVisibilityModifierRule:
+    active: true
+  ReturnCount:
+    active: false
+    excludeGuardClauses: true
+  SpacingBetweenPackageAndImports:
+    active: true
+  UnusedPrivateMember:
+    active: true
+    allowedNames: '(_|ignored|expected)'
+  UseCheckOrError:
+    active: true
+  SerialVersionUIDInSerializableClass:
+    active: false
+  WildcardImport:
+    active: false

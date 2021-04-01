@@ -93,12 +93,13 @@ class PlaceProposalViewModel(
         logSections()
     }
 
+    @Suppress("MagicNumber")
     private fun emitNewSchedule() {
         val sections = _sections.value
         val open24Hours = sections?.all {
             // all working days start from 00:00 and finishes at 23:59
             it.fromTime == Time.NOT_SET && it.toTime == Time.NOT_SET ||
-                    it.fromTime == Time(0, 0) && it.toTime == Time(23, 59)
+                it.fromTime == Time(0, 0) && it.toTime == Time(23, 59)
         } ?: false
         val newSchedule = Schedule(
             open24 = open24Hours,
@@ -127,10 +128,12 @@ class PlaceProposalViewModel(
     private fun logSections() {
         _sections.value?.forEach { section ->
             logger.log(TAG, "Section ${section.id}")
-            logger.log(TAG, section.daysMap.entries
-                .sortedBy { it.key }
-                .map { it.value }
-                .joinToString(separator = " ")
+            logger.log(
+                TAG,
+                section.daysMap.entries
+                    .sortedBy { it.key }
+                    .map { it.value }
+                    .joinToString(separator = " ")
             )
         }
     }
@@ -215,7 +218,7 @@ data class SectionData(
 }
 
 internal sealed class Screen {
-    object PlaceProposal: Screen()
+    object PlaceProposal : Screen()
     object AddSchedule : Screen()
-    object ChangePosition: Screen()
+    object ChangePosition : Screen()
 }

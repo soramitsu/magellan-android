@@ -3,6 +3,7 @@ package jp.co.soramitsu.map.data
 import jp.co.soramitsu.map.model.*
 import java.util.*
 
+@SuppressWarnings("MagicNumber")
 internal class DemoPlacesRepository : PlacesRepository {
 
     private val places: MutableList<Place> =
@@ -118,20 +119,20 @@ internal class DemoPlacesRepository : PlacesRepository {
             Cluster(GeoPoint(places[1].position.latitude, places[1].position.longitude), 30),
             Cluster(GeoPoint(places[2].position.latitude, places[2].position.longitude), 99)
         )
-        return Pair(places, emptyList())
+        return Pair(places, clusters)
     }
 
     override fun addReview(placeId: String, newRating: Int, comment: String) {
         updatePlaceRating(placeId, newRating, comment)
     }
 
-    override fun updatePlaceRating(placeId: String, newRating: Int, text: String) {
+    override fun updatePlaceRating(placeId: String, newRating: Int, comment: String) {
         val placeIdx = places.indexOfFirst { place -> place.id == placeId }
         places[placeIdx] = places[placeIdx].copy(
             userReview = Review(
                 rating = newRating.toFloat(),
                 date = Date().time,
-                text = text,
+                text = comment,
                 author = Author(
                     name = "User Name",
                     user = true

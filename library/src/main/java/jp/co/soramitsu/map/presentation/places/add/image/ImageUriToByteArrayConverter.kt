@@ -18,19 +18,19 @@ internal class DefaultImageUriToByteArrayConverter(
 ) : ImageUriToByteArrayConverter {
 
     override fun convert(fileUriString: String): ByteArray {
-        return try {
+        return kotlin.runCatching {
             val uri = Uri.parse(fileUriString)
             context.contentResolver.openInputStream(uri)?.let { inputStream ->
                 val bitmap = BitmapFactory.decodeStream(inputStream)
                 val bos = ByteArrayOutputStream()
-                bitmap.compress(Bitmap.CompressFormat.JPEG, 70, bos)
+                bitmap.compress(Bitmap.CompressFormat.JPEG, IMAGE_QUALITY, bos)
                 bitmap.recycle()
                 bos.toByteArray()
             } ?: ByteArray(0)
-        } catch (exception: Exception) {
-            logger.log("UriConverter", exception)
-            ByteArray(0)
-        }
+        }.onFailure { logger.log("UriConverter", it) }.getOrDefault(ByteArray(0))
     }
 
+    private companion object {
+        private const val IMAGE_QUALITY = 70
+    }
 }

@@ -63,6 +63,5 @@ internal class CategoriesAdapter : RecyclerView.Adapter<CategoriesAdapter.Catego
         override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
             return beforeList[oldItemPosition] == afterList[newItemPosition]
         }
-
     }
 }

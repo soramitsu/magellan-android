@@ -33,6 +33,7 @@ internal class ScheduleSectionView @JvmOverloads constructor(
     private var onRemoveButtonClickListener: () -> Unit = {}
     private var onWorkingDaysSelected: () -> Unit = { }
 
+    @Suppress("MagicNumber")
     val selectedDays: List<WorkDay>
         get() {
             val is24Hours = binding.open24HoursSwitch.isChecked
@@ -81,6 +82,32 @@ internal class ScheduleSectionView @JvmOverloads constructor(
             binding.topSeparator.visibility = if (value) View.VISIBLE else View.GONE
         }
 
+    init {
+        layoutTransition = LayoutTransition()
+
+        displayLocalisedWeekdays()
+
+        binding.open24HoursSwitch.setOnCheckedChangeListener { _, isChecked ->
+            binding.openHoursFlow.visibility = if (isChecked) View.GONE else View.VISIBLE
+        }
+
+        binding.lunchTimeSwitch.setOnCheckedChangeListener { _, isChecked ->
+            binding.lunchHoursFlow.visibility = if (isChecked) View.VISIBLE else View.GONE
+        }
+
+        weekdaysChips.forEach { chip ->
+            chip.setOnCheckedChangeListener { _, _ -> onWorkingDaysSelected.invoke() }
+        }
+
+        binding.deleteButton.setOnClickListener { onRemoveButtonClickListener.invoke() }
+
+        initTimeField(binding.openFromEditText)
+        initTimeField(binding.closeAtEditText)
+
+        initTimeField(binding.lunchFromEditText)
+        initTimeField(binding.lunchToEditText)
+    }
+
     fun setOnRemoveButtonClickListener(onRemoveButtonClickListener: () -> Unit) {
         this.onRemoveButtonClickListener = onRemoveButtonClickListener
     }
@@ -89,6 +116,7 @@ internal class ScheduleSectionView @JvmOverloads constructor(
         this.onWorkingDaysSelected = onWorkingDaysSelected
     }
 
+    @Suppress("MagicNumber")
     fun getSectionData(): SectionData {
         val is24Hours = binding.open24HoursSwitch.isChecked
         val from = if (is24Hours) {
@@ -184,6 +212,7 @@ internal class ScheduleSectionView @JvmOverloads constructor(
             }
     }
 
+    @Suppress("MagicNumber")
     private fun displayLocalisedWeekdays() {
         val firstDayOfWeek = WeekFields.of(Locale.getDefault()).firstDayOfWeek
         IntRange(0, 6).map { firstDayOfWeek.plus(it.toLong()) }.forEachIndexed { index, dayOfWeek ->
@@ -202,31 +231,5 @@ internal class ScheduleSectionView @JvmOverloads constructor(
                 TimePickerDialog(context, onTimeSetListener, 0, 0, is24HourFormat(context)).show()
             }
         }
-    }
-
-    init {
-        layoutTransition = LayoutTransition()
-
-        displayLocalisedWeekdays()
-
-        binding.open24HoursSwitch.setOnCheckedChangeListener { _, isChecked ->
-            binding.openHoursFlow.visibility = if (isChecked) View.GONE else View.VISIBLE
-        }
-
-        binding.lunchTimeSwitch.setOnCheckedChangeListener { _, isChecked ->
-            binding.lunchHoursFlow.visibility = if (isChecked) View.VISIBLE else View.GONE
-        }
-
-        weekdaysChips.forEach { chip ->
-            chip.setOnCheckedChangeListener { _, _ -> onWorkingDaysSelected.invoke() }
-        }
-
-        binding.deleteButton.setOnClickListener { onRemoveButtonClickListener.invoke() }
-
-        initTimeField(binding.openFromEditText)
-        initTimeField(binding.closeAtEditText)
-
-        initTimeField(binding.lunchFromEditText)
-        initTimeField(binding.lunchToEditText)
     }
 }
