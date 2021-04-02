@@ -29,6 +29,11 @@ android {
     buildFeatures {
         viewBinding = true
     }
+
+    lintOptions {
+        // https://issuetracker.google.com/issues/182388985
+        disable 'InvalidFragmentVersionForActivityResult'
+    }
 }
 
 dependencies {

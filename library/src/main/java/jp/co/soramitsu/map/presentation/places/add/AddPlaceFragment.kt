@@ -8,6 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.os.bundleOf
 import androidx.core.view.doOnLayout
+import androidx.fragment.app.setFragmentResult
 import androidx.lifecycle.lifecycleScope
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
@@ -19,16 +20,15 @@ import kotlinx.coroutines.launch
 
 internal class AddPlaceFragment : BottomSheetDialogFragment() {
 
-    interface Listener {
-        fun onAddPlaceButtonClick(position: LatLng, address: String)
-
-        fun onAddPlaceFragmentDismiss()
-    }
-
     private val position: LatLng get() = requireArguments().getParcelable<LatLng>(EXTRA_POSITION) as LatLng
 
     private var _binding: SmAddPlaceFragmentBinding? = null
     private val binding get() = _binding!!
+
+    private val launcher = registerForActivityResult(ProposePlaceActivity.Contract()) { success ->
+        setFragmentResult(REQUEST_KEY, bundleOf(EXTRA_CANCELLED to !success))
+        dismiss()
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -48,7 +48,7 @@ internal class AddPlaceFragment : BottomSheetDialogFragment() {
             dialog?.window?.setDimAmount(0f)
         }
 
-        binding.closeButton.setOnClickListener { dismiss() }
+        binding.closeButton.setOnClickListener { dialog?.cancel() }
 
         lifecycleScope.launch {
             binding.addPlaceButton.isEnabled = false
@@ -59,8 +59,7 @@ internal class AddPlaceFragment : BottomSheetDialogFragment() {
 
             binding.addPlaceButton.isEnabled = true
             binding.addPlaceButton.setOnClickListener {
-                (targetFragment as? Listener)?.onAddPlaceButtonClick(position, address)
-                dismiss()
+                launcher.launch(ProposePlaceActivity.Contract.Params(position, address))
             }
         }
     }
@@ -71,23 +70,20 @@ internal class AddPlaceFragment : BottomSheetDialogFragment() {
         _binding = null
     }
 
-    override fun onDismiss(dialog: DialogInterface) {
-        super.onDismiss(dialog)
-
-        (targetFragment as? Listener)?.onAddPlaceFragmentDismiss()
-    }
-
     override fun onCancel(dialog: DialogInterface) {
         super.onCancel(dialog)
 
-        (targetFragment as? Listener)?.onAddPlaceFragmentDismiss()
+        setFragmentResult(REQUEST_KEY, bundleOf(EXTRA_CANCELLED to true))
     }
 
     fun withPosition(position: LatLng) = this.apply {
         arguments = bundleOf(EXTRA_POSITION to position)
     }
 
-    private companion object {
-        private const val EXTRA_POSITION = "ExtraPosition"
+    companion object {
+        const val REQUEST_KEY = "AddPlaceFragmentRequestKey"
+
+        const val EXTRA_CANCELLED = "Dismiss"
+        const val EXTRA_POSITION = "Position"
     }
 }

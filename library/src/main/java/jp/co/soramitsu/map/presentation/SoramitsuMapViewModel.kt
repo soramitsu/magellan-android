@@ -73,6 +73,10 @@ internal class SoramitsuMapViewModel(
         requestParams = requestParams.copy(categoriesIds = selectedCategories)
     }
 
+    fun onPlaceAdded() {
+        viewState.value = viewState.value?.copy(dropPinPosition = null)
+    }
+
     fun onPlaceSelected(place: Place?) {
         selectedPlace = place
     }

@@ -1,9 +1,9 @@
 package jp.co.soramitsu.map.presentation
 
-import android.Manifest
-import android.app.Activity
+import android.Manifest.permission.ACCESS_COARSE_LOCATION
+import android.Manifest.permission.ACCESS_FINE_LOCATION
+import android.annotation.SuppressLint
 import android.content.Context
-import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.Canvas
@@ -11,10 +11,12 @@ import android.location.Location
 import android.os.Bundle
 import android.view.MotionEvent
 import android.view.View
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.DrawableRes
-import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.core.content.ContextCompat.checkSelfPermission
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.setFragmentResultListener
 import androidx.lifecycle.ViewModelProvider
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -33,7 +35,6 @@ import jp.co.soramitsu.map.model.Place
 import jp.co.soramitsu.map.presentation.categories.CategoriesFragment
 import jp.co.soramitsu.map.presentation.places.PlaceFragment
 import jp.co.soramitsu.map.presentation.places.add.AddPlaceFragment
-import jp.co.soramitsu.map.presentation.places.add.ProposePlaceActivity
 import jp.co.soramitsu.map.presentation.places.add.RequestSentBottomSheetFragment
 import jp.co.soramitsu.map.presentation.search.SearchBottomSheetFragment
 
@@ -41,7 +42,7 @@ import jp.co.soramitsu.map.presentation.search.SearchBottomSheetFragment
  * Used fragment as a base class because Maps module have to minimize
  * number of connections with Bakong and its base classes
  */
-open class SoramitsuMapFragment : Fragment(R.layout.sm_fragment_map_soramitsu), AddPlaceFragment.Listener {
+open class SoramitsuMapFragment : Fragment(R.layout.sm_fragment_map_soramitsu) {
 
     private lateinit var viewModel: SoramitsuMapViewModel
 
@@ -50,39 +51,33 @@ open class SoramitsuMapFragment : Fragment(R.layout.sm_fragment_map_soramitsu), 
     private var _binding: SmFragmentMapSoramitsuBinding? = null
     private val binding get() = _binding!!
 
+    private val requestLocationLauncher = registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissionsMap ->
+        if (permissionsMap[ACCESS_FINE_LOCATION] == true || permissionsMap[ACCESS_COARSE_LOCATION] == true) {
+            googleMap?.let { onFindMeButtonClicked(it) }
+        }
+    }
+
     private var droppedPinMarker: Marker? = null
     private val markers = mutableListOf<Marker>()
     private val clusters = mutableListOf<Marker>()
 
+    @Suppress("unused")
     protected fun retryGetPlacesRequest() {
         googleMap?.let { googleMap ->
             viewModel.mapParams = getMapParams(googleMap)
         }
     }
 
+    @Suppress("unused")
     protected fun retryGetPlaceInfoRequest() {
         viewModel.onPlaceSelected(viewModel.placeSelected().value)
     }
 
+    @Suppress("unused")
     protected fun retryGetCategoriesRequest() {
         // will trigger "get categories" request before "get places"
         googleMap?.let { googleMap ->
             viewModel.mapParams = getMapParams(googleMap)
-        }
-    }
-
-    override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<out String>,
-        grantResults: IntArray
-    ) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-
-        if (requestCode == LOCATION_REQUEST_CODE) {
-            val anyPermissionGranted = grantResults.any { it == PackageManager.PERMISSION_GRANTED }
-            if (anyPermissionGranted) {
-                googleMap?.let { onFindMeButtonClicked(it) }
-            }
         }
     }
 
@@ -129,6 +124,15 @@ open class SoramitsuMapFragment : Fragment(R.layout.sm_fragment_map_soramitsu), 
                 )
             }
         }
+
+        setFragmentResultListener(AddPlaceFragment.REQUEST_KEY) { _: String, bundle: Bundle ->
+            if (bundle[AddPlaceFragment.EXTRA_CANCELLED] == true) {
+                viewModel.onAddPlaceCancelled()
+            } else {
+                viewModel.onPlaceAdded()
+                RequestSentBottomSheetFragment().show(parentFragmentManager, "RequestSent")
+            }
+        }
     }
 
     override fun onStart() {
@@ -156,25 +160,6 @@ open class SoramitsuMapFragment : Fragment(R.layout.sm_fragment_map_soramitsu), 
         binding.soramitsuMapView.onDestroy()
 
         _binding = null
-    }
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-
-        if (requestCode == REQUEST_CODE_ADD_PLACE && resultCode == Activity.RESULT_OK) {
-            RequestSentBottomSheetFragment().show(parentFragmentManager, "RequestSent")
-        }
-    }
-
-    override fun onAddPlaceButtonClick(position: LatLng, address: String) {
-        context?.let { context ->
-            val intent = ProposePlaceActivity.createLaunchIntent(context, position, address)
-            startActivityForResult(intent, REQUEST_CODE_ADD_PLACE)
-        }
-    }
-
-    override fun onAddPlaceFragmentDismiss() {
-        viewModel.onAddPlaceCancelled()
     }
 
     private fun onMapReady(map: GoogleMap?) {
@@ -281,9 +266,7 @@ open class SoramitsuMapFragment : Fragment(R.layout.sm_fragment_map_soramitsu), 
 
             (parentFragmentManager.findFragmentByTag("Place") as? PlaceFragment)?.dismiss()
 
-            val addPlaceFragment = AddPlaceFragment().withPosition(position)
-            addPlaceFragment.setTargetFragment(this, REQUEST_CODE_ADD_PLACE)
-            addPlaceFragment.show(parentFragmentManager, "AddPlaceFragment")
+                AddPlaceFragment().withPosition(position).show(parentFragmentManager, "AddPlaceFragment")
         }
     }
 
@@ -403,22 +386,12 @@ open class SoramitsuMapFragment : Fragment(R.layout.sm_fragment_map_soramitsu), 
 
         // check permission and request when not granted. When permissions will
         // be granted, this method will be called again
-        val fineLocationPermissionGranted = ActivityCompat.checkSelfPermission(
-            requireContext(),
-            Manifest.permission.ACCESS_FINE_LOCATION
-        )
-        val coarseLocationPermissionGranter = ActivityCompat.checkSelfPermission(
-            requireContext(),
-            Manifest.permission.ACCESS_COARSE_LOCATION
-        )
+        val fineLocationPermissionGranted = checkSelfPermission(requireContext(), ACCESS_FINE_LOCATION)
+        val coarseLocationPermissionGranter = checkSelfPermission(requireContext(), ACCESS_COARSE_LOCATION)
         if (fineLocationPermissionGranted != PackageManager.PERMISSION_GRANTED &&
             coarseLocationPermissionGranter != PackageManager.PERMISSION_GRANTED
         ) {
-            val permissions = arrayOf(
-                Manifest.permission.ACCESS_FINE_LOCATION,
-                Manifest.permission.ACCESS_COARSE_LOCATION
-            )
-            requestPermissions(permissions, LOCATION_REQUEST_CODE)
+            requestLocationLauncher.launch(arrayOf(ACCESS_FINE_LOCATION, ACCESS_COARSE_LOCATION))
             return
         }
 
@@ -442,6 +415,7 @@ open class SoramitsuMapFragment : Fragment(R.layout.sm_fragment_map_soramitsu), 
             }
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     private fun initSearchPanel() {
         // show fullscreen search fragment when user try to enter search query
         binding.searchOnFragmentInputEditText.setOnClickListener {
@@ -451,7 +425,7 @@ open class SoramitsuMapFragment : Fragment(R.layout.sm_fragment_map_soramitsu), 
         }
 
         // clear edit text button click handler
-        binding.placesWithSearchTextInputLayout.setEndIconOnClickListener { v ->
+        binding.placesWithSearchTextInputLayout.setEndIconOnClickListener {
             activity?.onUserInteraction()
 
             binding.searchOnFragmentInputEditText.text = null
@@ -461,10 +435,8 @@ open class SoramitsuMapFragment : Fragment(R.layout.sm_fragment_map_soramitsu), 
         binding.searchOnFragmentInputEditText.setOnTouchListener { v, event ->
             if (event?.action == MotionEvent.ACTION_DOWN) {
                 activity?.onUserInteraction()
-
                 v.performClick()
             }
-
             true
         }
     }
@@ -490,9 +462,4 @@ open class SoramitsuMapFragment : Fragment(R.layout.sm_fragment_map_soramitsu), 
         val place: Place,
         val selected: Boolean = false
     )
-
-    companion object {
-        private const val LOCATION_REQUEST_CODE = 777
-        private const val REQUEST_CODE_ADD_PLACE = 1
-    }
 }
