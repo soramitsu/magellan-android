@@ -1,10 +1,12 @@
 package jp.co.soramitsu.map.presentation.places.add
 
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.view.View
+import androidx.activity.result.contract.ActivityResultContract
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import androidx.transition.*
@@ -95,16 +97,28 @@ class ProposePlaceActivity :
         }
     }
 
+    class Contract : ActivityResultContract<Contract.Params, Boolean>() {
+
+        data class Params(
+            internal val position: LatLng,
+            internal val address: String
+        )
+
+        override fun createIntent(context: Context, input: Params): Intent {
+            return Intent(context, ProposePlaceActivity::class.java)
+                .apply {
+                    putExtra(EXTRA_POSITION, input.position)
+                    putExtra(EXTRA_ADDRESS, input.address)
+                }
+        }
+
+        override fun parseResult(resultCode: Int, intent: Intent?): Boolean {
+            return resultCode == Activity.RESULT_OK
+        }
+    }
+
     companion object {
         private const val EXTRA_POSITION = "jp.co.soramitsu.map.presentation.places.add.Position"
         private const val EXTRA_ADDRESS = "jp.co.soramitsu.map.presentation.places.add.Address"
-
-        fun createLaunchIntent(context: Context, placePosition: LatLng, address: String): Intent {
-            return Intent(context, ProposePlaceActivity::class.java)
-                .apply {
-                    putExtra(EXTRA_POSITION, placePosition)
-                    putExtra(EXTRA_ADDRESS, address)
-                }
-        }
     }
 }

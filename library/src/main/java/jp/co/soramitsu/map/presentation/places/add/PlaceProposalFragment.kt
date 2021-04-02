@@ -16,15 +16,9 @@ import jp.co.soramitsu.map.model.Category
 import jp.co.soramitsu.map.model.Place
 import jp.co.soramitsu.map.model.Schedule
 import jp.co.soramitsu.map.presentation.places.add.image.*
-import jp.co.soramitsu.map.presentation.places.add.image.MultichoiceBottomSheetImagePicker
-import jp.co.soramitsu.map.presentation.places.add.image.RemovableImagesAdapter
-import jp.co.soramitsu.map.presentation.places.add.image.SingleChoiceBottomSheetImagePicker
 import jp.co.soramitsu.map.presentation.places.add.schedule.PlaceProposalViewModel
 
-internal class PlaceProposalFragment :
-    Fragment(R.layout.sm_fragment_place_proposal),
-    SelectPlaceCategoryFragment.OnCategorySelected,
-    ImagesSelectionListener {
+internal class PlaceProposalFragment : Fragment(R.layout.sm_fragment_place_proposal) {
 
     private lateinit var logoAdapter: RemovableImagesAdapter
     private lateinit var photosAdapter: RemovableImagesAdapter
@@ -50,21 +44,13 @@ internal class PlaceProposalFragment :
         requestManager?.let { glideRequestManager ->
             initRequestManagerDependentViews(glideRequestManager)
         } ?: activity?.onBackPressed()
+        initFragmentResultListeners()
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
 
         _binding = null
-    }
-
-    override fun onImagesSelected(selectedImages: List<Uri>, imagePickerCode: ImagePickerCode) = when (imagePickerCode) {
-        ImagePickerCode.SINGLE_CHOICE -> onLogoSelected(selectedImages.first())
-        ImagePickerCode.MULTICHOICE -> onPhotosSelected(selectedImages)
-    }
-
-    override fun onCategorySelected(category: Category) {
-        binding.categoryTextView.category = category
     }
 
     @ExperimentalStdlibApi
@@ -174,6 +160,30 @@ internal class PlaceProposalFragment :
             }
         }
         binding.photosRecyclerView.adapter = photosAdapter
+    }
+
+    private fun initFragmentResultListeners() {
+        childFragmentManager.setFragmentResultListener(SelectPlaceCategoryFragment.REQUEST_KEY, viewLifecycleOwner) { _, bundle ->
+            (bundle[SelectPlaceCategoryFragment.EXTRA_CATEGORY] as? Category)?.let { category ->
+                binding.categoryTextView.category = category
+            }
+        }
+
+        childFragmentManager.setFragmentResultListener(SingleChoiceBottomSheetImagePicker.REQUEST_KEY, viewLifecycleOwner) { _, bundle ->
+            val selectedImages = bundle[SingleChoiceBottomSheetImagePicker.EXTRA_IMAGES_URIS] as? List<Uri>
+            selectedImages?.firstOrNull()?.let { logoImageUri ->
+                onLogoSelected(logoImageUri)
+            }
+        }
+
+        childFragmentManager.setFragmentResultListener(MultichoiceBottomSheetImagePicker.REQUEST_KEY, viewLifecycleOwner) { _, bundle ->
+            val selectedImages = bundle[MultichoiceBottomSheetImagePicker.EXTRA_IMAGES_URIS] as? List<Uri>
+            selectedImages?.let { selectedImagesUris ->
+                if (selectedImagesUris.isNotEmpty()) {
+                    onPhotosSelected(selectedImagesUris)
+                }
+            }
+        }
     }
 
     private fun onLogoSelected(logoUri: Uri) {
