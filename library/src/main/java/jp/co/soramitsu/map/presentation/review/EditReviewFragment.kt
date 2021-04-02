@@ -16,7 +16,7 @@ import jp.co.soramitsu.map.presentation.SoramitsuMapViewModel
 internal class EditReviewFragment : BottomSheetDialogFragment() {
 
     private val viewModel: SoramitsuMapViewModel? by lazy {
-        parentFragmentManager.fragments.find { it is SoramitsuMapFragment }?.let { hostFragment ->
+        requireFragmentManager().fragments.find { it is SoramitsuMapFragment }?.let { hostFragment ->
             ViewModelProvider(hostFragment, ViewModelProvider.NewInstanceFactory())
                 .get(SoramitsuMapViewModel::class.java)
         }

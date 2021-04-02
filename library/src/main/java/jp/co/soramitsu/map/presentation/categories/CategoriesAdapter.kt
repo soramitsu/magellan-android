@@ -82,5 +82,4 @@ internal class CategoryViewHolder(itemView: View) : RecyclerView.ViewHolder(item
         Category.EDUCATION.name -> context.getResourceIdForAttr(R.attr.sm_categoryIconEducation)
         else -> context.getResourceIdForAttr(R.attr.sm_categoryIconOther)
     }
-
 }

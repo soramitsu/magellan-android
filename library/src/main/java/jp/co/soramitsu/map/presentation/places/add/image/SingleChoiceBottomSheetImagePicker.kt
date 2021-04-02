@@ -57,8 +57,7 @@ internal class SingleChoiceBottomSheetImagePicker : BottomSheetDialogFragment() 
         binding.chooseFromGallery.setOnClickListener {
             val galleryIntent = Intent(Intent.ACTION_PICK)
             galleryIntent.setType("image/*")
-            startActivityForResult(galleryIntent, PICK_PHOTO_FROM_GALLERY_REQUEST_CODE);
-
+            startActivityForResult(galleryIntent, PICK_PHOTO_FROM_GALLERY_REQUEST_CODE)
         }
 
         val padding = binding.imagesRecyclerView.resources
@@ -105,11 +104,11 @@ internal class SingleChoiceBottomSheetImagePicker : BottomSheetDialogFragment() 
         permissions: Array<out String>,
         grantResults: IntArray
     ) {
-        if (requestCode == READ_EXTERNAL_STORAGE_PERMISSION_REQUEST_CODE
-            && ActivityCompat.checkSelfPermission(
-                requireActivity(),
-                Manifest.permission.READ_EXTERNAL_STORAGE
-            ) == PackageManager.PERMISSION_GRANTED
+        if (requestCode == READ_EXTERNAL_STORAGE_PERMISSION_REQUEST_CODE &&
+            ActivityCompat.checkSelfPermission(
+                    requireActivity(),
+                    Manifest.permission.READ_EXTERNAL_STORAGE
+                ) == PackageManager.PERMISSION_GRANTED
         ) {
             displayImages()
         }

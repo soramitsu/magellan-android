@@ -33,10 +33,10 @@ internal class PhotoFragment : Fragment(R.layout.sm_fragment_photo) {
     }
 
     companion object {
+        private const val EXTRA_PHOTO_URI = "PhotoUri"
+
         fun newInstance(photoUri: Uri): PhotoFragment = PhotoFragment().apply {
             arguments = bundleOf(EXTRA_PHOTO_URI to photoUri)
         }
-
-        private const val EXTRA_PHOTO_URI = "PhotoUri"
     }
 }

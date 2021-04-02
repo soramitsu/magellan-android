@@ -52,7 +52,7 @@ internal class AddPlaceFragment : BottomSheetDialogFragment() {
 
         lifecycleScope.launch {
             binding.addPlaceButton.isEnabled = false
-            val address =  position.toPosition().addressString(requireContext())
+            val address = position.toPosition().addressString(requireContext())
             binding.placeAddressTextView.text = address
             binding.addressTextView.text = address
             binding.addressTextView.visibility = if (address.isEmpty()) View.GONE else View.VISIBLE

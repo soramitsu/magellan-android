@@ -49,6 +49,7 @@ internal class ReviewsAdapter : RecyclerView.Adapter<ReviewsAdapter.ReviewViewHo
     override fun getItemCount(): Int = items.size
 
     internal inner class ReviewViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        @Suppress("UnusedPrivateMember")
         private val avatarImageView: ImageView = itemView.findViewById(R.id.commentViewAvatar)
         private val initialsTextView: TextView = itemView.findViewById(R.id.commentViewInitialsTextView)
         private val reviewerNameTextView: TextView = itemView.findViewById(R.id.commentViewAuthorName)

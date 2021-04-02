@@ -8,6 +8,7 @@ import jp.co.soramitsu.map.model.Position
  * All agents on the map. Agent is an authorized person who can help user with
  * withdraw and top up his account
  */
+@Suppress("unused")
 internal val Places.agents
     get() = listOf(
         Place(
@@ -231,7 +232,8 @@ internal val Places.agents
             category = Category.BANK,
             position = Position(11.61558, 104.911136),
             address = "Phnom Penh. Russey Keo. Kiloumaetr Lekh Prammuoy"
-        ), Place(
+        ),
+        Place(
             name = "Reaksmey. Morb Kosomreaksmey ",
             category = Category.BANK,
             position = Position(11.5733, 104.876),
@@ -270,12 +272,14 @@ internal val Places.agents
             category = Category.BANK,
             position = Position(11.57746067, 104.89071074),
             address = "Phnom Penh. Tuol Kouk. Boeng Kak Ti Pir"
-        ), Place(
+        ),
+        Place(
             name = "Hay Vannak. Dean Hengsreyleak ",
             category = Category.BANK,
             position = Position(11.44699808, 104.80479311),
             address = "Phnom Penh. Dangkao. Krang Pongro"
-        ), Place(
+        ),
+        Place(
             name = "Ly Heng. Kun Kanika ",
             category = Category.BANK,
             position = Position(11.5225658333333, 104.888381944444),

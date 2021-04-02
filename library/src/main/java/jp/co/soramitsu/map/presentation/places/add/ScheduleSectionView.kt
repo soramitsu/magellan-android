@@ -44,6 +44,13 @@ internal class ScheduleSectionView @JvmOverloads constructor(
 
     private val adapter = DetailedScheduleAdapter(DetailedScheduleAdapter.Orientation.VERTICAL)
 
+    init {
+        binding.workingHoursRecyclerView.adapter = adapter
+
+        binding.addScheduleTextView.setOnClickListener { onAddButtonClickListener.invoke() }
+        binding.changeScheduleTextView.setOnClickListener { onChangeScheduleButtonClickListener.invoke() }
+    }
+
     fun setOnAddButtonClickListener(onAddButtonClickListener: () -> Unit) {
         this.onAddButtonClickListener = onAddButtonClickListener
     }
@@ -75,13 +82,6 @@ internal class ScheduleSectionView @JvmOverloads constructor(
         constraintSet.load(context, targetStateResId)
         TransitionManager.beginDelayedTransition(this)
         constraintSet.applyTo(this)
-    }
-
-    init {
-        binding.workingHoursRecyclerView.adapter = adapter
-
-        binding.addScheduleTextView.setOnClickListener { onAddButtonClickListener.invoke() }
-        binding.changeScheduleTextView.setOnClickListener { onChangeScheduleButtonClickListener.invoke() }
     }
 
     private sealed class SectionState {

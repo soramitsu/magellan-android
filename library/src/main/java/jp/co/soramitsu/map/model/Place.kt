@@ -2,6 +2,7 @@ package jp.co.soramitsu.map.model
 
 import java.util.*
 
+@SuppressWarnings("ComplexMethod")
 data class Place(
     val name: String,
     val khmerName: String = "",

@@ -1,0 +1,22 @@
+apply plugin: 'io.gitlab.arturbosch.detekt'
+
+ext.detektVersion = "1.16.0"
+
+detekt {
+    toolVersion = "$detektVersion"
+    parallel = true
+    allRules = false
+    autoCorrect = true
+    input = files("src/main/java")
+    config = files("$rootDir/scripts/detekt/detekt-config.yml")
+    buildUponDefaultConfig = true
+    reports {
+        xml.destination = file("build/reports/detekt-report.xml")
+        txt.enabled = false
+        html.enabled = false
+    }
+}
+
+dependencies {
+    detektPlugins "io.gitlab.arturbosch.detekt:detekt-formatting:$detektVersion"
+}

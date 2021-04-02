@@ -16,7 +16,6 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.lifecycleScope
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
@@ -37,8 +36,6 @@ import jp.co.soramitsu.map.presentation.places.add.AddPlaceFragment
 import jp.co.soramitsu.map.presentation.places.add.ProposePlaceActivity
 import jp.co.soramitsu.map.presentation.places.add.RequestSentBottomSheetFragment
 import jp.co.soramitsu.map.presentation.search.SearchBottomSheetFragment
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 
 /**
  * Used fragment as a base class because Maps module have to minimize
@@ -52,23 +49,6 @@ open class SoramitsuMapFragment : Fragment(R.layout.sm_fragment_map_soramitsu), 
 
     private var _binding: SmFragmentMapSoramitsuBinding? = null
     private val binding get() = _binding!!
-
-    private fun getMapParams(googleMap: GoogleMap): MapParams {
-        val farLeft = googleMap.projection.visibleRegion.farLeft
-        val nearRight = googleMap.projection.visibleRegion.nearRight
-        val zoom = googleMap.cameraPosition.zoom.toInt()
-        return MapParams(
-            topLeft = GeoPoint(
-                latitude = farLeft.latitude,
-                longitude = farLeft.longitude
-            ),
-            bottomRight = GeoPoint(
-                latitude = nearRight.latitude,
-                longitude = nearRight.longitude
-            ),
-            zoom = zoom
-        )
-    }
 
     private var droppedPinMarker: Marker? = null
     private val markers = mutableListOf<Marker>()
@@ -201,90 +181,97 @@ open class SoramitsuMapFragment : Fragment(R.layout.sm_fragment_map_soramitsu), 
         map?.let { googleMap ->
             this.googleMap = googleMap
 
-            googleMap.uiSettings.apply {
-                isZoomGesturesEnabled = true
-                isRotateGesturesEnabled = false
-                isCompassEnabled = true
-                isMyLocationButtonEnabled = true
-            }
-
-            googleMap.moveCamera(
-                CameraUpdateFactory.newLatLngZoom(
-                    SoramitsuMapLibraryConfig.defaultPosition.asLatLng(),
-                    SoramitsuMapLibraryConfig.defaultZoom
-                )
-            )
-
-            val onVisibleRegionChanged: () -> Unit = {
-                val farLeft = googleMap.projection.visibleRegion.farLeft
-                val nearRight = googleMap.projection.visibleRegion.nearRight
-                val zoom = googleMap.cameraPosition.zoom.toInt()
-                viewModel.mapParams = MapParams(
-                    topLeft = GeoPoint(
-                        latitude = farLeft.latitude,
-                        longitude = farLeft.longitude
-                    ),
-                    bottomRight = GeoPoint(
-                        latitude = nearRight.latitude,
-                        longitude = nearRight.longitude
-                    ),
-                    zoom = zoom
-                )
-            }
-
-            googleMap.setOnCameraIdleListener { onVisibleRegionChanged.invoke() }
-            googleMap.setOnCameraMoveCanceledListener { onVisibleRegionChanged.invoke() }
-            googleMap.setOnCameraMoveListener { activity?.onUserInteraction() }
-
-            viewModel.placeSelected().observe(viewLifecycleOwner) { selectedPlace ->
-                val buttonsVisibility = if (selectedPlace == null) View.VISIBLE else View.GONE
-                binding.zoomButtonsPanel.visibility = buttonsVisibility
-                binding.findMeButton.visibility = buttonsVisibility
-                binding.showFiltersButton.visibility = buttonsVisibility
-                binding.searchPanelFakeBottomSheet.visibility = buttonsVisibility
-
-                highlightSelectedPlace()
-
-                activity?.onUserInteraction()
-            }
-
-            viewModel.viewState().observe(viewLifecycleOwner) { viewState ->
-                displayMarkers(viewState)
-                displayClusters(viewState)
-
-                highlightSelectedPlace()
-
-                googleMap.setOnMarkerClickListener { marker ->
-                    if (marker in clusters) {
-                        // zoom in
-                        googleMap.animateCamera(
-                            CameraUpdateFactory.newLatLngZoom(
-                                marker.position,
-                                googleMap.cameraPosition.zoom + 2
-                            )
-                        )
-                    } else if (marker in markers) {
-                        val placePoint = GeoPoint(
-                            latitude = marker.position.latitude,
-                            longitude = marker.position.longitude
-                        )
-                        viewModel.onExtendedPlaceInfoRequested(placePoint)
-
-                        (parentFragmentManager.findFragmentByTag("Place") as? PlaceFragment)?.dismiss()
-                        PlaceFragment().show(parentFragmentManager, "Place")
-                    }
-
-                    true
-                }
-            }
-
-            viewModel.searchQuery.observe(viewLifecycleOwner) { query ->
-                binding.searchOnFragmentInputEditText.setText(query)
-            }
+            initGoogleMap(googleMap)
+            observeViewModel(googleMap)
 
             if (SoramitsuMapLibraryConfig.enablePlaceProposal) {
                 enablePlaceProposal()
             }
+        }
+    }
+
+    private fun initGoogleMap(googleMap: GoogleMap) {
+        googleMap.uiSettings.apply {
+            isZoomGesturesEnabled = true
+            isRotateGesturesEnabled = false
+            isCompassEnabled = true
+            isMyLocationButtonEnabled = true
+        }
+
+        googleMap.moveCamera(
+            CameraUpdateFactory.newLatLngZoom(
+                SoramitsuMapLibraryConfig.defaultPosition.asLatLng(),
+                SoramitsuMapLibraryConfig.defaultZoom
+            )
+        )
+
+        val onVisibleRegionChanged: () -> Unit = {
+            val farLeft = googleMap.projection.visibleRegion.farLeft
+            val nearRight = googleMap.projection.visibleRegion.nearRight
+            val zoom = googleMap.cameraPosition.zoom.toInt()
+            viewModel.mapParams = MapParams(
+                topLeft = GeoPoint(
+                    latitude = farLeft.latitude,
+                    longitude = farLeft.longitude
+                ),
+                bottomRight = GeoPoint(
+                    latitude = nearRight.latitude,
+                    longitude = nearRight.longitude
+                ),
+                zoom = zoom
+            )
+        }
+
+        googleMap.setOnCameraIdleListener { onVisibleRegionChanged.invoke() }
+        googleMap.setOnCameraMoveCanceledListener { onVisibleRegionChanged.invoke() }
+        googleMap.setOnCameraMoveListener { activity?.onUserInteraction() }
+    }
+
+    private fun observeViewModel(googleMap: GoogleMap) {
+        viewModel.placeSelected().observe(viewLifecycleOwner) { selectedPlace ->
+            val buttonsVisibility = if (selectedPlace == null) View.VISIBLE else View.GONE
+            binding.zoomButtonsPanel.visibility = buttonsVisibility
+            binding.findMeButton.visibility = buttonsVisibility
+            binding.showFiltersButton.visibility = buttonsVisibility
+            binding.searchPanelFakeBottomSheet.visibility = buttonsVisibility
+
+            highlightSelectedPlace()
+
+            activity?.onUserInteraction()
+        }
+
+        viewModel.viewState().observe(viewLifecycleOwner) { viewState ->
+            displayMarkers(viewState)
+            displayClusters(viewState)
+
+            highlightSelectedPlace()
+
+            googleMap.setOnMarkerClickListener { marker ->
+                if (marker in clusters) {
+                    // zoom in
+                    googleMap.animateCamera(
+                        CameraUpdateFactory.newLatLngZoom(
+                            marker.position,
+                            googleMap.cameraPosition.zoom + 2
+                        )
+                    )
+                } else if (marker in markers) {
+                    val placePoint = GeoPoint(
+                        latitude = marker.position.latitude,
+                        longitude = marker.position.longitude
+                    )
+                    viewModel.onExtendedPlaceInfoRequested(placePoint)
+
+                    (parentFragmentManager.findFragmentByTag("Place") as? PlaceFragment)?.dismiss()
+                    PlaceFragment().show(parentFragmentManager, "Place")
+                }
+
+                true
+            }
+        }
+
+        viewModel.searchQuery.observe(viewLifecycleOwner) { query ->
+            binding.searchOnFragmentInputEditText.setText(query)
         }
     }
 
@@ -424,8 +411,8 @@ open class SoramitsuMapFragment : Fragment(R.layout.sm_fragment_map_soramitsu), 
             requireContext(),
             Manifest.permission.ACCESS_COARSE_LOCATION
         )
-        if (fineLocationPermissionGranted != PackageManager.PERMISSION_GRANTED
-            && coarseLocationPermissionGranter != PackageManager.PERMISSION_GRANTED
+        if (fineLocationPermissionGranted != PackageManager.PERMISSION_GRANTED &&
+            coarseLocationPermissionGranter != PackageManager.PERMISSION_GRANTED
         ) {
             val permissions = arrayOf(
                 Manifest.permission.ACCESS_FINE_LOCATION,
@@ -480,6 +467,23 @@ open class SoramitsuMapFragment : Fragment(R.layout.sm_fragment_map_soramitsu), 
 
             true
         }
+    }
+
+    private fun getMapParams(googleMap: GoogleMap): MapParams {
+        val farLeft = googleMap.projection.visibleRegion.farLeft
+        val nearRight = googleMap.projection.visibleRegion.nearRight
+        val zoom = googleMap.cameraPosition.zoom.toInt()
+        return MapParams(
+            topLeft = GeoPoint(
+                latitude = farLeft.latitude,
+                longitude = farLeft.longitude
+            ),
+            bottomRight = GeoPoint(
+                latitude = nearRight.latitude,
+                longitude = nearRight.longitude
+            ),
+            zoom = zoom
+        )
     }
 
     data class MarkerTagData(

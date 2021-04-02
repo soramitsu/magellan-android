@@ -43,12 +43,10 @@ internal class ReviewViewModel(
         viewModelScope.launch {
             _viewState.value = ViewState.Loading
             val viewState = withContext(backgroundDispatcher) {
-                try {
+                runCatching {
                     block()
                     ViewState.Submitted
-                } catch (exception: Exception) {
-                    ViewState.Error
-                }
+                }.getOrDefault(ViewState.Error)
             }
             _viewState.value = viewState
         }

@@ -97,11 +97,11 @@ internal class MultichoiceBottomSheetImagePicker : BottomSheetDialogFragment() {
         permissions: Array<out String>,
         grantResults: IntArray
     ) {
-        if (requestCode == READ_EXTERNAL_STORAGE_PERMISSION_REQUEST_CODE
-            && ActivityCompat.checkSelfPermission(
-                requireActivity(),
-                Manifest.permission.READ_EXTERNAL_STORAGE
-            ) == PackageManager.PERMISSION_GRANTED
+        if (requestCode == READ_EXTERNAL_STORAGE_PERMISSION_REQUEST_CODE &&
+            ActivityCompat.checkSelfPermission(
+                    requireActivity(),
+                    Manifest.permission.READ_EXTERNAL_STORAGE
+                ) == PackageManager.PERMISSION_GRANTED
         ) {
             displayImages()
         }
