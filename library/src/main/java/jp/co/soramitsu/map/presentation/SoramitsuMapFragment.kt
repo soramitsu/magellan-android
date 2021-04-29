@@ -37,6 +37,7 @@ import jp.co.soramitsu.map.presentation.places.PlaceFragment
 import jp.co.soramitsu.map.presentation.places.add.AddPlaceFragment
 import jp.co.soramitsu.map.presentation.places.add.RequestSentBottomSheetFragment
 import jp.co.soramitsu.map.presentation.search.SearchBottomSheetFragment
+import java.util.*
 
 /**
  * Used fragment as a base class because Maps module have to minimize
@@ -356,14 +357,14 @@ open class SoramitsuMapFragment : Fragment(R.layout.sm_fragment_map_soramitsu) {
     }
 
     @DrawableRes
-    private fun iconForCategory(context: Context, category: Category): Int = when (category.name) {
-        Category.BANK.name -> context.getResourceIdForAttr(R.attr.sm_categoryPinIconDeposit)
-        Category.FOOD.name -> context.getResourceIdForAttr(R.attr.sm_categoryPinIconRestaurant)
-        Category.SERVICES.name -> context.getResourceIdForAttr(R.attr.sm_categoryPinIconServices)
-        Category.SUPERMARKETS.name -> context.getResourceIdForAttr(R.attr.sm_categoryPinIconSupermarket)
-        Category.PHARMACY.name -> context.getResourceIdForAttr(R.attr.sm_categoryPinIconPharmacy)
-        Category.ENTERTAINMENT.name -> context.getResourceIdForAttr(R.attr.sm_categoryPinIconEntertainment)
-        Category.EDUCATION.name -> context.getResourceIdForAttr(R.attr.sm_categoryPinIconEducation)
+    private fun iconForCategory(context: Context, category: Category): Int = when (category.localisedName(Locale.US)) {
+        Category.BANK.localisedName(Locale.US) -> context.getResourceIdForAttr(R.attr.sm_categoryPinIconDeposit)
+        Category.FOOD.localisedName(Locale.US) -> context.getResourceIdForAttr(R.attr.sm_categoryPinIconRestaurant)
+        Category.SERVICES.localisedName(Locale.US) -> context.getResourceIdForAttr(R.attr.sm_categoryPinIconServices)
+        Category.SUPERMARKETS.localisedName(Locale.US) -> context.getResourceIdForAttr(R.attr.sm_categoryPinIconSupermarket)
+        Category.PHARMACY.localisedName(Locale.US) -> context.getResourceIdForAttr(R.attr.sm_categoryPinIconPharmacy)
+        Category.ENTERTAINMENT.localisedName(Locale.US) -> context.getResourceIdForAttr(R.attr.sm_categoryPinIconEntertainment)
+        Category.EDUCATION.localisedName(Locale.US) -> context.getResourceIdForAttr(R.attr.sm_categoryPinIconEducation)
         else -> context.getResourceIdForAttr(R.attr.sm_categoryPinIconOther)
     }
 
