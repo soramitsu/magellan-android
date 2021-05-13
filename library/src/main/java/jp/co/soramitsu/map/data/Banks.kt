@@ -7,6 +7,7 @@ import jp.co.soramitsu.map.model.Position
 /**
  * All banks and branches on geo map
  */
+@Suppress("unused")
 internal val Places.banks
     get() = listOf(
         // region banks

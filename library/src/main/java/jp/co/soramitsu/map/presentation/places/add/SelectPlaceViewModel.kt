@@ -1,6 +1,5 @@
 package jp.co.soramitsu.map.presentation.places.add
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -26,11 +25,10 @@ internal class SelectPlaceViewModel(
 
     private suspend fun getAllCategoriesSuspend(): List<Category> =
         withContext(backgroundDispatcher) {
-            try {
+            kotlin.runCatching {
                 placesRepository.getCategories()
-            } catch (exception: Exception) {
-                Log.w("Network", exception)
-                emptyList()
-            }
+            }.onFailure {
+                SoramitsuMapLibraryConfig.logger.log("Network", it)
+            }.getOrDefault(emptyList())
         }
 }

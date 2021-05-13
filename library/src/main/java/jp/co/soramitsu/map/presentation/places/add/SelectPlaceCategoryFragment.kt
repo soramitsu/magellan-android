@@ -5,14 +5,14 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.os.bundleOf
 import androidx.core.view.doOnLayout
-import androidx.lifecycle.Observer
+import androidx.fragment.app.setFragmentResult
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import jp.co.soramitsu.map.R
 import jp.co.soramitsu.map.databinding.SmFragmentSelectPlaceCategoryBinding
-import jp.co.soramitsu.map.model.Category
 
 internal class SelectPlaceCategoryFragment : BottomSheetDialogFragment() {
 
@@ -42,15 +42,15 @@ internal class SelectPlaceCategoryFragment : BottomSheetDialogFragment() {
 
         val categoriesAdapter = CategoriesAdapter()
         categoriesAdapter.setOnCategorySelectedListener { category ->
-            (parentFragment as? OnCategorySelected)?.onCategorySelected(category)
+            setFragmentResult(REQUEST_KEY, bundleOf(EXTRA_CATEGORY to category))
             dismiss()
         }
 
         binding.categoriesRecyclerView.adapter = categoriesAdapter
 
-        viewModel.categories.observe(viewLifecycleOwner, Observer { categories ->
+        viewModel.categories.observe(viewLifecycleOwner) { categories ->
             categoriesAdapter.setItems(categories)
-        })
+        }
     }
 
     override fun onDestroyView() {
@@ -59,7 +59,9 @@ internal class SelectPlaceCategoryFragment : BottomSheetDialogFragment() {
         _binding = null
     }
 
-    internal interface OnCategorySelected {
-        fun onCategorySelected(category: Category)
+    companion object {
+        const val REQUEST_KEY = "SelectPlaceRequestKey"
+
+        const val EXTRA_CATEGORY = "Category"
     }
 }

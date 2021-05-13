@@ -1,18 +1,23 @@
 package jp.co.soramitsu.map.presentation.places.add.image
 
-import android.Manifest
+import android.Manifest.permission.READ_EXTERNAL_STORAGE
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Color
+import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.annotation.RequiresPermission
+import androidx.activity.result.contract.ActivityResultContract
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
+import androidx.core.os.bundleOf
 import androidx.core.view.doOnLayout
+import androidx.fragment.app.setFragmentResult
 import com.bumptech.glide.Glide
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import jp.co.soramitsu.map.R
@@ -26,6 +31,17 @@ internal class SingleChoiceBottomSheetImagePicker : BottomSheetDialogFragment() 
 
     private var _binding: SmSingleChoiceImagePickerBinding? = null
     private val binding get() = _binding!!
+
+    private val imagePickerLauncher = registerForActivityResult(PickImageContract()) { imageUri ->
+        setFragmentResult(REQUEST_KEY, bundleOf(EXTRA_IMAGES_URIS to arrayListOf(imageUri)))
+        dismiss()
+    }
+
+    private val readExternalStoragePermissionRequestLauncher = registerForActivityResult(ActivityResultContracts.RequestPermission()) { permissionGranted ->
+        if (permissionGranted) {
+            displayImages()
+        }
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -45,38 +61,26 @@ internal class SingleChoiceBottomSheetImagePicker : BottomSheetDialogFragment() 
         imagesAdapter = SelectableImagesAdapter(Glide.with(this), false)
         binding.imagesRecyclerView.adapter = imagesAdapter
         imagesAdapter.setOnImageSelectedListener { uri ->
-            val listener = parentFragment as? ImagesSelectionListener
             val selectedImages = Collections.singletonList(uri)
-            listener?.onImagesSelected(
-                selectedImages.map { it.imageUri },
-                ImagePickerCode.SINGLE_CHOICE
+            setFragmentResult(
+                REQUEST_KEY, bundleOf(
+                    EXTRA_IMAGES_URIS to ArrayList(selectedImages.map { it.imageUri })
+                )
             )
             dismiss()
         }
 
-        binding.chooseFromGallery.setOnClickListener {
-            val galleryIntent = Intent(Intent.ACTION_PICK)
-            galleryIntent.setType("image/*")
-            startActivityForResult(galleryIntent, PICK_PHOTO_FROM_GALLERY_REQUEST_CODE);
-
-        }
+        binding.chooseFromGallery.setOnClickListener { imagePickerLauncher.launch(Unit) }
 
         val padding = binding.imagesRecyclerView.resources
             .getDimension(R.dimen.sm_margin_padding_size_medium)
             .toInt()
         binding.imagesRecyclerView.addItemDecoration(SpanItemDecorator(padding))
 
-        if (ActivityCompat.checkSelfPermission(
-                requireActivity(),
-                Manifest.permission.READ_EXTERNAL_STORAGE
-            ) == PackageManager.PERMISSION_GRANTED
-        ) {
+        if (ActivityCompat.checkSelfPermission(requireActivity(), READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
             displayImages()
         } else {
-            requestPermissions(
-                arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE),
-                READ_EXTERNAL_STORAGE_PERMISSION_REQUEST_CODE
-            )
+            readExternalStoragePermissionRequestLauncher.launch(READ_EXTERNAL_STORAGE)
         }
     }
 
@@ -86,36 +90,6 @@ internal class SingleChoiceBottomSheetImagePicker : BottomSheetDialogFragment() 
         _binding = null
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-
-        if (resultCode == Activity.RESULT_OK && requestCode == PICK_PHOTO_FROM_GALLERY_REQUEST_CODE) {
-            val selectedImageUri = data?.data ?: return
-            val listener = parentFragment as? ImagesSelectionListener
-            listener?.onImagesSelected(
-                Collections.singletonList(selectedImageUri),
-                ImagePickerCode.SINGLE_CHOICE
-            )
-            dismiss()
-        }
-    }
-
-    override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<out String>,
-        grantResults: IntArray
-    ) {
-        if (requestCode == READ_EXTERNAL_STORAGE_PERMISSION_REQUEST_CODE
-            && ActivityCompat.checkSelfPermission(
-                requireActivity(),
-                Manifest.permission.READ_EXTERNAL_STORAGE
-            ) == PackageManager.PERMISSION_GRANTED
-        ) {
-            displayImages()
-        }
-    }
-
-    @RequiresPermission(Manifest.permission.READ_EXTERNAL_STORAGE)
     private fun displayImages() {
         val externalGallery =
             context?.contentResolver?.images(MediaStore.Images.Media.EXTERNAL_CONTENT_URI).orEmpty()
@@ -127,8 +101,21 @@ internal class SingleChoiceBottomSheetImagePicker : BottomSheetDialogFragment() 
         imagesAdapter.update(images)
     }
 
-    private companion object {
-        private const val READ_EXTERNAL_STORAGE_PERMISSION_REQUEST_CODE = 1
-        private const val PICK_PHOTO_FROM_GALLERY_REQUEST_CODE = 2
+    class PickImageContract : ActivityResultContract<Unit, Uri?>() {
+
+        override fun createIntent(context: Context, input: Unit?): Intent {
+            return Intent(Intent.ACTION_PICK).apply { type = "image/*" }
+        }
+
+        override fun parseResult(resultCode: Int, intent: Intent?): Uri? {
+            if (resultCode != Activity.RESULT_OK || intent?.data == null) return null
+
+            return intent.data
+        }
+    }
+
+    companion object {
+        const val REQUEST_KEY = "SingleChoiceBottomSheetImagePicker"
+        const val EXTRA_IMAGES_URIS = "ImagesUris"
     }
 }

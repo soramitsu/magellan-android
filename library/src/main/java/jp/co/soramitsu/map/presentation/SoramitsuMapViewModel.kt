@@ -1,6 +1,5 @@
 package jp.co.soramitsu.map.presentation
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -53,11 +52,13 @@ internal class SoramitsuMapViewModel(
             updateScreen()
         }
 
-    /**
-     * Used to sync fake search field on the map screen and search fragment's search query input field
-     */
-    private val _searchQuery = MutableLiveData<String>("")
+    // Used to sync fake search field on the map screen and search fragment's search query input field
+    private val _searchQuery = MutableLiveData("")
     val searchQuery: LiveData<String> = _searchQuery
+
+    init {
+        viewState.value = SoramitsuMapViewState()
+    }
 
     fun uploadReviewInProgress(): LiveData<Boolean> = uploadReviewInProgress
     fun editPlaceReviewClicked(): LiveData<Place> = editPlaceReview
@@ -70,6 +71,10 @@ internal class SoramitsuMapViewModel(
             .map { it.category.id }
 
         requestParams = requestParams.copy(categoriesIds = selectedCategories)
+    }
+
+    fun onPlaceAdded() {
+        viewState.value = viewState.value?.copy(dropPinPosition = null)
     }
 
     fun onPlaceSelected(place: Place?) {
@@ -106,7 +111,7 @@ internal class SoramitsuMapViewModel(
         viewModelScope.launch(mainThreadDispatcher) {
             val place = currentState.places.find {
                 it.position.latitude == placePosition.latitude &&
-                        it.position.longitude == placePosition.longitude
+                    it.position.longitude == placePosition.longitude
             }
             if (place != null) {
                 selectedPlace = place
@@ -114,35 +119,6 @@ internal class SoramitsuMapViewModel(
                 selectedPlace = placeWithFullInfo
             }
         }
-
-    private suspend fun getAllCategoriesSuspend(): List<Category> =
-        withContext(backgroundDispatcher) {
-            try {
-                placesRepository.getCategories()
-            } catch (exception: Exception) {
-                Log.w("Network", exception)
-                emptyList<Category>()
-            }
-        }
-
-    private suspend fun loadPlaceInfo(place: Place): Place = withContext(backgroundDispatcher) {
-        try {
-            placesRepository.getPlaceInfo(place)
-        } catch (exception: Exception) {
-            Log.w("Network", exception)
-            place
-        }
-    }
-
-    private suspend fun deleteReview(place: Place): Place = withContext(backgroundDispatcher) {
-        try {
-            place.userReview?.let { userReview -> placesRepository.deleteReview(userReview, place) }
-            placesRepository.getPlaceInfo(place)
-        } catch (exception: Exception) {
-            Log.w("Network", exception)
-            place
-        }
-    }
 
     fun onCategorySelected(category: Category) {
         val categoryListItems = currentState.categories
@@ -171,25 +147,31 @@ internal class SoramitsuMapViewModel(
         )
     }
 
+    fun onMapClickedAtPosition(position: Position) {
+        viewState.value = viewState.value?.copy(
+            dropPinPosition = position
+        )
+    }
+
+    fun onAddPlaceCancelled() {
+        viewState.value = viewState.value?.copy(dropPinPosition = null)
+    }
+
     private suspend fun getAllPlacesAndClustersSuspend(
         mapParams: MapParams,
         requestParams: RequestParams
     ): Pair<List<Place>, List<Cluster>> = withContext(backgroundDispatcher) {
-        try {
+        kotlin.runCatching {
             placesRepository.getCategories()
             placesRepository.getAllPlaces(mapParams, requestParams)
-        } catch (exception: Exception) {
-            Log.w("Network", exception)
-            Pair(emptyList<Place>(), emptyList<Cluster>())
-        }
+        }.onFailure {
+            SoramitsuMapLibraryConfig.logger.log("Network", it)
+        }.getOrDefault(Pair(emptyList(), emptyList()))
     }
 
     private fun updateScreen() {
         loadAllPlacesAndClustersJob?.cancel()
         loadAllPlacesAndClustersJob = viewModelScope.launch(mainThreadDispatcher) {
-            // throttle last
-            delay(1000)
-
             val allCategories = getAllCategoriesSuspend()
             val categoryListItems = allCategories.map { category ->
                 CategoryListItem(category, category.id in requestParams.categoriesIds)
@@ -210,14 +192,30 @@ internal class SoramitsuMapViewModel(
         }
     }
 
-    fun onMapClickedAtPosition(position: Position) {
-        viewState.value = viewState.value?.copy(
-            dropPinPosition = position
-        )
+    private suspend fun getAllCategoriesSuspend(): List<Category> =
+        withContext(backgroundDispatcher) {
+            kotlin.runCatching {
+                placesRepository.getCategories()
+            }.onFailure {
+                SoramitsuMapLibraryConfig.logger.log("Network", it)
+            }.getOrDefault(emptyList())
+        }
+
+    private suspend fun loadPlaceInfo(place: Place): Place = withContext(backgroundDispatcher) {
+        kotlin.runCatching {
+            placesRepository.getPlaceInfo(place)
+        }.onFailure {
+            SoramitsuMapLibraryConfig.logger.log("Network", it)
+        }.getOrDefault(place)
     }
 
-    init {
-        viewState.value = SoramitsuMapViewState()
+    private suspend fun deleteReview(place: Place): Place = withContext(backgroundDispatcher) {
+        kotlin.runCatching {
+            place.userReview?.let { userReview -> placesRepository.deleteReview(userReview, place) }
+            placesRepository.getPlaceInfo(place)
+        }.onFailure {
+            SoramitsuMapLibraryConfig.logger.log("Network", it)
+        }.getOrDefault(place)
     }
 }
 

@@ -82,6 +82,7 @@ internal fun Cluster.asLatLng(): LatLng = LatLng(position.latitude, position.lon
  * modular operations. We will do DAY_INDEX-1 to start counting from 0
  */
 @ExperimentalStdlibApi
+@Suppress("MagicNumber", "UseCheckOrError")
 internal fun Schedule.asIntervals(
     locale: Locale = Locale.getDefault(),
     mergeDaysPredicate: (WorkDay, WorkDay) -> (Boolean) = { d1, d2 -> d1.from == d2.from && d1.to == d2.to }
@@ -91,7 +92,7 @@ internal fun Schedule.asIntervals(
         DayOfWeek.MONDAY -> -1
         DayOfWeek.SATURDAY -> 1
         DayOfWeek.FRIDAY -> 2
-        else -> throw IllegalStateException()
+        else -> throw IllegalStateException("Failed to determinate the first day of week in current locale")
     }
 
     val workingCalendarDays = workingDays.map { it.weekDay }
@@ -164,6 +165,7 @@ fun ContentResolver.images(baseUri: Uri): List<Pair<Uri, Long>> {
  *
  * @param locale -- used to determinate a first day of the week
  */
+@SuppressWarnings("MagicNumber")
 fun List<DayOfWeek>.intervals(locale: Locale = Locale.getDefault()): List<Pair<DayOfWeek, DayOfWeek>> {
     if (this.isEmpty()) return emptyList()
 
@@ -171,7 +173,6 @@ fun List<DayOfWeek>.intervals(locale: Locale = Locale.getDefault()): List<Pair<D
     val weekdaysOrderedInLocale = IntRange(0, 6)
         .map { firstDayOfWeek.plus(it.toLong()) }
         .filter { it in this }
-
 
     var firstIntervalStart = firstDayOfWeek
     while (firstIntervalStart !in this) firstIntervalStart = firstIntervalStart.plus(1)
@@ -192,17 +193,14 @@ fun List<DayOfWeek>.intervals(locale: Locale = Locale.getDefault()): List<Pair<D
 
 suspend fun Position.addressString(
     context: Context,
-    logFun: (Exception) -> Unit = { if (BuildConfig.DEBUG) Log.w("Geocoder", it) }
+    logFun: (Throwable) -> Unit = { if (BuildConfig.DEBUG) Log.w("Geocoder", it) }
 ): String = withContext(Dispatchers.IO) {
-    try {
+    kotlin.runCatching {
         val geocoder = Geocoder(context)
         val addresses = geocoder.getFromLocation(latitude, longitude, 1)
         val haveAddress = addresses.isNotEmpty() && addresses[0].maxAddressLineIndex >= 0
         if (haveAddress) addresses[0].getAddressLine(0) else ""
-    } catch (exception: Exception) {
-        logFun.invoke(exception)
-        ""
-    }
+    }.onFailure { logFun.invoke(it) }.getOrDefault("")
 }
 
 fun LatLng.toPosition(): Position = Position(latitude, longitude)

@@ -28,6 +28,11 @@ internal class ReviewView @JvmOverloads constructor(
 
     private val binding = SmReviewViewBinding.inflate(LayoutInflater.from(context), this)
 
+    init {
+        binding.reviewAndSummaryCommentsRecyclerView.layoutManager = LinearLayoutManager(context)
+        binding.reviewAndSummaryCommentsRecyclerView.adapter = reviewsAdapter
+    }
+
     fun setOnUserChangeRatingListener(onUserChangeRatingListener: (Int) -> Unit) {
         this.onUserChangeRatingListener = onUserChangeRatingListener
     }
@@ -89,7 +94,7 @@ internal class ReviewView @JvmOverloads constructor(
     /**
      * Don't modify comment block visibility directly. Use this method
      */
-    private fun UserCommentSectionState.renderCommentViewState() = when(this) {
+    private fun UserCommentSectionState.renderCommentViewState() = when (this) {
         UserCommentSectionState.Loading -> {
             binding.reviewAndSummaryUploadUserCommentProgressBar.visibility = View.VISIBLE
             binding.reviewAndSummaryUserCommentGroup.visibility = View.GONE
@@ -120,19 +125,14 @@ internal class ReviewView @JvmOverloads constructor(
         SoramitsuMapLibraryConfig.logger.log("ReviewView", this.toString())
     }
 
-    init {
-        binding.reviewAndSummaryCommentsRecyclerView.layoutManager = LinearLayoutManager(context)
-        binding.reviewAndSummaryCommentsRecyclerView.adapter = reviewsAdapter
-    }
-
     /**
      * We will use sealed class to prevent inconsistent view state. It'll guarantee
      * that we won't show "user comment" over "proposal to rate this place"
      */
     private sealed class UserCommentSectionState {
         object Loading : UserCommentSectionState()
-        data class PlaceReviewedByUser(val userReview: Review): UserCommentSectionState()
-        object CanBeReviewed: UserCommentSectionState()
+        data class PlaceReviewedByUser(val userReview: Review) : UserCommentSectionState()
+        object CanBeReviewed : UserCommentSectionState()
     }
 
     private companion object {

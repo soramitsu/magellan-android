@@ -13,10 +13,15 @@
         <item name="endIconMode">clear_text</item>
         <item name="hintAnimationEnabled">true</item>
         <item name="hintEnabled">true</item>
+        <item name="boxCornerRadiusBottomStart">10dp</item>
+        <item name="boxCornerRadiusBottomEnd">10dp</item>
+        <item name="boxCornerRadiusTopStart">10dp</item>
+        <item name="boxCornerRadiusTopEnd">10dp</item>
         <item name="hintTextAppearance">
             @style/SM.TextAppearance.Soramitsu.MaterialComponents.Body2
         </item>
         <item name="hintTextColor">#A1A1A0</item>
+        <item name="android:textColorHint">#A1A1A0</item>
     </style>
 
     <style name="SM.Widget.Soramitsu.MaterialComponents.Button.TextButton" parent="Widget.MaterialComponents.Button.TextButton">

@@ -5,23 +5,23 @@ import java.util.*
 
 data class Category(
     val id: Long,
-    val name: String,
-    val khmerName: String = ""
-): Serializable {
+    val names: Map<String, String>
+) : Serializable {
 
-    fun localisedName(): String {
-        val useKhmerName = Locale.getDefault().language == "km" && khmerName.isNotBlank()
-        return if (useKhmerName) khmerName else name
+    fun localisedName(locale: Locale = Locale.getDefault()): String {
+        return names.getOrElse(locale.isO3Language) {
+            names[Locale.US.isO3Language].orEmpty()
+        }
     }
 
     companion object {
-        val BANK = Category(-1, "Bank")
-        val FOOD = Category(-2, "Food")
-        val SERVICES = Category(-3, "Services")
-        val SUPERMARKETS = Category(-4, "Supermarkets")
-        val PHARMACY = Category(-5, "Pharmacy")
-        val ENTERTAINMENT = Category(-6, "Entertainment")
-        val EDUCATION = Category(-7, "Education")
-        val OTHER = Category(-8, "Other")
+        val BANK = Category(-1, mapOf(Locale.US.isO3Language to "Bank"))
+        val FOOD = Category(-2, mapOf(Locale.US.isO3Language to "Food"))
+        val SERVICES = Category(-3, mapOf(Locale.US.isO3Language to "Services"))
+        val SUPERMARKETS = Category(-4, mapOf(Locale.US.isO3Language to "Supermarkets"))
+        val PHARMACY = Category(-5, mapOf(Locale.US.isO3Language to "Pharmacy"))
+        val ENTERTAINMENT = Category(-6, mapOf(Locale.US.isO3Language to "Entertainment"))
+        val EDUCATION = Category(-7, mapOf(Locale.US.isO3Language to "Education"))
+        val OTHER = Category(-8, mapOf(Locale.US.isO3Language to "Other"))
     }
 }

@@ -14,10 +14,9 @@ import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.content.ContextCompat
 import androidx.core.widget.TextViewCompat
 import jp.co.soramitsu.map.R
-import jp.co.soramitsu.map.SoramitsuMapLibraryConfig
 import jp.co.soramitsu.map.ext.getResourceIdForAttr
 import jp.co.soramitsu.map.model.Category
-import kotlinx.coroutines.*
+import java.util.*
 
 class CategoryTextView @JvmOverloads constructor(
     context: Context,
@@ -25,33 +24,15 @@ class CategoryTextView @JvmOverloads constructor(
     defStyleRes: Int = 0
 ) : AppCompatTextView(context, attributeSet, defStyleRes) {
 
-    private val viewScope: CoroutineScope = MainScope()
-
-    private val logger = SoramitsuMapLibraryConfig.logger
-    private val repository = SoramitsuMapLibraryConfig.repository
-
     var category: Category? = null
         set(value) {
             field = value
 
-            // we already know what to show in category field. Just cancel background task and enable CategoryView
-            if (value != null && viewScope.isActive) {
-                isEnabled = true
-                viewScope.cancel()
-            }
-
             invalidateSelf()
         }
 
-    override fun onFinishInflate() {
-        super.onFinishInflate()
-        reloadDefaultCategory()
-    }
-
-    override fun onDetachedFromWindow() {
-        super.onDetachedFromWindow()
-
-        viewScope.cancel()
+    init {
+        invalidateSelf()
     }
 
     override fun onSaveInstanceState(): Parcelable {
@@ -67,40 +48,21 @@ class CategoryTextView @JvmOverloads constructor(
         } else {
             super.onRestoreInstanceState(state)
         }
-
-        if (category == null) reloadDefaultCategory()
-    }
-
-    private fun reloadDefaultCategory() {
-        // if category already set, we won't do anything to prevent unexpected field override
-        if (category != null) return
-
-        viewScope.launch {
-            isEnabled = false
-            val result = withContext(Dispatchers.IO) {
-                runCatching {
-                    repository.getCategories().first()
-                }.onFailure {
-                    logger.log("CategoryView", it)
-                }.onSuccess {
-                    logger.log("CategoryView", "Default category: $it")
-                }
-            }
-            isEnabled = result.isSuccess
-
-            // if category loaded from outside and set to the corresponding field, we wont rewrite field
-            if (category == null) {
-                category = result.getOrNull()
-            }
-        }
     }
 
     private fun invalidateSelf() {
-        text = category?.localisedName().orEmpty()
-        val categoryIcon = wrapInCircle44dp(iconForCategory(context, category ?: Category.OTHER))
-        TextViewCompat.setCompoundDrawablesRelativeWithIntrinsicBounds(
-            this, categoryIcon, null, null, null
-        )
+        if (category == null) {
+            setText(R.string.sm_choose_category)
+            TextViewCompat.setCompoundDrawablesRelativeWithIntrinsicBounds(
+                this, R.drawable.sm_ic_choose_category_circle_44, 0, 0, 0
+            )
+        } else {
+            text = category?.localisedName().orEmpty()
+            val categoryIcon = wrapInCircle44dp(iconForCategory(context, category ?: Category.OTHER))
+            TextViewCompat.setCompoundDrawablesRelativeWithIntrinsicBounds(
+                this, categoryIcon, null, null, null
+            )
+        }
     }
 
     private fun wrapInCircle44dp(@DrawableRes categoryIconRes: Int): Drawable {
@@ -126,19 +88,15 @@ class CategoryTextView @JvmOverloads constructor(
     }
 
     @DrawableRes
-    private fun iconForCategory(context: Context, category: Category): Int = when (category.name) {
-        Category.BANK.name -> context.getResourceIdForAttr(R.attr.sm_categoryIconDeposit)
-        Category.FOOD.name -> context.getResourceIdForAttr(R.attr.sm_categoryIconRestaurant)
-        Category.SERVICES.name -> context.getResourceIdForAttr(R.attr.sm_categoryIconServices)
-        Category.SUPERMARKETS.name -> context.getResourceIdForAttr(R.attr.sm_categoryIconSupermarket)
-        Category.PHARMACY.name -> context.getResourceIdForAttr(R.attr.sm_categoryIconPharmacy)
-        Category.ENTERTAINMENT.name -> context.getResourceIdForAttr(R.attr.sm_categoryIconEntertainment)
-        Category.EDUCATION.name -> context.getResourceIdForAttr(R.attr.sm_categoryIconEducation)
+    private fun iconForCategory(context: Context, category: Category): Int = when (category.localisedName(Locale.US)) {
+        Category.BANK.localisedName(Locale.US) -> context.getResourceIdForAttr(R.attr.sm_categoryIconDeposit)
+        Category.FOOD.localisedName(Locale.US) -> context.getResourceIdForAttr(R.attr.sm_categoryIconRestaurant)
+        Category.SERVICES.localisedName(Locale.US) -> context.getResourceIdForAttr(R.attr.sm_categoryIconServices)
+        Category.SUPERMARKETS.localisedName(Locale.US) -> context.getResourceIdForAttr(R.attr.sm_categoryIconSupermarket)
+        Category.PHARMACY.localisedName(Locale.US) -> context.getResourceIdForAttr(R.attr.sm_categoryIconPharmacy)
+        Category.ENTERTAINMENT.localisedName(Locale.US) -> context.getResourceIdForAttr(R.attr.sm_categoryIconEntertainment)
+        Category.EDUCATION.localisedName(Locale.US) -> context.getResourceIdForAttr(R.attr.sm_categoryIconEducation)
         else -> context.getResourceIdForAttr(R.attr.sm_categoryIconOther)
-    }
-
-    init {
-        invalidateSelf()
     }
 
     internal class CategoryTextViewSavedState : BaseSavedState {
@@ -165,7 +123,6 @@ class CategoryTextView @JvmOverloads constructor(
                 }
 
                 override fun newArray(size: Int): Array<CategoryTextViewSavedState> = emptyArray()
-
             }
         }
     }

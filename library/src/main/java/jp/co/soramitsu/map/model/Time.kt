@@ -7,6 +7,7 @@ data class Time(
 
     fun inMilliseconds(): Long = inMinutes().toLong() * MILLISECONDS_IN_MINUTE
 
+    @Suppress("MagicNumber")
     private fun inMinutes() = hour * 60 + minute
 
     operator fun compareTo(other: Time): Int = this.inMinutes().compareTo(other.inMinutes())

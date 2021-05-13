@@ -10,7 +10,9 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.RequiresPermission
 import androidx.core.app.ActivityCompat
+import androidx.core.os.bundleOf
 import androidx.core.view.doOnLayout
+import androidx.fragment.app.setFragmentResult
 import com.bumptech.glide.Glide
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import jp.co.soramitsu.map.R
@@ -53,17 +55,15 @@ internal class MultichoiceBottomSheetImagePicker : BottomSheetDialogFragment() {
 
                 updateConfirmButtonTitle(updatedItems.count { it.selected })
             } else {
-                val listener = parentFragment as? ImagesSelectionListener
-                listener?.onImagesSelected(listOf(selectedItem.imageUri), ImagePickerCode.MULTICHOICE)
+                setFragmentResult(REQUEST_KEY, bundleOf(EXTRA_IMAGES_URIS to arrayListOf(selectedItem.imageUri)))
                 dismiss()
             }
         }
 
         updateConfirmButtonTitle(0)
         binding.confirmSelectedPhotosButton.setOnClickListener {
-            val listener = parentFragment as? ImagesSelectionListener
             val selectedUris = imagesAdapter.items.filter { it.selected }.map { it.imageUri }
-            listener?.onImagesSelected(selectedUris, ImagePickerCode.MULTICHOICE)
+            setFragmentResult(REQUEST_KEY, bundleOf(EXTRA_IMAGES_URIS to ArrayList(selectedUris)))
             dismiss()
         }
 
@@ -97,11 +97,11 @@ internal class MultichoiceBottomSheetImagePicker : BottomSheetDialogFragment() {
         permissions: Array<out String>,
         grantResults: IntArray
     ) {
-        if (requestCode == READ_EXTERNAL_STORAGE_PERMISSION_REQUEST_CODE
-            && ActivityCompat.checkSelfPermission(
-                requireActivity(),
-                Manifest.permission.READ_EXTERNAL_STORAGE
-            ) == PackageManager.PERMISSION_GRANTED
+        if (requestCode == READ_EXTERNAL_STORAGE_PERMISSION_REQUEST_CODE &&
+            ActivityCompat.checkSelfPermission(
+                    requireActivity(),
+                    Manifest.permission.READ_EXTERNAL_STORAGE
+                ) == PackageManager.PERMISSION_GRANTED
         ) {
             displayImages()
         }
@@ -128,7 +128,10 @@ internal class MultichoiceBottomSheetImagePicker : BottomSheetDialogFragment() {
         binding.confirmSelectedPhotosButton.text = confirmButtonTitle
     }
 
-    private companion object {
+    companion object {
         private const val READ_EXTERNAL_STORAGE_PERMISSION_REQUEST_CODE = 1
+
+        const val REQUEST_KEY = "MultichoiceBottomSheetImagePicker"
+        const val EXTRA_IMAGES_URIS = "ImagesUris"
     }
 }

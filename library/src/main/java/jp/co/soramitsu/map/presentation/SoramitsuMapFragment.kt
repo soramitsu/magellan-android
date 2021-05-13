@@ -1,9 +1,9 @@
 package jp.co.soramitsu.map.presentation
 
-import android.Manifest
-import android.app.Activity
+import android.Manifest.permission.ACCESS_COARSE_LOCATION
+import android.Manifest.permission.ACCESS_FINE_LOCATION
+import android.annotation.SuppressLint
 import android.content.Context
-import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.Canvas
@@ -11,13 +11,13 @@ import android.location.Location
 import android.os.Bundle
 import android.view.MotionEvent
 import android.view.View
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.DrawableRes
-import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.core.content.ContextCompat.checkSelfPermission
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Observer
+import androidx.fragment.app.setFragmentResultListener
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.lifecycleScope
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
@@ -35,17 +35,15 @@ import jp.co.soramitsu.map.model.Place
 import jp.co.soramitsu.map.presentation.categories.CategoriesFragment
 import jp.co.soramitsu.map.presentation.places.PlaceFragment
 import jp.co.soramitsu.map.presentation.places.add.AddPlaceFragment
-import jp.co.soramitsu.map.presentation.places.add.ProposePlaceActivity
 import jp.co.soramitsu.map.presentation.places.add.RequestSentBottomSheetFragment
 import jp.co.soramitsu.map.presentation.search.SearchBottomSheetFragment
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
+import java.util.*
 
 /**
  * Used fragment as a base class because Maps module have to minimize
  * number of connections with Bakong and its base classes
  */
-open class SoramitsuMapFragment : Fragment(R.layout.sm_fragment_map_soramitsu), AddPlaceFragment.Listener {
+open class SoramitsuMapFragment : Fragment(R.layout.sm_fragment_map_soramitsu) {
 
     private lateinit var viewModel: SoramitsuMapViewModel
 
@@ -54,55 +52,33 @@ open class SoramitsuMapFragment : Fragment(R.layout.sm_fragment_map_soramitsu), 
     private var _binding: SmFragmentMapSoramitsuBinding? = null
     private val binding get() = _binding!!
 
-    private fun getMapParams(googleMap: GoogleMap): MapParams {
-        val farLeft = googleMap.projection.visibleRegion.farLeft
-        val nearRight = googleMap.projection.visibleRegion.nearRight
-        val zoom = googleMap.cameraPosition.zoom.toInt()
-        return MapParams(
-            topLeft = GeoPoint(
-                latitude = farLeft.latitude,
-                longitude = farLeft.longitude
-            ),
-            bottomRight = GeoPoint(
-                latitude = nearRight.latitude,
-                longitude = nearRight.longitude
-            ),
-            zoom = zoom
-        )
+    private val requestLocationLauncher = registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissionsMap ->
+        if (permissionsMap[ACCESS_FINE_LOCATION] == true || permissionsMap[ACCESS_COARSE_LOCATION] == true) {
+            googleMap?.let { onFindMeButtonClicked(it) }
+        }
     }
 
+    private var droppedPinMarker: Marker? = null
     private val markers = mutableListOf<Marker>()
     private val clusters = mutableListOf<Marker>()
 
+    @Suppress("unused")
     protected fun retryGetPlacesRequest() {
         googleMap?.let { googleMap ->
             viewModel.mapParams = getMapParams(googleMap)
         }
     }
 
+    @Suppress("unused")
     protected fun retryGetPlaceInfoRequest() {
         viewModel.onPlaceSelected(viewModel.placeSelected().value)
     }
 
+    @Suppress("unused")
     protected fun retryGetCategoriesRequest() {
         // will trigger "get categories" request before "get places"
         googleMap?.let { googleMap ->
             viewModel.mapParams = getMapParams(googleMap)
-        }
-    }
-
-    override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<out String>,
-        grantResults: IntArray
-    ) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-
-        if (requestCode == LOCATION_REQUEST_CODE) {
-            val anyPermissionGranted = grantResults.any { it == PackageManager.PERMISSION_GRANTED }
-            if (anyPermissionGranted) {
-                googleMap?.let { onFindMeButtonClicked(it) }
-            }
         }
     }
 
@@ -149,6 +125,15 @@ open class SoramitsuMapFragment : Fragment(R.layout.sm_fragment_map_soramitsu), 
                 )
             }
         }
+
+        setFragmentResultListener(AddPlaceFragment.REQUEST_KEY) { _: String, bundle: Bundle ->
+            if (bundle[AddPlaceFragment.EXTRA_CANCELLED] == true) {
+                viewModel.onAddPlaceCancelled()
+            } else {
+                viewModel.onPlaceAdded()
+                RequestSentBottomSheetFragment().show(parentFragmentManager, "RequestSent")
+            }
+        }
     }
 
     override fun onStart() {
@@ -178,113 +163,101 @@ open class SoramitsuMapFragment : Fragment(R.layout.sm_fragment_map_soramitsu), 
         _binding = null
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-
-        if (requestCode == REQUEST_CODE_ADD_PLACE && resultCode == Activity.RESULT_OK) {
-            RequestSentBottomSheetFragment().show(parentFragmentManager, "RequestSent")
-        }
-    }
-
-    override fun onAddPlaceButtonClick(position: LatLng, address: String) {
-        context?.let { context ->
-            val intent = ProposePlaceActivity.createLaunchIntent(context, position, address)
-            startActivityForResult(intent, REQUEST_CODE_ADD_PLACE)
-        }
-    }
-
     private fun onMapReady(map: GoogleMap?) {
         map?.let { googleMap ->
             this.googleMap = googleMap
 
-            googleMap.uiSettings.apply {
-                isZoomGesturesEnabled = true
-                isRotateGesturesEnabled = false
-                isCompassEnabled = true
-                isMyLocationButtonEnabled = true
-            }
-
-            googleMap.moveCamera(
-                CameraUpdateFactory.newLatLngZoom(
-                    SoramitsuMapLibraryConfig.defaultPosition.asLatLng(),
-                    SoramitsuMapLibraryConfig.defaultZoom
-                )
-            )
-
-            googleMap.setOnCameraMoveListener {
-                val farLeft = googleMap.projection.visibleRegion.farLeft
-                val nearRight = googleMap.projection.visibleRegion.nearRight
-                val zoom = googleMap.cameraPosition.zoom.toInt()
-                viewModel.mapParams = MapParams(
-                    topLeft = GeoPoint(
-                        latitude = farLeft.latitude,
-                        longitude = farLeft.longitude
-                    ),
-                    bottomRight = GeoPoint(
-                        latitude = nearRight.latitude,
-                        longitude = nearRight.longitude
-                    ),
-                    zoom = zoom
-                )
-
-                activity?.onUserInteraction()
-            }
-
-            viewModel.placeSelected().observe(viewLifecycleOwner) { selectedPlace ->
-                val buttonsVisibility = if (selectedPlace == null) View.VISIBLE else View.GONE
-                binding.zoomButtonsPanel.visibility = buttonsVisibility
-                binding.findMeButton.visibility = buttonsVisibility
-                binding.showFiltersButton.visibility = buttonsVisibility
-                binding.searchPanelFakeBottomSheet.visibility = buttonsVisibility
-
-                highlightSelectedPlace()
-
-                activity?.onUserInteraction()
-            }
-
-            viewModel.viewState().observe(viewLifecycleOwner) { viewState ->
-                displayMarkers(viewState)
-                displayClusters(viewState)
-
-                highlightSelectedPlace()
-
-                googleMap.setOnMarkerClickListener { marker ->
-                    if (marker in clusters) {
-                        // zoom in
-                        googleMap.animateCamera(
-                            CameraUpdateFactory.newLatLngZoom(
-                                marker.position,
-                                googleMap.cameraPosition.zoom + 2
-                            )
-                        )
-                    } else if (marker in markers) {
-                        val placePoint = GeoPoint(
-                            latitude = marker.position.latitude,
-                            longitude = marker.position.longitude
-                        )
-                        viewModel.onExtendedPlaceInfoRequested(placePoint)
-
-                        (parentFragmentManager.findFragmentByTag("Place") as? PlaceFragment)?.dismiss()
-                        PlaceFragment().show(parentFragmentManager, "Place")
-                    }
-
-                    true
-                }
-            }
-
-            lifecycleScope.launch {
-                // wait some time to prevent passing [(0,0), (0,0)] rectangle
-                delay(100)
-                viewModel.mapParams = getMapParams(googleMap)
-            }
-
-            viewModel.searchQuery.observe(viewLifecycleOwner) { query ->
-                binding.searchOnFragmentInputEditText.setText(query)
-            }
+            initGoogleMap(googleMap)
+            observeViewModel(googleMap)
 
             if (SoramitsuMapLibraryConfig.enablePlaceProposal) {
                 enablePlaceProposal()
             }
+        }
+    }
+
+    private fun initGoogleMap(googleMap: GoogleMap) {
+        googleMap.uiSettings.apply {
+            isZoomGesturesEnabled = true
+            isRotateGesturesEnabled = false
+            isCompassEnabled = true
+            isMyLocationButtonEnabled = true
+        }
+
+        googleMap.moveCamera(
+            CameraUpdateFactory.newLatLngZoom(
+                SoramitsuMapLibraryConfig.defaultPosition.asLatLng(),
+                SoramitsuMapLibraryConfig.defaultZoom
+            )
+        )
+
+        val onVisibleRegionChanged: () -> Unit = {
+            val farLeft = googleMap.projection.visibleRegion.farLeft
+            val nearRight = googleMap.projection.visibleRegion.nearRight
+            val zoom = googleMap.cameraPosition.zoom.toInt()
+            viewModel.mapParams = MapParams(
+                topLeft = GeoPoint(
+                    latitude = farLeft.latitude,
+                    longitude = farLeft.longitude
+                ),
+                bottomRight = GeoPoint(
+                    latitude = nearRight.latitude,
+                    longitude = nearRight.longitude
+                ),
+                zoom = zoom
+            )
+        }
+
+        googleMap.setOnCameraIdleListener { onVisibleRegionChanged.invoke() }
+        googleMap.setOnCameraMoveCanceledListener { onVisibleRegionChanged.invoke() }
+        googleMap.setOnCameraMoveListener { activity?.onUserInteraction() }
+    }
+
+    private fun observeViewModel(googleMap: GoogleMap) {
+        viewModel.placeSelected().observe(viewLifecycleOwner) { selectedPlace ->
+            val buttonsVisibility = if (selectedPlace == null) View.VISIBLE else View.GONE
+            binding.zoomButtonsPanel.visibility = buttonsVisibility
+            binding.findMeButton.visibility = buttonsVisibility
+            binding.showFiltersButton.visibility = buttonsVisibility
+            binding.searchPanelFakeBottomSheet.visibility = buttonsVisibility
+
+            highlightSelectedPlace()
+
+            activity?.onUserInteraction()
+        }
+
+        viewModel.viewState().observe(viewLifecycleOwner) { viewState ->
+            displayMarkers(viewState)
+            displayClusters(viewState)
+
+            highlightSelectedPlace()
+
+            googleMap.setOnMarkerClickListener { marker ->
+                if (marker in clusters) {
+                    // zoom in
+                    googleMap.animateCamera(
+                        CameraUpdateFactory.newLatLngZoom(
+                            marker.position,
+                            googleMap.cameraPosition.zoom + 2
+                        )
+                    )
+                } else if (marker in markers) {
+                    val placePoint = GeoPoint(
+                        latitude = marker.position.latitude,
+                        longitude = marker.position.longitude
+                    )
+                    viewModel.onExtendedPlaceInfoRequested(placePoint)
+
+                    (parentFragmentManager.findFragmentByTag("Place") as? PlaceFragment)?.dismiss()
+                    PlaceFragment().show(parentFragmentManager, "Place")
+                }
+
+                true
+            }
+        }
+
+        viewModel.searchQuery.observe(viewLifecycleOwner) { query ->
+            binding.searchOnFragmentInputEditText.setText(query)
         }
     }
 
@@ -294,9 +267,7 @@ open class SoramitsuMapFragment : Fragment(R.layout.sm_fragment_map_soramitsu), 
 
             (parentFragmentManager.findFragmentByTag("Place") as? PlaceFragment)?.dismiss()
 
-            val addPlaceFragment = AddPlaceFragment().withPosition(position)
-            addPlaceFragment.setTargetFragment(this, REQUEST_CODE_ADD_PLACE)
-            addPlaceFragment.show(parentFragmentManager, "AddPlaceFragment")
+                AddPlaceFragment().withPosition(position).show(parentFragmentManager, "AddPlaceFragment")
         }
     }
 
@@ -323,6 +294,31 @@ open class SoramitsuMapFragment : Fragment(R.layout.sm_fragment_map_soramitsu), 
     }
 
     private fun displayMarkers(viewState: SoramitsuMapViewState) {
+        SoramitsuMapLibraryConfig.logger.log("MapViewState", viewState.toString())
+        if (viewState.dropPinPosition != null) {
+            val addPlaceDrawablePin = ContextCompat.getDrawable(requireContext(), R.drawable.sm_pin_add_place) ?: return
+            val bitmap = Bitmap.createBitmap(
+                addPlaceDrawablePin.intrinsicWidth,
+                addPlaceDrawablePin.intrinsicHeight,
+                Bitmap.Config.ARGB_8888
+            )
+            val canvas = Canvas(bitmap)
+            addPlaceDrawablePin.setBounds(0, 0, canvas.width, canvas.height)
+            addPlaceDrawablePin.draw(canvas)
+
+            droppedPinMarker?.remove()
+            droppedPinMarker = googleMap?.addMarker(
+                MarkerOptions()
+                    .position(viewState.dropPinPosition.asLatLng())
+                    .icon(BitmapDescriptorFactory.fromBitmap(bitmap))
+            )
+
+            markers.forEach { marker -> marker.remove() }
+            return
+        }
+
+        droppedPinMarker?.remove()
+
         val markersToRemove = markers.filter { marker ->
             if (marker.tag is MarkerTagData) {
                 val markerTagData = marker.tag as MarkerTagData
@@ -361,14 +357,14 @@ open class SoramitsuMapFragment : Fragment(R.layout.sm_fragment_map_soramitsu), 
     }
 
     @DrawableRes
-    private fun iconForCategory(context: Context, category: Category): Int = when (category.name) {
-        Category.BANK.name -> context.getResourceIdForAttr(R.attr.sm_categoryPinIconDeposit)
-        Category.FOOD.name -> context.getResourceIdForAttr(R.attr.sm_categoryPinIconRestaurant)
-        Category.SERVICES.name -> context.getResourceIdForAttr(R.attr.sm_categoryPinIconServices)
-        Category.SUPERMARKETS.name -> context.getResourceIdForAttr(R.attr.sm_categoryPinIconSupermarket)
-        Category.PHARMACY.name -> context.getResourceIdForAttr(R.attr.sm_categoryPinIconPharmacy)
-        Category.ENTERTAINMENT.name -> context.getResourceIdForAttr(R.attr.sm_categoryPinIconEntertainment)
-        Category.EDUCATION.name -> context.getResourceIdForAttr(R.attr.sm_categoryPinIconEducation)
+    private fun iconForCategory(context: Context, category: Category): Int = when (category.localisedName(Locale.US)) {
+        Category.BANK.localisedName(Locale.US) -> context.getResourceIdForAttr(R.attr.sm_categoryPinIconDeposit)
+        Category.FOOD.localisedName(Locale.US) -> context.getResourceIdForAttr(R.attr.sm_categoryPinIconRestaurant)
+        Category.SERVICES.localisedName(Locale.US) -> context.getResourceIdForAttr(R.attr.sm_categoryPinIconServices)
+        Category.SUPERMARKETS.localisedName(Locale.US) -> context.getResourceIdForAttr(R.attr.sm_categoryPinIconSupermarket)
+        Category.PHARMACY.localisedName(Locale.US) -> context.getResourceIdForAttr(R.attr.sm_categoryPinIconPharmacy)
+        Category.ENTERTAINMENT.localisedName(Locale.US) -> context.getResourceIdForAttr(R.attr.sm_categoryPinIconEntertainment)
+        Category.EDUCATION.localisedName(Locale.US) -> context.getResourceIdForAttr(R.attr.sm_categoryPinIconEducation)
         else -> context.getResourceIdForAttr(R.attr.sm_categoryPinIconOther)
     }
 
@@ -391,22 +387,12 @@ open class SoramitsuMapFragment : Fragment(R.layout.sm_fragment_map_soramitsu), 
 
         // check permission and request when not granted. When permissions will
         // be granted, this method will be called again
-        val fineLocationPermissionGranted = ActivityCompat.checkSelfPermission(
-            requireContext(),
-            Manifest.permission.ACCESS_FINE_LOCATION
-        )
-        val coarseLocationPermissionGranter = ActivityCompat.checkSelfPermission(
-            requireContext(),
-            Manifest.permission.ACCESS_COARSE_LOCATION
-        )
-        if (fineLocationPermissionGranted != PackageManager.PERMISSION_GRANTED
-            && coarseLocationPermissionGranter != PackageManager.PERMISSION_GRANTED
+        val fineLocationPermissionGranted = checkSelfPermission(requireContext(), ACCESS_FINE_LOCATION)
+        val coarseLocationPermissionGranter = checkSelfPermission(requireContext(), ACCESS_COARSE_LOCATION)
+        if (fineLocationPermissionGranted != PackageManager.PERMISSION_GRANTED &&
+            coarseLocationPermissionGranter != PackageManager.PERMISSION_GRANTED
         ) {
-            val permissions = arrayOf(
-                Manifest.permission.ACCESS_FINE_LOCATION,
-                Manifest.permission.ACCESS_COARSE_LOCATION
-            )
-            requestPermissions(permissions, LOCATION_REQUEST_CODE)
+            requestLocationLauncher.launch(arrayOf(ACCESS_FINE_LOCATION, ACCESS_COARSE_LOCATION))
             return
         }
 
@@ -430,6 +416,7 @@ open class SoramitsuMapFragment : Fragment(R.layout.sm_fragment_map_soramitsu), 
             }
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     private fun initSearchPanel() {
         // show fullscreen search fragment when user try to enter search query
         binding.searchOnFragmentInputEditText.setOnClickListener {
@@ -439,7 +426,7 @@ open class SoramitsuMapFragment : Fragment(R.layout.sm_fragment_map_soramitsu), 
         }
 
         // clear edit text button click handler
-        binding.placesWithSearchTextInputLayout.setEndIconOnClickListener { v ->
+        binding.placesWithSearchTextInputLayout.setEndIconOnClickListener {
             activity?.onUserInteraction()
 
             binding.searchOnFragmentInputEditText.text = null
@@ -449,21 +436,31 @@ open class SoramitsuMapFragment : Fragment(R.layout.sm_fragment_map_soramitsu), 
         binding.searchOnFragmentInputEditText.setOnTouchListener { v, event ->
             if (event?.action == MotionEvent.ACTION_DOWN) {
                 activity?.onUserInteraction()
-
                 v.performClick()
             }
-
             true
         }
+    }
+
+    private fun getMapParams(googleMap: GoogleMap): MapParams {
+        val farLeft = googleMap.projection.visibleRegion.farLeft
+        val nearRight = googleMap.projection.visibleRegion.nearRight
+        val zoom = googleMap.cameraPosition.zoom.toInt()
+        return MapParams(
+            topLeft = GeoPoint(
+                latitude = farLeft.latitude,
+                longitude = farLeft.longitude
+            ),
+            bottomRight = GeoPoint(
+                latitude = nearRight.latitude,
+                longitude = nearRight.longitude
+            ),
+            zoom = zoom
+        )
     }
 
     data class MarkerTagData(
         val place: Place,
         val selected: Boolean = false
     )
-
-    companion object {
-        private const val LOCATION_REQUEST_CODE = 777
-        private const val REQUEST_CODE_ADD_PLACE = 1
-    }
 }

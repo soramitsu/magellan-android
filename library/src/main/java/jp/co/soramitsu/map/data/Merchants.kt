@@ -7,6 +7,7 @@ import jp.co.soramitsu.map.model.Position
 /**
  * All shops, supermarkets, stores and so on that will be displayed on the map
  */
+@Suppress("unused")
 internal val Places.merchants
     get() = listOf(
         // region merchants
@@ -1375,7 +1376,8 @@ internal val Places.merchants
             category = Category.FOOD,
             position = Position(11.5306913, 104.9282349), phone = "012575702",
             address = "Phrase Norotherm Blvd, Sangkat Tonle Bassac , Khan Chamkar Mon , Phnom Penh "
-        ), Place(
+        ),
+        Place(
             name = "យានដ្ឋាន វ៉ាអូតូ 99",
             category = Category.OTHER,
             position = Position(11.5230997, 104.9153345), phone = "017300036 / 015300037",

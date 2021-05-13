@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.RecyclerView
 import jp.co.soramitsu.map.R
 import jp.co.soramitsu.map.ext.getResourceIdForAttr
 import jp.co.soramitsu.map.model.Category
+import java.util.*
 
 internal class CategoriesAdapter : RecyclerView.Adapter<CategoryViewHolder>() {
 
@@ -47,7 +48,7 @@ internal class CategoryDiffUtilCallback(
     private val afterList: List<CategoryListItem>
 ) : DiffUtil.Callback() {
     override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
-        return beforeList[oldItemPosition].category.name == afterList[newItemPosition].category.name
+        return beforeList[oldItemPosition].category.localisedName() == afterList[newItemPosition].category.localisedName()
     }
 
     override fun getOldListSize(): Int = beforeList.size
@@ -72,15 +73,14 @@ internal class CategoryViewHolder(itemView: View) : RecyclerView.ViewHolder(item
         categoryTextView.setCompoundDrawablesRelativeWithIntrinsicBounds(0, 0, checkIconId, 0)
     }
 
-    private fun iconForCategory(context: Context, category: Category): Int = when (category.name) {
-        Category.BANK.name -> context.getResourceIdForAttr(R.attr.sm_categoryIconDeposit)
-        Category.FOOD.name -> context.getResourceIdForAttr(R.attr.sm_categoryIconRestaurant)
-        Category.SERVICES.name -> context.getResourceIdForAttr(R.attr.sm_categoryIconServices)
-        Category.SUPERMARKETS.name -> context.getResourceIdForAttr(R.attr.sm_categoryIconSupermarket)
-        Category.PHARMACY.name -> context.getResourceIdForAttr(R.attr.sm_categoryIconPharmacy)
-        Category.ENTERTAINMENT.name -> context.getResourceIdForAttr(R.attr.sm_categoryIconEntertainment)
-        Category.EDUCATION.name -> context.getResourceIdForAttr(R.attr.sm_categoryIconEducation)
+    private fun iconForCategory(context: Context, category: Category): Int = when (category.localisedName(Locale.US)) {
+        Category.BANK.localisedName(Locale.US) -> context.getResourceIdForAttr(R.attr.sm_categoryIconDeposit)
+        Category.FOOD.localisedName(Locale.US) -> context.getResourceIdForAttr(R.attr.sm_categoryIconRestaurant)
+        Category.SERVICES.localisedName(Locale.US) -> context.getResourceIdForAttr(R.attr.sm_categoryIconServices)
+        Category.SUPERMARKETS.localisedName(Locale.US) -> context.getResourceIdForAttr(R.attr.sm_categoryIconSupermarket)
+        Category.PHARMACY.localisedName(Locale.US) -> context.getResourceIdForAttr(R.attr.sm_categoryIconPharmacy)
+        Category.ENTERTAINMENT.localisedName(Locale.US) -> context.getResourceIdForAttr(R.attr.sm_categoryIconEntertainment)
+        Category.EDUCATION.localisedName(Locale.US) -> context.getResourceIdForAttr(R.attr.sm_categoryIconEducation)
         else -> context.getResourceIdForAttr(R.attr.sm_categoryIconOther)
     }
-
 }

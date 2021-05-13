@@ -18,10 +18,7 @@ import jp.co.soramitsu.map.model.Schedule
 import jp.co.soramitsu.map.presentation.places.add.image.*
 import jp.co.soramitsu.map.presentation.places.add.schedule.PlaceProposalViewModel
 
-internal class PlaceProposalFragment :
-    Fragment(R.layout.sm_fragment_place_proposal),
-    SelectPlaceCategoryFragment.OnCategorySelected,
-    ImagesSelectionListener {
+internal class PlaceProposalFragment : Fragment(R.layout.sm_fragment_place_proposal) {
 
     private lateinit var logoAdapter: RemovableImagesAdapter
     private lateinit var photosAdapter: RemovableImagesAdapter
@@ -34,12 +31,7 @@ internal class PlaceProposalFragment :
     private var _binding: SmFragmentPlaceProposalBinding? = null
     private val binding get() = _binding!!
 
-    private val requestManager: RequestManager?
-        get() = try {
-            Glide.with(this)
-        } catch (exception: Exception) {
-            null
-        }
+    private val requestManager get() = kotlin.runCatching { Glide.with(this) }.getOrNull()
 
     @ExperimentalStdlibApi
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -47,8 +39,25 @@ internal class PlaceProposalFragment :
 
         _binding = SmFragmentPlaceProposalBinding.bind(view)
 
+        initViewModel()
+        initView()
+        requestManager?.let { glideRequestManager ->
+            initRequestManagerDependentViews(glideRequestManager)
+        } ?: activity?.onBackPressed()
+        initFragmentResultListeners()
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+
+        _binding = null
+    }
+
+    @ExperimentalStdlibApi
+    private fun initViewModel() {
         addPlaceViewModel = ViewModelProvider(
-            this, object : ViewModelProvider.Factory {
+            this,
+            object : ViewModelProvider.Factory {
                 override fun <T : ViewModel?> create(modelClass: Class<T>): T {
                     val converter = DefaultImageUriToByteArrayConverter(requireContext().applicationContext)
                     return AddPlaceViewModel(converter) as T
@@ -65,111 +74,116 @@ internal class PlaceProposalFragment :
         placeProposalViewModel.schedule.observe(viewLifecycleOwner) { schedule ->
             binding.scheduleSection.schedule = schedule
         }
+    }
 
+    @ExperimentalStdlibApi
+    private fun initView() {
         binding.toolbar.setNavigationOnClickListener { activity?.onBackPressed() }
-
         binding.addressTextView.text = placeProposalViewModel.address
-
         binding.scheduleSection.setOnAddButtonClickListener {
             placeProposalViewModel.onAddScheduleButtonClicked()
         }
-
         binding.scheduleSection.setOnChangeScheduleButtonClickListener {
             placeProposalViewModel.onChangeScheduleButtonClicked()
         }
-
         binding.addressTextView.setOnClickListener {
             placeProposalViewModel.onChangeAddressButtonClicked()
         }
-
         binding.categoryTextView.setOnClickListener {
             SelectPlaceCategoryFragment().show(childFragmentManager, "SelectCategoryFragment")
         }
-
         binding.addLogoTextView.setOnClickListener {
             SingleChoiceBottomSheetImagePicker().show(childFragmentManager, "LogoPicker")
         }
-
         binding.addPhotoTextView.setOnClickListener {
             MultichoiceBottomSheetImagePicker().show(childFragmentManager, "PhotosPicker")
         }
 
-        requestManager?.let { glideRequestManager ->
-            logoAdapter = RemovableImagesAdapter(glideRequestManager)
-            logoAdapter.setOnButtonClickListener {
-                SingleChoiceBottomSheetImagePicker().show(childFragmentManager, "LogoPicker")
-            }
-            logoAdapter.setOnImageSelectedListener { imageUri ->
-                val selectedItemPosition = logoAdapter.items
-                    .indexOfFirst { it is RemovableImagesAdapter.RemovableImageListItem.Image && it.imageUri == imageUri }
-                val viewHolder = binding.logoRecyclerView.findViewHolderForAdapterPosition(selectedItemPosition)
-                viewHolder as RemovableImagesAdapter.BaseViewHolder.ImageViewHolder
-                showPhoto(viewHolder.imageView, imageUri)
-            }
-            logoAdapter.setOnRemoveImageClickListener {
-                binding.logoRecyclerView.visibility = View.GONE
-                binding.addLogoTextView.visibility = View.VISIBLE
-            }
-            binding.logoRecyclerView.adapter = logoAdapter
+        binding.createAndSendForReviewButton.setOnClickListener {
+            val position = placeProposalViewModel.position ?: return@setOnClickListener
+            val category = binding.categoryTextView.category ?: return@setOnClickListener
+            val place = Place(
+                name = binding.placeNameEditText.text.toString(),
+                address = binding.addressTextView.text.toString(),
+                category = category,
+                position = position,
+                phone = binding.placePhoneNumberEditText.text.toString(),
+                website = binding.websiteEditText.text.toString(),
+                facebook = binding.facebookEditText.text.toString(),
+                schedule = binding.scheduleSection.schedule ?: Schedule()
+            )
+            addPlaceViewModel.addPlace(place)
+        }
+    }
 
-            photosAdapter = RemovableImagesAdapter(glideRequestManager)
-            photosAdapter.setOnButtonClickListener {
-                MultichoiceBottomSheetImagePicker().show(childFragmentManager, "PhotosPicker")
-            }
-            photosAdapter.setOnImageSelectedListener { imageUri ->
-                val selectedItemPosition = photosAdapter.items
-                    .indexOfFirst { it is RemovableImagesAdapter.RemovableImageListItem.Image && it.imageUri == imageUri }
-                val viewHolder = binding.photosRecyclerView.findViewHolderForAdapterPosition(selectedItemPosition)
-                viewHolder as RemovableImagesAdapter.BaseViewHolder.ImageViewHolder
-                showPhoto(viewHolder.imageView, imageUri)
-            }
-            photosAdapter.setOnRemoveImageClickListener { uri ->
-                val imageItems = photosAdapter.items
-                    .filterIsInstance(RemovableImagesAdapter.RemovableImageListItem.Image::class.java)
-                val imageToRemove = imageItems.find { it.imageUri == uri }
-                imageToRemove?.let {
-                    photosAdapter.update(photosAdapter.items - imageToRemove)
+    private fun initRequestManagerDependentViews(requestManager: RequestManager) {
+        logoAdapter = RemovableImagesAdapter(requestManager)
+        logoAdapter.setOnButtonClickListener {
+            SingleChoiceBottomSheetImagePicker().show(childFragmentManager, "LogoPicker")
+        }
+        logoAdapter.setOnImageSelectedListener { imageUri ->
+            val selectedItemPosition = logoAdapter.items
+                .indexOfFirst { it is RemovableImagesAdapter.RemovableImageListItem.Image && it.imageUri == imageUri }
+            val viewHolder = binding.logoRecyclerView.findViewHolderForAdapterPosition(selectedItemPosition)
+            viewHolder as RemovableImagesAdapter.BaseViewHolder.ImageViewHolder
+            showPhoto(viewHolder.imageView, imageUri)
+        }
+        logoAdapter.setOnRemoveImageClickListener {
+            binding.logoRecyclerView.visibility = View.GONE
+            binding.addLogoTextView.visibility = View.VISIBLE
+        }
+        binding.logoRecyclerView.adapter = logoAdapter
 
-                    val removedLastImage = imageItems.size == 1
-                    if (removedLastImage) {
-                        binding.photosRecyclerView.visibility = View.GONE
-                        binding.addPhotoTextView.visibility = View.VISIBLE
-                    }
+        photosAdapter = RemovableImagesAdapter(requestManager)
+        photosAdapter.setOnButtonClickListener {
+            MultichoiceBottomSheetImagePicker().show(childFragmentManager, "PhotosPicker")
+        }
+        photosAdapter.setOnImageSelectedListener { imageUri ->
+            val selectedItemPosition = photosAdapter.items
+                .indexOfFirst { it is RemovableImagesAdapter.RemovableImageListItem.Image && it.imageUri == imageUri }
+            val viewHolder = binding.photosRecyclerView.findViewHolderForAdapterPosition(selectedItemPosition)
+            viewHolder as RemovableImagesAdapter.BaseViewHolder.ImageViewHolder
+            showPhoto(viewHolder.imageView, imageUri)
+        }
+        photosAdapter.setOnRemoveImageClickListener { uri ->
+            val imageItems = photosAdapter.items
+                .filterIsInstance(RemovableImagesAdapter.RemovableImageListItem.Image::class.java)
+            val imageToRemove = imageItems.find { it.imageUri == uri }
+            imageToRemove?.let {
+                photosAdapter.update(photosAdapter.items - imageToRemove)
+
+                val removedLastImage = imageItems.size == 1
+                if (removedLastImage) {
+                    binding.photosRecyclerView.visibility = View.GONE
+                    binding.addPhotoTextView.visibility = View.VISIBLE
                 }
             }
-            binding.photosRecyclerView.adapter = photosAdapter
+        }
+        binding.photosRecyclerView.adapter = photosAdapter
+    }
 
-            binding.createAndSendForReviewButton.setOnClickListener {
-                val position = placeProposalViewModel.position ?: return@setOnClickListener
-                val category = binding.categoryTextView.category ?: return@setOnClickListener
-                val place = Place(
-                    name = binding.placeNameEditText.text.toString(),
-                    address = binding.addressTextView.text.toString(),
-                    category = category,
-                    position = position,
-                    phone = binding.placePhoneNumberEditText.text.toString(),
-                    website = binding.websiteEditText.text.toString(),
-                    facebook = binding.facebookEditText.text.toString(),
-                    schedule = binding.scheduleSection.schedule ?: Schedule()
-                )
-                addPlaceViewModel.addPlace(place)
+    private fun initFragmentResultListeners() {
+        childFragmentManager.setFragmentResultListener(SelectPlaceCategoryFragment.REQUEST_KEY, viewLifecycleOwner) { _, bundle ->
+            (bundle[SelectPlaceCategoryFragment.EXTRA_CATEGORY] as? Category)?.let { category ->
+                binding.categoryTextView.category = category
             }
-        } ?: activity?.onBackPressed()
-    }
+        }
 
-    override fun onDestroyView() {
-        super.onDestroyView()
+        childFragmentManager.setFragmentResultListener(SingleChoiceBottomSheetImagePicker.REQUEST_KEY, viewLifecycleOwner) { _, bundle ->
+            val selectedImages = bundle[SingleChoiceBottomSheetImagePicker.EXTRA_IMAGES_URIS] as? List<Uri>
+            selectedImages?.firstOrNull()?.let { logoImageUri ->
+                onLogoSelected(logoImageUri)
+            }
+        }
 
-        _binding = null
-    }
-
-    override fun onImagesSelected(selectedImages: List<Uri>, imagePickerCode: ImagePickerCode) = when (imagePickerCode) {
-        ImagePickerCode.SINGLE_CHOICE -> onLogoSelected(selectedImages.first())
-        ImagePickerCode.MULTICHOICE -> onPhotosSelected(selectedImages)
-    }
-
-    override fun onCategorySelected(category: Category) {
-        binding.categoryTextView.category = category
+        childFragmentManager.setFragmentResultListener(MultichoiceBottomSheetImagePicker.REQUEST_KEY, viewLifecycleOwner) { _, bundle ->
+            val selectedImages = bundle[MultichoiceBottomSheetImagePicker.EXTRA_IMAGES_URIS] as? List<Uri>
+            selectedImages?.let { selectedImagesUris ->
+                if (selectedImagesUris.isNotEmpty()) {
+                    onPhotosSelected(selectedImagesUris)
+                }
+            }
+        }
     }
 
     private fun onLogoSelected(logoUri: Uri) {

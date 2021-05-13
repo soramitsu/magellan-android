@@ -28,17 +28,17 @@ internal class ReviewListViewModel(
     }
 
     private suspend fun loadAllReviews(placeId: String) = withContext(backgroundDispatcher) {
-        try {
+        kotlin.runCatching {
             val reviews = placesRepository.getPlaceReviews(placeId).popUserReviewOnTop()
             if (reviews.isEmpty()) {
                 ReviewListViewState.NoReviewsYet
             } else if (reviews[0].author.user) {
                 ReviewListViewState.ContentWithUserReview(reviews)
-            } else  {
+            } else {
                 ReviewListViewState.ContentWithoutUserReview(reviews)
             }
-        } catch(exception: Exception) {
-            ReviewListViewState.Error(exception)
+        }.getOrElse {
+            ReviewListViewState.Error(it)
         }
     }
 
@@ -50,9 +50,9 @@ internal class ReviewListViewModel(
 
     internal sealed class ReviewListViewState {
         object Loading : ReviewListViewState()
-        data class Error(val exception: Exception) : ReviewListViewState()
-        data class ContentWithUserReview(val reviews: List<Review>): ReviewListViewState()
-        data class ContentWithoutUserReview(val reviews: List<Review>): ReviewListViewState()
-        object NoReviewsYet: ReviewListViewState()
+        data class Error(val exception: Throwable) : ReviewListViewState()
+        data class ContentWithUserReview(val reviews: List<Review>) : ReviewListViewState()
+        data class ContentWithoutUserReview(val reviews: List<Review>) : ReviewListViewState()
+        object NoReviewsYet : ReviewListViewState()
     }
 }
