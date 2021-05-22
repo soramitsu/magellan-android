@@ -56,6 +56,7 @@
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="@dimen/sm_margin_padding_size_medium"
         android:layout_marginTop="@dimen/sm_margin_padding_size_small"
+        app:hintEnabled="false"
         app:layout_constraintTop_toBottomOf="@id/placeRatingBar">
 
         <com.google.android.material.textfield.TextInputEditText
@@ -63,6 +64,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="@string/sm_share_details_of_your_experience"
+            android:minHeight="56dp"
+            android:paddingTop="@dimen/sm_margin_padding_size_small"
             android:textAppearance="@style/SM.TextAppearance.Soramitsu.MaterialComponents.Body1"
             tools:text="St. Christopher's Inn is in the best location in all of Berlin. St. Christopher's Inn is in the best location in all of Berlin. You are within walking distance to the Spree Promenade, Museum Insel and, in the other direction you are within walking distance to the Berlin Hauptbahnhof..." />
     </com.google.android.material.textfield.TextInputLayout>
