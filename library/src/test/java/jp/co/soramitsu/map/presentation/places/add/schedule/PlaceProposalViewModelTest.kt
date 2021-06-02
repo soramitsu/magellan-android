@@ -26,33 +26,25 @@ class PlaceProposalViewModelTest {
     @Test
     fun `when nothing selected, all days are available for selection in default section`() {
         assertThat(sections().first().daysMap.values).contains(SelectionState.NotSelected)
-        assertThat(sections().first().daysMap.values).containsNoneOf(
-            SelectionState.Selected,
-            SelectionState.SelectedInOtherSection
-        )
+        assertThat(sections().first().daysMap.values).doesNotContain(SelectionState.Selected)
     }
 
-
     @Test
-    fun `when add section, all selected elements of current section marked as SelectedInOtherSection in a new section`() {
+    fun `when add section, all elements marked as NotSelected in a new section`() {
         val sectionsBeforeUpdate = sections()
         val updatedDaysMap = sectionsBeforeUpdate[0].daysMap.toMutableMap()
         updatedDaysMap[DayOfWeek.MONDAY] = SelectionState.Selected
         updatedDaysMap[DayOfWeek.TUESDAY] = SelectionState.Selected
         updatedDaysMap[DayOfWeek.WEDNESDAY] = SelectionState.Selected
+        viewModel.onSectionChanged(sectionsBeforeUpdate[0].copy(daysMap = updatedDaysMap))
 
-        val updatedFirstSection = sectionsBeforeUpdate[0].copy(daysMap = updatedDaysMap)
-        viewModel.addSection(updatedFirstSection)
+        viewModel.addSection()
 
         val sectionsAfterUpdate = sections()
         assertThat(sectionsAfterUpdate.first().daysMap[DayOfWeek.MONDAY]).isEqualTo(SelectionState.Selected)
         assertThat(sectionsAfterUpdate.first().daysMap[DayOfWeek.TUESDAY]).isEqualTo(SelectionState.Selected)
-        assertThat(sectionsAfterUpdate.first().daysMap[DayOfWeek.WEDNESDAY]).isEqualTo(
-            SelectionState.Selected
-        )
-        assertThat(sectionsAfterUpdate.last().daysMap[DayOfWeek.MONDAY]).isEqualTo(SelectionState.SelectedInOtherSection)
-        assertThat(sectionsAfterUpdate.last().daysMap[DayOfWeek.TUESDAY]).isEqualTo(SelectionState.SelectedInOtherSection)
-        assertThat(sectionsAfterUpdate.last().daysMap[DayOfWeek.WEDNESDAY]).isEqualTo(SelectionState.SelectedInOtherSection)
+        assertThat(sectionsAfterUpdate.first().daysMap[DayOfWeek.WEDNESDAY]).isEqualTo(SelectionState.Selected)
+        assertThat(sectionsAfterUpdate.last().daysMap.values.all { it == SelectionState.NotSelected }).isTrue()
     }
 
     @Test
@@ -62,23 +54,23 @@ class PlaceProposalViewModelTest {
         updatedDaysMapOfFirstSection[DayOfWeek.MONDAY] = SelectionState.Selected
         updatedDaysMapOfFirstSection[DayOfWeek.TUESDAY] = SelectionState.Selected
         updatedDaysMapOfFirstSection[DayOfWeek.WEDNESDAY] = SelectionState.Selected
-        val updatedFirstSection = sections()[0].copy(daysMap = updatedDaysMapOfFirstSection)
-        viewModel.addSection(updatedFirstSection)
+        viewModel.onSectionChanged(sections()[0].copy(daysMap = updatedDaysMapOfFirstSection))
+        viewModel.addSection()
 
         // fill second section
         val updatedDaysMapOfSecondSection = sections()[1].daysMap.toMutableMap()
         updatedDaysMapOfSecondSection[DayOfWeek.THURSDAY] = SelectionState.Selected
         updatedDaysMapOfSecondSection[DayOfWeek.FRIDAY] = SelectionState.Selected
-        val updatedSecondSection = sections()[1].copy(daysMap = updatedDaysMapOfSecondSection)
-        viewModel.addSection(updatedSecondSection)
+        viewModel.onSectionChanged(sections()[1].copy(daysMap = updatedDaysMapOfSecondSection))
+        viewModel.addSection()
 
-        // check that we can't select already selected days in the third section
+        // check that we can select already selected days in the third section
         val sectionsAfterAdd = sections()
-        assertThat(sectionsAfterAdd.last().daysMap[DayOfWeek.MONDAY]).isEqualTo(SelectionState.SelectedInOtherSection)
-        assertThat(sectionsAfterAdd.last().daysMap[DayOfWeek.TUESDAY]).isEqualTo(SelectionState.SelectedInOtherSection)
-        assertThat(sectionsAfterAdd.last().daysMap[DayOfWeek.WEDNESDAY]).isEqualTo(SelectionState.SelectedInOtherSection)
-        assertThat(sectionsAfterAdd.last().daysMap[DayOfWeek.THURSDAY]).isEqualTo(SelectionState.SelectedInOtherSection)
-        assertThat(sectionsAfterAdd.last().daysMap[DayOfWeek.FRIDAY]).isEqualTo(SelectionState.SelectedInOtherSection)
+        assertThat(sectionsAfterAdd.last().daysMap[DayOfWeek.MONDAY]).isEqualTo(SelectionState.NotSelected)
+        assertThat(sectionsAfterAdd.last().daysMap[DayOfWeek.TUESDAY]).isEqualTo(SelectionState.NotSelected)
+        assertThat(sectionsAfterAdd.last().daysMap[DayOfWeek.WEDNESDAY]).isEqualTo(SelectionState.NotSelected)
+        assertThat(sectionsAfterAdd.last().daysMap[DayOfWeek.THURSDAY]).isEqualTo(SelectionState.NotSelected)
+        assertThat(sectionsAfterAdd.last().daysMap[DayOfWeek.FRIDAY]).isEqualTo(SelectionState.NotSelected)
 
         // remove second section
         viewModel.removeSectionWithId(sectionsAfterAdd[1].id)
@@ -100,15 +92,16 @@ class PlaceProposalViewModelTest {
         updatedDaysMap[DayOfWeek.FRIDAY] = SelectionState.Selected
         updatedDaysMap[DayOfWeek.SATURDAY] = SelectionState.Selected
 
-        viewModel.onSaveButtonClick(
-            sections().first().copy(
-                daysMap = updatedDaysMap,
-                fromTime = Time(9, 0),
-                toTime = Time(18, 0),
-                lunchFromTime = Time(12, 0),
-                lunchToTime = Time(13, 0),
-            )
+        val updatedFirstSection = sections().first().copy(
+            daysMap = updatedDaysMap,
+            fromTime = Time(9, 0),
+            toTime = Time(18, 0),
+            lunchFromTime = Time(12, 0),
+            lunchToTime = Time(13, 0),
         )
+        val updateSections = sections().toMutableList()
+        updateSections[0] = updatedFirstSection
+        viewModel.onSaveButtonClick(updateSections)
 
         val workDay: (Int) -> WorkDay = { weekDay ->
             WorkDay(

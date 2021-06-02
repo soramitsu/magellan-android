@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    tools:ignore="MissingConstraints"
     tools:parentTag="androidx.constraintlayout.widget.ConstraintLayout">
 
     <View
@@ -17,69 +18,77 @@
         android:id="@+id/weekChipGroupHorizontalScroll"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:fillViewport="true"
         android:scrollbars="none"
         app:layout_constraintTop_toTopOf="parent">
 
-        <com.google.android.material.chip.ChipGroup
-            android:id="@+id/weekChipGroup"
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:padding="@dimen/sm_margin_padding_size_medium"
-            app:chipSpacing="0dp"
-            app:itemSpacing="0dp"
-            app:singleLine="true">
+            android:layout_height="wrap_content">
 
-            <com.google.android.material.chip.Chip
+            <androidx.appcompat.widget.AppCompatCheckedTextView
                 android:id="@+id/weekday1"
-                style="@style/SM.Widget.Soramitsu.MaterialComponents.Chip.Choice"
+                style="@style/SM.Widget.Soramitsu.TextView.Selectable"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 tools:text="S" />
 
-            <com.google.android.material.chip.Chip
+            <androidx.appcompat.widget.AppCompatCheckedTextView
                 android:id="@+id/weekday2"
-                style="@style/SM.Widget.Soramitsu.MaterialComponents.Chip.Choice"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                style="@style/SM.Widget.Soramitsu.TextView.Selectable"
                 tools:text="M" />
 
-            <com.google.android.material.chip.Chip
+            <androidx.appcompat.widget.AppCompatCheckedTextView
                 android:id="@+id/weekday3"
-                style="@style/SM.Widget.Soramitsu.MaterialComponents.Chip.Choice"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                style="@style/SM.Widget.Soramitsu.TextView.Selectable"
                 tools:text="T" />
 
-            <com.google.android.material.chip.Chip
+            <androidx.appcompat.widget.AppCompatCheckedTextView
                 android:id="@+id/weekday4"
-                style="@style/SM.Widget.Soramitsu.MaterialComponents.Chip.Choice"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                style="@style/SM.Widget.Soramitsu.TextView.Selectable"
                 tools:text="W" />
 
-            <com.google.android.material.chip.Chip
+            <androidx.appcompat.widget.AppCompatCheckedTextView
                 android:id="@+id/weekday5"
-                style="@style/SM.Widget.Soramitsu.MaterialComponents.Chip.Choice"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                style="@style/SM.Widget.Soramitsu.TextView.Selectable"
                 tools:text="T" />
 
-            <com.google.android.material.chip.Chip
+            <androidx.appcompat.widget.AppCompatCheckedTextView
                 android:id="@+id/weekday6"
-                style="@style/SM.Widget.Soramitsu.MaterialComponents.Chip.Choice"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                style="@style/SM.Widget.Soramitsu.TextView.Selectable"
                 tools:text="F" />
 
-            <com.google.android.material.chip.Chip
+            <androidx.appcompat.widget.AppCompatCheckedTextView
                 android:id="@+id/weekday7"
-                style="@style/SM.Widget.Soramitsu.MaterialComponents.Chip.Choice"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                tools:text="S" />
+                style="@style/SM.Widget.Soramitsu.TextView.Selectable"
+                tools:text="T" />
 
-        </com.google.android.material.chip.ChipGroup>
+            <androidx.constraintlayout.helper.widget.Flow
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/sm_margin_padding_size_medium"
+                app:constraint_referenced_ids="weekday1, weekday2, weekday3, weekday4, weekday5, weekday6, weekday7"
+                app:flow_firstHorizontalStyle="spread_inside"
+                app:flow_maxElementsWrap="7"
+                app:flow_wrapMode="chain"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
     </HorizontalScrollView>
 
     <com.google.android.material.switchmaterial.SwitchMaterial

@@ -11,7 +11,6 @@ import android.widget.EditText
 import androidx.constraintlayout.widget.ConstraintLayout
 import jp.co.soramitsu.map.databinding.SmAddScheduleSectionViewBinding
 import jp.co.soramitsu.map.model.Time
-import jp.co.soramitsu.map.model.WorkDay
 import java.time.DayOfWeek
 import java.time.temporal.WeekFields
 import java.util.*
@@ -32,48 +31,6 @@ internal class ScheduleSectionView @JvmOverloads constructor(
 
     private var onRemoveButtonClickListener: () -> Unit = {}
     private var onWorkingDaysSelected: () -> Unit = { }
-
-    @Suppress("MagicNumber")
-    val selectedDays: List<WorkDay>
-        get() {
-            val is24Hours = binding.open24HoursSwitch.isChecked
-            val from = if (is24Hours) {
-                Time(0, 0)
-            } else {
-                TimeUtils.parseTime(binding.openFromEditText.text.toString())
-            }
-            val to = if (is24Hours) {
-                Time(23, 59)
-            } else {
-                TimeUtils.parseTime(binding.closeAtEditText.text.toString())
-            }
-
-            val lunchTimeFrom = TimeUtils.parseTime(binding.lunchFromEditText.text.toString())
-            val lunchTimeTo = TimeUtils.parseTime(binding.lunchToEditText.text.toString())
-            return weekdaysChips.filter { it.isChecked }.map { chip ->
-                val dayOfWeek = chip.tag as DayOfWeek
-                WorkDay(
-                    weekDay = dayOfWeek.asJavaCalendarValue(),
-                    from = from,
-                    to = to,
-                    lunchTimeFrom = lunchTimeFrom,
-                    lunchTimeTo = lunchTimeTo,
-                )
-            }
-        }
-
-    var editable: Boolean = true
-        set(value) {
-            field = value
-
-            weekdaysChips.forEach { it.isCheckable = value }
-            binding.open24HoursSwitch.isEnabled = value
-            binding.openFromTextInputLayout.isEnabled = value
-            binding.closeAtTextInputLayout.isEnabled = value
-            binding.lunchTimeSwitch.isEnabled = value
-            binding.lunchFromTextInputLayout.isEnabled = value
-            binding.lunchToTextInputLayout.isEnabled = value
-        }
 
     var removeButtonVisibility: Boolean = false
         set(value) {
@@ -96,7 +53,10 @@ internal class ScheduleSectionView @JvmOverloads constructor(
         }
 
         weekdaysChips.forEach { chip ->
-            chip.setOnCheckedChangeListener { _, _ -> onWorkingDaysSelected.invoke() }
+            chip.setOnClickListener {
+                chip.toggle()
+                onWorkingDaysSelected.invoke()
+            }
         }
 
         binding.deleteButton.setOnClickListener { onRemoveButtonClickListener.invoke() }
@@ -144,11 +104,6 @@ internal class ScheduleSectionView @JvmOverloads constructor(
             .map { it.tag as DayOfWeek }
             .forEach { dayOfWeek -> daysMap[dayOfWeek] = SelectionState.NotSelected }
 
-        weekdaysChips
-            .filter { !it.isEnabled }
-            .map { it.tag as DayOfWeek }
-            .forEach { dayOfWeek -> daysMap[dayOfWeek] = SelectionState.SelectedInOtherSection }
-
         return SectionData(
             id = tag as Int,
             daysMap = daysMap,
@@ -183,7 +138,6 @@ internal class ScheduleSectionView @JvmOverloads constructor(
             .map { it.key }
             .forEach { dayOfWeek ->
                 weekdaysChips.find { it.tag == dayOfWeek }?.let { chip ->
-                    chip.isCheckable = true
                     chip.isEnabled = true
                     chip.isChecked = true
                 }
@@ -194,19 +148,7 @@ internal class ScheduleSectionView @JvmOverloads constructor(
             .map { it.key }
             .forEach { dayOfWeek ->
                 weekdaysChips.find { it.tag == dayOfWeek }?.let { chip ->
-                    chip.isCheckable = true
                     chip.isEnabled = true
-                    chip.isChecked = false
-                }
-            }
-
-        daysMap
-            .filterValues { state -> state == SelectionState.SelectedInOtherSection }
-            .map { it.key }
-            .forEach { dayOfWeek ->
-                weekdaysChips.find { it.tag == dayOfWeek }?.let { chip ->
-                    chip.isCheckable = false
-                    chip.isEnabled = false
                     chip.isChecked = false
                 }
             }

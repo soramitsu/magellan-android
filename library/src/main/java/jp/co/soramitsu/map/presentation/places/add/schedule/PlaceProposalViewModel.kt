@@ -38,26 +38,26 @@ class PlaceProposalViewModel(
         logSections()
     }
 
-    fun onSaveButtonClick(lastSectionData: SectionData) {
+    fun onSaveButtonClick(sectionsState: List<SectionData>) {
         logger.log(TAG, "Save button click")
         logSections()
 
-        applySectionChanges(lastSectionData)
+        sectionsState.forEach {
+            applySectionChanges(it)
+        }
         emitNewSchedule()
 
         logger.log(TAG, "After add")
         logSections()
     }
 
-    fun addSection(currentSectionData: SectionData) {
+    fun addSection() {
         logger.log(TAG, "Add section")
         logger.log(TAG, "Current state")
         logSections()
 
-        applySectionChanges(currentSectionData)
-
         val sections = _sections.value.orEmpty().toMutableList()
-        sections.add(generateNewSection())
+        sections.add(SectionData(SectionData.nextId++))
 
         _sections.value = sections
 
@@ -72,20 +72,7 @@ class PlaceProposalViewModel(
 
         _sections.value?.let { value ->
             val sections = value.toMutableList()
-            sections.find { it.id == sectionId }?.let { sectionToRemove ->
-                sections.remove(sectionToRemove)
-
-                val selectedInThisSection = sectionToRemove.daysMap
-                    .filter { it.value == SelectionState.Selected }
-                    .map { it.key }
-
-                sections.forEachIndexed { index, sectionData ->
-                    val newDaysMap = sectionData.daysMap.toMutableMap()
-                    selectedInThisSection.forEach { newDaysMap[it] = SelectionState.NotSelected }
-                    sections[index] = sectionData.copy(daysMap = newDaysMap)
-                }
-            }
-
+            sections.removeIf { it.id == sectionId }
             _sections.value = sections
         }
 
@@ -99,7 +86,7 @@ class PlaceProposalViewModel(
         val open24Hours = sections?.all {
             // all working days start from 00:00 and finishes at 23:59
             it.fromTime == Time.NOT_SET && it.toTime == Time.NOT_SET ||
-                it.fromTime == Time(0, 0) && it.toTime == Time(23, 59)
+                    it.fromTime == Time(0, 0) && it.toTime == Time(23, 59)
         } ?: false
         val newSchedule = Schedule(
             open24 = open24Hours,
@@ -108,9 +95,17 @@ class PlaceProposalViewModel(
         _schedule.value = newSchedule
     }
 
-    fun onAddScheduleButtonClicked() { _screen.value = Screen.AddSchedule }
-    fun onChangeScheduleButtonClicked() { _screen.value = Screen.AddSchedule }
-    fun onChangeAddressButtonClicked() { _screen.value = Screen.ChangePosition }
+    fun onAddScheduleButtonClicked() {
+        _screen.value = Screen.AddSchedule
+    }
+
+    fun onChangeScheduleButtonClicked() {
+        _screen.value = Screen.AddSchedule
+    }
+
+    fun onChangeAddressButtonClicked() {
+        _screen.value = Screen.ChangePosition
+    }
 
     private fun SectionData.toWorkDays(): List<WorkDay> = daysMap
         .filterValues { it == SelectionState.Selected }
@@ -148,11 +143,12 @@ class PlaceProposalViewModel(
             .filter { it.value == SelectionState.Selected }
             .map { it.key }
 
+        // if day selected in updateSelectionData, unselect it in other sections
         sections.forEachIndexed { index, sectionData ->
             if (sectionData != updateSectionData) {
                 val updatedDaysMap = sectionData.daysMap.mapValues { entry ->
                     if (entry.key in selectedInThisSection) {
-                        SelectionState.SelectedInOtherSection
+                        SelectionState.NotSelected
                     } else {
                         entry.value
                     }
@@ -162,18 +158,6 @@ class PlaceProposalViewModel(
         }
 
         _sections.value = sections
-    }
-
-    private fun generateNewSection(): SectionData {
-        val sections = _sections.value.orEmpty().toMutableList()
-        val daysMap = sections.last().daysMap.mapValues { entry ->
-            if (entry.value == SelectionState.NotSelected) {
-                SelectionState.NotSelected
-            } else {
-                SelectionState.SelectedInOtherSection
-            }
-        }
-        return SectionData(SectionData.nextId++, daysMap = daysMap)
     }
 
     private companion object {
@@ -188,10 +172,6 @@ sealed class SelectionState {
 
     object NotSelected : SelectionState() {
         override fun toString() = "-"
-    }
-
-    object SelectedInOtherSection : SelectionState() {
-        override fun toString() = "x"
     }
 }
 
