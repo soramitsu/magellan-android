@@ -13,6 +13,7 @@ import androidx.transition.TransitionManager
 import jp.co.soramitsu.map.R
 import jp.co.soramitsu.map.databinding.SmFragmentAddScheduleBinding
 import jp.co.soramitsu.map.ext.intervals
+import java.time.DayOfWeek
 
 @ExperimentalStdlibApi
 internal class AddScheduleFragment : Fragment(R.layout.sm_fragment_add_schedule) {
@@ -24,26 +25,23 @@ internal class AddScheduleFragment : Fragment(R.layout.sm_fragment_add_schedule)
     private var _binding: SmFragmentAddScheduleBinding? = null
     private val binding get() = _binding!!
 
-    private var currentScheduleSection: ScheduleSectionView? = null
-        set(value) {
-            field = value
-            value?.removeButtonVisibility = binding.scheduleLinearLayout.childCount > 1
-            value?.setOnRemoveButtonClickListener {
-                placeProposalViewModel.removeSectionWithId(value.tag as Int)
-                currentScheduleSection =
-                    binding.scheduleLinearLayout.children.last() as? ScheduleSectionView
-            }
-            value?.setOnWorkingDaysSelected {
-                placeProposalViewModel.onSectionChanged(value.getSectionData())
-                updateButtonTitle()
-            }
-        }
+    private val sectionsData: List<SectionData>
+        get() = binding.scheduleLinearLayout.children
+            .filterIsInstance(ScheduleSectionView::class.java)
+            .map { it.getSectionData() }
+            .toList()
+
+    private val lastSectionHeight: Int
+        get() = binding.scheduleLinearLayout.children
+            .filterIsInstance(ScheduleSectionView::class.java)
+            .last()
+            .height
 
     private var addSectionTransitionListener = object : TransitionListenerAdapter() {
         override fun onTransitionEnd(transition: Transition) {
             super.onTransitionEnd(transition)
             binding.scrollView.post {
-                binding.scrollView.smoothScrollBy(0, currentScheduleSection?.height ?: 0)
+                binding.scrollView.smoothScrollBy(0, lastSectionHeight)
             }
         }
     }
@@ -93,14 +91,12 @@ internal class AddScheduleFragment : Fragment(R.layout.sm_fragment_add_schedule)
                     }
             }
 
-            binding.scheduleLinearLayout.children
+            binding.scheduleLinearLayout
+                .children
                 .filterIsInstance(ScheduleSectionView::class.java)
-                .forEach { it.editable = false }
-
-            currentScheduleSection = binding.scheduleLinearLayout.children
-                .filterIsInstance(ScheduleSectionView::class.java)
-                .last()
-            currentScheduleSection?.editable = true
+                .forEachIndexed { index, scheduleSectionView ->
+                    scheduleSectionView.removeButtonVisibility = index > 0
+                }
 
             updateButtonTitle()
         }
@@ -108,22 +104,17 @@ internal class AddScheduleFragment : Fragment(R.layout.sm_fragment_add_schedule)
         binding.toolbar.setNavigationOnClickListener { activity?.onBackPressed() }
 
         binding.addScheduleSection.setOnClickListener {
-            currentScheduleSection?.getSectionData()?.let { currentSectionData ->
-                placeProposalViewModel.addSection(currentSectionData)
-            }
+            placeProposalViewModel.addSection()
         }
 
         binding.saveButton.setOnClickListener {
-            currentScheduleSection?.getSectionData()?.let { currentSectionData ->
-                placeProposalViewModel.onSaveButtonClick(currentSectionData)
-            }
+            placeProposalViewModel.onSaveButtonClick(sectionsData)
             activity?.onBackPressed()
         }
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
-        currentScheduleSection = null
         TransitionManager.endTransitions(binding.scheduleLinearLayout)
 
         _binding = null
@@ -139,6 +130,12 @@ internal class AddScheduleFragment : Fragment(R.layout.sm_fragment_add_schedule)
                 val top = resources.getDimension(R.dimen.sm_margin_padding_size_medium).toInt()
                 layoutParams.setMargins(0, top, 0, 0)
             }
+            setOnWorkingDaysSelected {
+                placeProposalViewModel.onSectionChanged(getSectionData())
+            }
+            setOnRemoveButtonClickListener {
+                placeProposalViewModel.removeSectionWithId(getSectionData().id)
+            }
         }
         newSection.bindWithSectionData(newSectionData)
 
@@ -153,28 +150,34 @@ internal class AddScheduleFragment : Fragment(R.layout.sm_fragment_add_schedule)
     }
 
     private fun updateButtonTitle() {
-        currentScheduleSection?.getSectionData()?.let { currentSectionData ->
-            val postfix = currentSectionData.daysMap
-                .filterValues { it is SelectionState.NotSelected }
-                .map { it.key }
-                .intervals()
-                .joinToString { interval ->
-                    if (interval.first == interval.second) {
-                        interval.first.shortLocalisedName(resources)
-                    } else {
-                        val from = interval.first.shortLocalisedName(resources)
-                        val to = interval.second.shortLocalisedName(resources)
-                        resources.getString(R.string.sm_working_days_interval, from, to)
-                    }
+        val selectedDays = sectionsData.map { sectionData ->
+            sectionData.daysMap.filterValues { it is SelectionState.Selected }.keys
+        }.flatten().toSet().toList()
+
+        val notSelectedDays = listOf(
+            DayOfWeek.SUNDAY,
+            DayOfWeek.MONDAY,
+            DayOfWeek.TUESDAY,
+            DayOfWeek.WEDNESDAY,
+            DayOfWeek.THURSDAY,
+            DayOfWeek.FRIDAY,
+            DayOfWeek.SATURDAY
+        ).filter { it !in selectedDays }
+
+        val postfix = notSelectedDays
+            .intervals()
+            .joinToString { interval ->
+                if (interval.first == interval.second) {
+                    interval.first.shortLocalisedName(resources)
+                } else {
+                    val from = interval.first.shortLocalisedName(resources)
+                    val to = interval.second.shortLocalisedName(resources)
+                    resources.getString(R.string.sm_working_days_interval, from, to)
                 }
-
-            binding.addScheduleSection.text = resources.getString(R.string.sm_add_opening_hours, postfix)
-
-            if (currentSectionData.daysMap.containsValue(SelectionState.NotSelected)) {
-                binding.addScheduleSection.visibility = View.VISIBLE
-            } else {
-                binding.addScheduleSection.visibility = View.GONE
             }
-        }
+
+        binding.addScheduleSection.text = resources.getString(R.string.sm_add_opening_hours, postfix)
+
+        binding.addScheduleSection.visibility = if (notSelectedDays.isNotEmpty()) View.VISIBLE else View.GONE
     }
 }

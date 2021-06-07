@@ -133,10 +133,12 @@
         <item name="android:fontFamily">@font/sora_regular</item>
     </style>
 
-    <style name="SM.Widget.Soramitsu.MaterialComponents.Chip.Choice" parent="Widget.MaterialComponents.Chip.Choice">
-        <item name="chipStrokeColor">#E2E4E6</item>
-        <item name="chipStrokeWidth">1dp</item>
-        <item name="chipBackgroundColor">@color/sm_chip_background_color</item>
-        <item name="android:textColor">@color/sm_chip_text_color</item>
+    <style name="SM.Widget.Soramitsu.TextView.Selectable" parent="SM.Widget.Soramitsu.TextView.SemiBold15">
+        <item name="android:textAlignment">center</item>
+        <item name="android:background">@drawable/sm_weekday_selection_background</item>
+        <item name="android:gravity">center</item>
+        <item name="android:minWidth">38dp</item>
+        <item name="android:minHeight">38dp</item>
+        <item name="android:textColor">@color/sm_weekday_text_color</item>
     </style>
 </resources>
