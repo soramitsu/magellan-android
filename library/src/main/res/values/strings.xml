@@ -122,6 +122,7 @@
     <string name="sm_move_the_map_or_enter_the_address_in_the_input_to_choose_the_right_place">Move the map or enter the address in the input to choose the right place</string>
     <string name="sm_location_on_map">Location on map</string>
     <string name="sm_close_change_place_position_screen">Close change place position screen</string>
+    <string name="sm_review_deleted">Review deleted</string>
 
     <plurals name="sm_reviews_format">
         <item quantity="one">(%1$d review)</item>

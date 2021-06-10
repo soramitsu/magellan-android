@@ -22,6 +22,7 @@ internal class SoramitsuMapViewModel(
     private val viewState: MutableLiveData<SoramitsuMapViewState> = MutableLiveData()
     private val selectedPlaceSingleLiveEvent: MutableLiveData<Place?> = MutableLiveData()
     private val uploadReviewInProgress: SingleLiveEvent<Boolean> = SingleLiveEvent()
+    private val reviewDeleted: MutableLiveData<Boolean> = MutableLiveData<Boolean>(false)
 
     private val editPlaceReview: SingleLiveEvent<Place> = SingleLiveEvent()
 
@@ -61,6 +62,7 @@ internal class SoramitsuMapViewModel(
     }
 
     fun uploadReviewInProgress(): LiveData<Boolean> = uploadReviewInProgress
+    fun reviewDeleted(): LiveData<Boolean> = reviewDeleted
     fun editPlaceReviewClicked(): LiveData<Place> = editPlaceReview
     fun viewState(): LiveData<SoramitsuMapViewState> = viewState
     fun placeSelected(): LiveData<Place?> = selectedPlaceSingleLiveEvent
@@ -111,7 +113,7 @@ internal class SoramitsuMapViewModel(
         viewModelScope.launch(mainThreadDispatcher) {
             val place = currentState.places.find {
                 it.position.latitude == placePosition.latitude &&
-                    it.position.longitude == placePosition.longitude
+                        it.position.longitude == placePosition.longitude
             }
             if (place != null) {
                 selectedPlace = place
@@ -211,11 +213,25 @@ internal class SoramitsuMapViewModel(
 
     private suspend fun deleteReview(place: Place): Place = withContext(backgroundDispatcher) {
         kotlin.runCatching {
-            place.userReview?.let { userReview -> placesRepository.deleteReview(userReview, place) }
-            placesRepository.getPlaceInfo(place)
+            var removeNotification: Deferred<Any>? = null
+            place.userReview?.let { userReview ->
+                placesRepository.deleteReview(userReview, place)
+                reviewDeleted.postValue(true)
+                removeNotification = async {
+                    delay(REVIEW_DELETED_NOTIFICATION_TTL_MS)
+                    reviewDeleted.postValue(false)
+                }
+            }
+            placesRepository.getPlaceInfo(place).also {
+                removeNotification?.await()
+            }
         }.onFailure {
             SoramitsuMapLibraryConfig.logger.log("Network", it)
         }.getOrDefault(place)
+    }
+
+    private companion object {
+        private const val REVIEW_DELETED_NOTIFICATION_TTL_MS = 3000L
     }
 }
 
