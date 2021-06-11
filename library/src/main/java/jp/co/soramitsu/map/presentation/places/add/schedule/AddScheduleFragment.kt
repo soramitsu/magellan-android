@@ -179,5 +179,6 @@ internal class AddScheduleFragment : Fragment(R.layout.sm_fragment_add_schedule)
         binding.addScheduleSection.text = resources.getString(R.string.sm_add_opening_hours, postfix)
 
         binding.addScheduleSection.visibility = if (notSelectedDays.isNotEmpty()) View.VISIBLE else View.GONE
+        binding.saveButton.isEnabled = notSelectedDays.isEmpty()
     }
 }
