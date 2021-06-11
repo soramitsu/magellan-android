@@ -10,6 +10,24 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
+    <TextView
+        android:id="@+id/reviewDeletedNotification"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        style="?sm_textViewStyleRegular14"
+        android:background="@drawable/sm_notification_background"
+        android:text="@string/sm_review_deleted"
+        android:textColor="#FFFFFF"
+        android:padding="@dimen/sm_margin_padding_size_medium"
+        android:drawablePadding="@dimen/sm_margin_padding_size_medium"
+        android:gravity="center_vertical"
+        app:drawableStartCompat="@drawable/sm_ic_check_green_28"
+        android:layout_margin="@dimen/sm_margin_padding_size_medium"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        />
+
     <LinearLayout
         android:id="@+id/zoomButtonsPanel"
         android:layout_width="wrap_content"

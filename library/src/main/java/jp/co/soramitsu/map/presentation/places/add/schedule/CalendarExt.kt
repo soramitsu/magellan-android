@@ -118,7 +118,8 @@ fun Schedule.generateLaunchTimeFields(context: Context): List<Pair<String, Strin
         val launchTimeString = context.getString(R.string.sm_lunch_time_interval, fromTime, toTime)
         if (firstDay == lastDay) {
             // lunch time (mon)
-            val lunchTimeSingleDay = context.getString(R.string.sm_lunch_time_single_day, firstDay)
+            val firstDayStr = calendarDayToDayOfWeek(firstDay.weekDay).localisedName(context.resources)
+            val lunchTimeSingleDay = context.getString(R.string.sm_lunch_time_single_day, firstDayStr)
             Pair(lunchTimeSingleDay, launchTimeString)
         } else {
             // lunch time (mon-fri)

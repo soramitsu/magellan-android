@@ -18,10 +18,15 @@ import androidx.core.content.ContextCompat.checkSelfPermission
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.setFragmentResultListener
 import androidx.lifecycle.ViewModelProvider
+import androidx.transition.TransitionManager
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
-import com.google.android.gms.maps.model.*
+import com.google.android.gms.maps.model.BitmapDescriptor
+import com.google.android.gms.maps.model.BitmapDescriptorFactory
+import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.Marker
+import com.google.android.gms.maps.model.MarkerOptions
 import jp.co.soramitsu.map.R
 import jp.co.soramitsu.map.SoramitsuMapLibraryConfig
 import jp.co.soramitsu.map.data.MapParams
@@ -214,6 +219,10 @@ open class SoramitsuMapFragment : Fragment(R.layout.sm_fragment_map_soramitsu) {
     }
 
     private fun observeViewModel(googleMap: GoogleMap) {
+        viewModel.reviewDeleted().observe(viewLifecycleOwner) { visible ->
+            TransitionManager.beginDelayedTransition(binding.root)
+            binding.reviewDeletedNotification.visibility = if (visible) View.VISIBLE else View.GONE
+        }
         viewModel.placeSelected().observe(viewLifecycleOwner) { selectedPlace ->
             val buttonsVisibility = if (selectedPlace == null) View.VISIBLE else View.GONE
             binding.zoomButtonsPanel.visibility = buttonsVisibility
@@ -267,7 +276,7 @@ open class SoramitsuMapFragment : Fragment(R.layout.sm_fragment_map_soramitsu) {
 
             (parentFragmentManager.findFragmentByTag("Place") as? PlaceFragment)?.dismiss()
 
-                AddPlaceFragment().withPosition(position).show(parentFragmentManager, "AddPlaceFragment")
+            AddPlaceFragment().withPosition(position).show(parentFragmentManager, "AddPlaceFragment")
         }
     }
 
