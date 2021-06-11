@@ -169,6 +169,7 @@
                 android:text="@string/sm_logo" />
 
             <TextView
+                style="?sm_textViewStyleRegular14"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/sm_margin_padding_size_medium"
@@ -211,6 +212,7 @@
                 android:text="@string/sm_photo" />
 
             <TextView
+                style="?sm_textViewStyleRegular14"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/sm_margin_padding_size_medium"
